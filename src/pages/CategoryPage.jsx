@@ -9,6 +9,7 @@ export const CategoryPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const subcategory = searchParams.get('sub');
+  const item = searchParams.get('item');
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ export const CategoryPage = () => {
     const fetchData = async () => {
       setLoading(true);
       const [prodData, catData] = await Promise.all([
-        catalogService.getProducts(categoryName, subcategory || undefined, priceFilters),
+        catalogService.getProducts(categoryName, subcategory || undefined, priceFilters, item || undefined),
         catalogService.getCategories()
       ]);
       setProducts(prodData);
@@ -29,7 +30,7 @@ export const CategoryPage = () => {
       setCurrentPage(1);
     };
     fetchData();
-  }, [categoryName, subcategory, priceFilters]);
+  }, [categoryName, subcategory, priceFilters, item]);
 
   const categoryInfo = categories.find((c) => c.name.toLowerCase() === categoryName?.toLowerCase());
 
@@ -74,22 +75,29 @@ export const CategoryPage = () => {
         {/* Sidebar Filters */}
         <aside id="category-sidebar" className="w-full lg:w-64 space-y-8 sidebar-filters">
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-4">Subcategories</h3>
-            <ul className="space-y-2">
-              {categoryInfo?.subcategories.map((sub) => (
-                <li key={sub}>
-                  <Link
-                    to={`/category/${categoryName}?sub=${sub.toLowerCase()}`}
-                    className={cn(
-                      "text-sm transition-colors cursor-pointer",
-                      subcategory?.toLowerCase() === sub.toLowerCase() ? "text-zinc-900 font-bold" : "text-zinc-600 hover:text-zinc-900"
-                    )}
-                  >
-                    {sub}
-                  </Link>
-                </li>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-4">Categories</h3>
+            <div className="space-y-6">
+              {categoryInfo?.sections.map((section) => (
+                <div key={section.title}>
+                  <h4 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-3">{section.title}</h4>
+                  <ul className="space-y-2 pl-2 border-l border-zinc-100">
+                    {section.items.map((item) => (
+                      <li key={item}>
+                        <Link
+                          to={`/category/${categoryName}?sub=${section.title.toLowerCase()}&item=${item.toLowerCase()}`}
+                          className={cn(
+                            "text-sm transition-colors cursor-pointer block",
+                            searchParams.get('item')?.toLowerCase() === item.toLowerCase() ? "text-zinc-900 font-bold" : "text-zinc-600 hover:text-zinc-900"
+                          )}
+                        >
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
           <div>
             <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-4">Price Range</h3>

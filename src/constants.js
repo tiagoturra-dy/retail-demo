@@ -1,23 +1,96 @@
 export const CATEGORIES = [
   {
     name: 'Men',
-    subcategories: ['Clothing', 'Shoes', 'Accessories', 'Watches', 'Grooming'],
+    sections: [
+      {
+        title: 'Clothing',
+        items: ['T-Shirts', 'Shirts', 'Pants', 'Jackets', 'Suits', 'Denim']
+      },
+      {
+        title: 'Shoes',
+        items: ['Sneakers', 'Boots', 'Formal', 'Sandals', 'Loafers']
+      },
+      {
+        title: 'Accessories',
+        items: ['Watches', 'Belts', 'Wallets', 'Sunglasses', 'Bags']
+      },
+      {
+        title: 'Grooming',
+        items: ['Skincare', 'Fragrance', 'Haircare', 'Shaving']
+      }
+    ],
   },
   {
     name: 'Women',
-    subcategories: ['Clothing', 'Shoes', 'Handbags', 'Jewelry', 'Beauty'],
+    sections: [
+      {
+        title: 'Clothing',
+        items: ['Dresses', 'Tops', 'Skirts', 'Pants', 'Jackets', 'Knitwear']
+      },
+      {
+        title: 'Shoes',
+        items: ['Heels', 'Flats', 'Sneakers', 'Boots', 'Sandals']
+      },
+      {
+        title: 'Handbags',
+        items: ['Totes', 'Clutches', 'Crossbody', 'Shoulder Bags']
+      },
+      {
+        title: 'Jewelry',
+        items: ['Necklaces', 'Earrings', 'Bracelets', 'Rings']
+      }
+    ],
   },
   {
     name: 'Kids',
-    subcategories: ['Boys', 'Girls', 'Baby', 'Toys', 'School'],
+    sections: [
+      {
+        title: 'Boys',
+        items: ['Clothing', 'Shoes', 'Accessories']
+      },
+      {
+        title: 'Girls',
+        items: ['Clothing', 'Shoes', 'Accessories']
+      },
+      {
+        title: 'Baby',
+        items: ['Newborn', 'Toddler', 'Essentials']
+      }
+    ],
   },
   {
     name: 'Beauty',
-    subcategories: ['Skincare', 'Makeup', 'Fragrance', 'Haircare', 'Tools'],
+    sections: [
+      {
+        title: 'Skincare',
+        items: ['Cleansers', 'Moisturizers', 'Serums', 'Sunscreen']
+      },
+      {
+        title: 'Makeup',
+        items: ['Face', 'Eyes', 'Lips', 'Brushes']
+      },
+      {
+        title: 'Fragrance',
+        items: ['Perfume', 'Cologne', 'Body Mist']
+      }
+    ],
   },
   {
     name: 'Home & Decor',
-    subcategories: ['Furniture', 'Bedding', 'Kitchen', 'Lighting', 'Art'],
+    sections: [
+      {
+        title: 'Furniture',
+        items: ['Living Room', 'Bedroom', 'Dining', 'Office']
+      },
+      {
+        title: 'Bedding',
+        items: ['Sheets', 'Duvets', 'Pillows', 'Blankets']
+      },
+      {
+        title: 'Kitchen',
+        items: ['Cookware', 'Dining', 'Storage', 'Appliances']
+      }
+    ],
   },
 ];
 

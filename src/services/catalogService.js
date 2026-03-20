@@ -4,11 +4,12 @@ export const catalogService = {
   getCategories: async () => {
     return CATEGORIES;
   },
-  getProducts: async (category, subcategory, priceRanges) => {
+  getProducts: async (category, subcategory, priceRanges, item) => {
     let filtered = PRODUCTS.filter(p => {
       const matchesCategory = !category || category === 'all' || p.category.toLowerCase() === category.toLowerCase();
       const matchesSub = !subcategory || p.subcategory.toLowerCase() === subcategory.toLowerCase();
-      return matchesCategory && matchesSub;
+      const matchesItem = !item || p.name.toLowerCase().includes(item.toLowerCase());
+      return matchesCategory && matchesSub && matchesItem;
     });
 
     if (priceRanges && priceRanges.length > 0) {
