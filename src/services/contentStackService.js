@@ -1,5 +1,5 @@
 export const contentStackService = {
-  getEntry: async (contentType: string, entryId: string) => {
+  getEntry: async (contentType, entryId) => {
     console.log(`Fetching ContentStack entry: ${contentType}/${entryId}`);
     // Mock response for a banner
     if (contentType === 'hero_banner') {

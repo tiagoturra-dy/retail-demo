@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { catalogService } from '../services/catalogService';
-import { Product, Category } from '../types';
 import { ProductCard } from '../components/ProductCard';
 import { motion } from 'motion/react';
 
@@ -10,10 +9,10 @@ export const CategoryPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const subcategory = searchParams.get('sub');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [priceFilters, setPriceFilters] = useState<string[]>([]);
+  const [priceFilters, setPriceFilters] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -34,7 +33,7 @@ export const CategoryPage = () => {
 
   const categoryInfo = categories.find((c) => c.name.toLowerCase() === categoryName?.toLowerCase());
 
-  const handlePriceFilterChange = (range: string) => {
+  const handlePriceFilterChange = (range) => {
     setPriceFilters(prev => 
       prev.includes(range) ? prev.filter(r => r !== range) : [...prev, range]
     );
@@ -178,7 +177,7 @@ export const CategoryPage = () => {
   );
 };
 
-function cn(...classes: any[]) {
+function cn(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 

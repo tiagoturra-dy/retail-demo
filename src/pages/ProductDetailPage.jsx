@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../services/catalogService';
-import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { Star, ShoppingBag, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -9,7 +8,7 @@ import { motion } from 'motion/react';
 export const ProductDetailPage = () => {
   const { productId } = useParams();
   const { addToCart } = useCart();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

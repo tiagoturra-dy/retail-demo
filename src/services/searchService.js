@@ -1,12 +1,12 @@
-import { PRODUCTS } from '../constants';
+import { PRODUCTS } from '../constants.js';
 
 export const searchService = {
-  getAutocompleteTerms: async (query: string) => {
+  getAutocompleteTerms: async (query) => {
     if (!query) return [];
     const terms = ['T-shirt', 'Dress', 'Watch', 'Bag', 'Jacket', 'Serum', 'Sofa', 'Lamp'];
     return terms.filter(t => t.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
   },
-  searchProducts: async (query: string, subcategories?: string[], priceRanges?: string[], sortBy?: string) => {
+  searchProducts: async (query, subcategories, priceRanges, sortBy) => {
     if (!query) return [];
     let filtered = PRODUCTS.filter(p => 
       p.name.toLowerCase().includes(query.toLowerCase()) || 

@@ -1,15 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { ShoppingBag, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 
-interface ProductCardProps {
-  product: Product;
-}
-
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
 
   return (

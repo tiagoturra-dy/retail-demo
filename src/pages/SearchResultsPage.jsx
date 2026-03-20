@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../services/searchService';
-import { Product } from '../types';
 import { ProductCard } from '../components/ProductCard';
 import { motion } from 'motion/react';
 
 export const SearchResultsPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = useState<Product[]>([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [subFilters, setSubFilters] = useState<string[]>([]);
-  const [priceFilters, setPriceFilters] = useState<string[]>([]);
+  const [subFilters, setSubFilters] = useState([]);
+  const [priceFilters, setPriceFilters] = useState([]);
   const [sortBy, setSortBy] = useState('relevancy');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -27,15 +26,15 @@ export const SearchResultsPage = () => {
     fetchResults();
   }, [query, subFilters, priceFilters, sortBy]);
 
-  const availableSubcategories: string[] = Array.from(new Set(results.map(p => p.subcategory)));
+  const availableSubcategories = Array.from(new Set(results.map(p => p.subcategory)));
 
-  const handleSubFilterChange = (sub: string) => {
+  const handleSubFilterChange = (sub) => {
     setSubFilters(prev => 
       prev.includes(sub.toLowerCase()) ? prev.filter(s => s !== sub.toLowerCase()) : [...prev, sub.toLowerCase()]
     );
   };
 
-  const handlePriceFilterChange = (range: string) => {
+  const handlePriceFilterChange = (range) => {
     setPriceFilters(prev => 
       prev.includes(range) ? prev.filter(r => r !== range) : [...prev, range]
     );
@@ -196,6 +195,6 @@ export const SearchResultsPage = () => {
   );
 };
 
-function cn(...classes: any[]) {
+function cn(...classes) {
   return classes.filter(Boolean).join(' ');
 }

@@ -1,10 +1,10 @@
-import { PRODUCTS, CATEGORIES } from '../constants';
+import { PRODUCTS, CATEGORIES } from '../constants.js';
 
 export const catalogService = {
   getCategories: async () => {
     return CATEGORIES;
   },
-  getProducts: async (category?: string, subcategory?: string, priceRanges?: string[]) => {
+  getProducts: async (category, subcategory, priceRanges) => {
     let filtered = PRODUCTS.filter(p => {
       const matchesCategory = !category || category === 'all' || p.category.toLowerCase() === category.toLowerCase();
       const matchesSub = !subcategory || p.subcategory.toLowerCase() === subcategory.toLowerCase();
@@ -25,7 +25,7 @@ export const catalogService = {
 
     return filtered;
   },
-  getProductById: async (id: string) => {
+  getProductById: async (id) => {
     return PRODUCTS.find(p => p.id === id) || null;
   }
 };

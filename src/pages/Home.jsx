@@ -5,12 +5,11 @@ import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { personalizationService } from '../services/personalizationService';
 import { contentStackService } from '../services/contentStackService';
-import { Product } from '../types';
 
 export const Home = () => {
-  const [recommendations, setRecommendations] = useState<Product[]>([]);
-  const [heroBanner, setHeroBanner] = useState<any>(null);
-  const [promoBanner, setPromoBanner] = useState<any>(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [heroBanner, setHeroBanner] = useState(null);
+  const [promoBanner, setPromoBanner] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {

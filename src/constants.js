@@ -1,6 +1,4 @@
-import { Category, Product } from './types';
-
-export const CATEGORIES: Category[] = [
+export const CATEGORIES = [
   {
     name: 'Men',
     subcategories: ['Clothing', 'Shoes', 'Accessories', 'Watches', 'Grooming'],
@@ -23,7 +21,7 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-export const PRODUCTS: Product[] = [
+export const PRODUCTS = [
   {
     id: '1',
     name: 'Premium Cotton Tee',

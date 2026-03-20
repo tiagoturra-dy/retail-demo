@@ -2,20 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { searchService } from '../services/searchService';
-import { Product } from '../types';
 
-interface SearchOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
+export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [results, setResults] = useState<Product[]>([]);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [results, setResults] = useState([]);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const inputRef = useRef(null);
 
   const popularSuggestions = ['clothing', 'watch', 'men', 'women'];
 
@@ -35,7 +29,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
       setQuery('');
     }
 
-    const handleEsc = (e: KeyboardEvent) => {
+    const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleEsc);
@@ -63,14 +57,14 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
     return () => clearTimeout(timer);
   }, [query]);
 
-  const saveSearch = (term: string) => {
+  const saveSearch = (term) => {
     if (!term.trim()) return;
     const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 10);
     setRecentSearches(updated);
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     if (query.trim()) {
       saveSearch(query.trim());
@@ -79,7 +73,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
     }
   };
 
-  const handleSuggestionClick = (term: string) => {
+  const handleSuggestionClick = (term) => {
     setQuery(term);
     saveSearch(term);
     navigate(`/search?q=${encodeURIComponent(term)}`);

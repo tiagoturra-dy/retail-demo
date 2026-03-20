@@ -1,7 +1,7 @@
-import { PRODUCTS } from '../constants';
+import { PRODUCTS } from '../constants.js';
 
 export const personalizationService = {
-  getRecommendations: async (userId?: string) => {
+  getRecommendations: async (userId) => {
     console.log('Fetching recommendations for:', userId);
     // Return a subset of products as recommendations
     return PRODUCTS.slice(0, 4);
