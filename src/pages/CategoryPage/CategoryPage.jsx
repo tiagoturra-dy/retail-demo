@@ -3,7 +3,7 @@ import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { catalogService } from '../../services/catalogService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { motion } from 'motion/react';
-import './CategoryPage.css';
+import styles from './CategoryPage.module.css';
 
 export const CategoryPage = () => {
   const { categoryName } = useParams();
@@ -50,45 +50,45 @@ export const CategoryPage = () => {
   const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="category-page-container">
-      <div className="category-header">
+    <div className={styles.categoryPageContainer}>
+      <div className={styles.categoryHeader}>
         <div>
-          <h1 className="category-title">
+          <h1 className={styles.categoryTitle}>
             {categoryName === 'all' ? 'All Collections' : categoryName}
           </h1>
           {subcategory && (
-            <p className="category-subtitle">
-              Showing results for <span className="category-subtitle-highlight">{subcategory}</span>
+            <p className={styles.categorySubtitle}>
+              Showing results for <span className={styles.categorySubtitleHighlight}>{subcategory}</span>
             </p>
           )}
         </div>
         {(priceFilters.length > 0 || subcategory) && (
           <button 
             onClick={clearFilters}
-            className="clear-filters-btn"
+            className={styles.clearFiltersBtn}
           >
             Clear all filters
           </button>
         )}
       </div>
 
-      <div className="category-layout">
+      <div className={styles.categoryLayout}>
         {/* Sidebar Filters */}
-        <aside className="category-sidebar">
+        <aside className={styles.categorySidebar}>
           <div>
-            <h3 className="sidebar-title">Categories</h3>
-            <div className="sidebar-section-list">
+            <h3 className={styles.sidebarTitle}>Categories</h3>
+            <div className={styles.sidebarSectionList}>
               {categoryInfo?.sections.map((section) => (
                 <div key={section.title}>
-                  <h4 className="sidebar-subtitle">{section.title}</h4>
-                  <ul className="sidebar-item-list">
+                  <h4 className={styles.sidebarSubtitle}>{section.title}</h4>
+                  <ul className={styles.sidebarItemList}>
                     {section.items.map((itemStr) => {
                       const isActive = searchParams.get('item')?.toLowerCase() === itemStr.toLowerCase();
                       return (
                         <li key={itemStr}>
                           <Link
                             to={`/category/${categoryName}?sub=${section.title.toLowerCase()}&item=${itemStr.toLowerCase()}`}
-                            className={`sidebar-link ${isActive ? 'active' : ''}`}
+                            className={`${styles.sidebarLink} ${isActive ? styles.active : ''}`}
                           >
                             {itemStr}
                           </Link>
@@ -101,18 +101,18 @@ export const CategoryPage = () => {
             </div>
           </div>
           <div>
-            <h3 className="sidebar-title">Price Range</h3>
-            <div className="price-filter-list">
+            <h3 className={styles.sidebarTitle}>Price Range</h3>
+            <div className={styles.priceFilterList}>
               {[
                 { label: 'Under $50', value: 'under-50' },
                 { label: '$50 - $100', value: '50-100' },
                 { label: '$100 - $500', value: '100-500' },
                 { label: 'Over $500', value: 'over-500' },
               ].map((range) => (
-                <label key={range.value} className="price-filter-label">
+                <label key={range.value} className={styles.priceFilterLabel}>
                   <input 
                     type="checkbox" 
-                    className="price-filter-checkbox"
+                    className={styles.priceFilterCheckbox}
                     checked={priceFilters.includes(range.value)}
                     onChange={() => handlePriceFilterChange(range.value)}
                   /> 
@@ -124,12 +124,12 @@ export const CategoryPage = () => {
         </aside>
 
         {/* Product Grid */}
-        <div className="category-product-area">
+        <div className={styles.categoryProductArea}>
           {loading ? (
-            <div className="loading-state">Loading products...</div>
+            <div className={styles.loadingState}>Loading products...</div>
           ) : paginatedProducts.length > 0 ? (
             <>
-              <div className="product-grid">
+              <div className={styles.productGrid}>
                 {paginatedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -137,20 +137,20 @@ export const CategoryPage = () => {
               
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="pagination-container">
+                <div className={styles.paginationContainer}>
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
-                    className="pagination-arrow"
+                    className={styles.paginationArrow}
                   >
                     <span className="material-symbols-outlined">chevron_left</span>
                   </button>
-                  <div className="pagination-numbers">
+                  <div className={styles.paginationNumbers}>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                        className={`${styles.paginationNumber} ${currentPage === page ? styles.active : ''}`}
                       >
                         {page}
                       </button>
@@ -159,7 +159,7 @@ export const CategoryPage = () => {
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
-                    className="pagination-arrow"
+                    className={styles.paginationArrow}
                   >
                     <span className="material-symbols-outlined">chevron_right</span>
                   </button>
@@ -167,11 +167,11 @@ export const CategoryPage = () => {
               )}
             </>
           ) : (
-            <div className="empty-state">
-              <p className="empty-state-text">No products found in this category.</p>
+            <div className={styles.emptyState}>
+              <p className={styles.emptyStateText}>No products found in this category.</p>
               <button 
                 onClick={clearFilters}
-                className="empty-state-btn"
+                className={styles.emptyStateBtn}
               >
                 Reset all filters
               </button>

@@ -1,13 +1,23 @@
-.product-card {
+.productCard {
   display: block;
+
+  &:hover {
+    .productImage {
+      transform: scale(1.05);
+    }
+    .productName {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
 }
 
-.product-card-link {
+.productCardLink {
   text-decoration: none;
   display: block;
 }
 
-.product-image-container {
+.productImageContainer {
   aspect-ratio: 3 / 4;
   border-radius: 1rem;
   overflow: hidden;
@@ -15,24 +25,20 @@
   position: relative;
 }
 
-.product-image {
+.productImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.7s;
 }
 
-.product-card:hover .product-image {
-  transform: scale(1.05);
-}
-
-.product-badge-container {
+.productBadgeContainer {
   position: absolute;
   top: 1rem;
   left: 1rem;
 }
 
-.product-badge {
+.productBadge {
   background-color: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(4px);
   padding: 0.25rem 0.75rem;
@@ -44,23 +50,23 @@
   color: #18181b;
 }
 
-.product-info-container {
+.productInfoContainer {
   margin-top: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.product-details {
+.productDetails {
   display: flex;
   flex-direction: column;
 }
 
-.product-name-link {
+.productNameLink {
   text-decoration: none;
 }
 
-.product-name {
+.productName {
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
@@ -68,32 +74,27 @@
   margin: 0;
 }
 
-.product-card:hover .product-name {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.product-rating {
+.productRating {
   display: flex;
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.25rem;
 }
 
-.rating-icon {
+.ratingIcon {
   width: 0.75rem;
   height: 0.75rem;
   fill: #facc15;
   color: #facc15;
 }
 
-.rating-text {
+.ratingText {
   font-size: 0.75rem;
   line-height: 1rem;
   color: #71717a;
 }
 
-.product-price {
+.productPrice {
   margin-top: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -101,7 +102,7 @@
   color: #18181b;
 }
 
-.add-to-cart-btn {
+.addToCartBtn {
   padding: 0.375rem;
   border-radius: 9999px;
   background-color: #18181b;
@@ -109,13 +110,13 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #27272a;
+  }
 }
 
-.add-to-cart-btn:hover {
-  background-color: #27272a;
-}
-
-.cart-icon {
+.cartIcon {
   width: 0.875rem;
   height: 0.875rem;
 }

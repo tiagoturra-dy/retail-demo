@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { searchService } from '../../services/searchService';
-import './SearchOverlay.css';
+import styles from './SearchOverlay.module.css';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -88,52 +88,52 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="search-overlay"
+          className={styles.searchOverlay}
         >
           {/* Header */}
-          <header className="search-header">
-            <div className="search-header-inner">
-              <div className="search-logo">LUXE</div>
-              <button onClick={onClose} className="search-close-btn group">
-                <span className="search-close-text">Close</span>
-                <span className="material-symbols-outlined search-close-icon">close</span>
+          <header className={styles.searchHeader}>
+            <div className={styles.searchHeaderInner}>
+              <div className={styles.searchLogo}>LUXE</div>
+              <button onClick={onClose} className={styles.searchCloseBtn}>
+                <span className={styles.searchCloseText}>Close</span>
+                <span className={`material-symbols-outlined ${styles.searchCloseIcon}`}>close</span>
               </button>
             </div>
           </header>
 
           {/* Main Search Canvas */}
-          <main className="search-main">
-            <div className="search-container">
+          <main className={styles.searchMain}>
+            <div className={styles.searchContainer}>
               {/* Search Input Section */}
-              <form onSubmit={handleSearch} className="search-form group">
-                <div className="search-input-wrapper">
+              <form onSubmit={handleSearch} className={styles.searchForm}>
+                <div className={styles.searchInputWrapper}>
                   <input
                     ref={inputRef}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search for products, categories..."
-                    className="search-input"
+                    className={styles.searchInput}
                   />
-                  <button type="button" className="image-search-btn" aria-label="Search by image">
+                  <button type="button" className={styles.imageSearchBtn} aria-label="Search by image">
                     <span className="material-symbols-outlined">photo_camera</span>
                   </button>
                 </div>
-                <div className="search-input-line"></div>
+                <div className={styles.searchInputLine}></div>
               </form>
 
               {/* Content Grid */}
-              <div className="search-grid">
+              <div className={styles.searchGrid}>
                 {/* Suggestions Column */}
-                <div className="search-suggestions-col">
+                <div className={styles.searchSuggestionsCol}>
                   <section>
-                    <h3 className="search-section-title">Our Suggestions</h3>
-                    <div className="search-tags">
+                    <h3 className={styles.searchSectionTitle}>Our Suggestions</h3>
+                    <div className={styles.searchTags}>
                       {popularSuggestions.map((sub) => (
                         <button
                           key={sub}
                           onClick={() => handleSuggestionClick(sub)}
-                          className="search-tag"
+                          className={styles.searchTag}
                         >
                           {sub}
                         </button>
@@ -142,16 +142,16 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                   </section>
 
                   {recentSearches.length > 0 && query.length <= 1 && (
-                    <section className="recent-searches-section">
-                      <h3 className="search-section-title">Recent Searches</h3>
-                      <div className="recent-searches-list">
+                    <section className={styles.recentSearchesSection}>
+                      <h3 className={styles.searchSectionTitle}>Recent Searches</h3>
+                      <div className={styles.recentSearchesList}>
                         {recentSearches.map((term, i) => (
                           <button
                             key={i}
                             onClick={() => handleSuggestionClick(term)}
-                            className="recent-search-item group"
+                            className={styles.recentSearchItem}
                           >
-                            <span className="material-symbols-outlined recent-search-icon">history</span>
+                            <span className={`material-symbols-outlined ${styles.recentSearchIcon}`}>history</span>
                             {term}
                           </button>
                         ))}
@@ -161,11 +161,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Autocomplete / Results Preview Column */}
-                <div className="search-results-col">
-                  <h3 className="search-section-title">
+                <div className={styles.searchResultsCol}>
+                  <h3 className={styles.searchSectionTitle}>
                     {query.length > 1 ? 'Refining Search' : 'Featured Products'}
                   </h3>
-                  <div className="search-results-list">
+                  <div className={styles.searchResultsList}>
                     {results.length > 0 ? (
                       results.map((product) => (
                         <div
@@ -174,40 +174,40 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                             navigate(`/product/${product.id}`);
                             onClose();
                           }}
-                          className="search-result-item group"
+                          className={styles.searchResultItem}
                         >
-                          <div className="search-result-info">
-                            <div className="search-result-image-container">
-                              <img src={product.image} alt={product.name} className="search-result-image" />
+                          <div className={styles.searchResultInfo}>
+                            <div className={styles.searchResultImageContainer}>
+                              <img src={product.image} alt={product.name} className={styles.searchResultImage} />
                             </div>
                             <div>
-                              <div className="search-result-name-container">
-                                <span className="search-result-name">
+                              <div className={styles.searchResultNameContainer}>
+                                <span className={styles.searchResultName}>
                                   {product.name.split(new RegExp(`(${query})`, 'gi')).map((part, i) => 
                                     part.toLowerCase() === query.toLowerCase() ? 
-                                    <span key={i} className="search-highlight">{part}</span> : 
+                                    <span key={i} className={styles.searchHighlight}>{part}</span> : 
                                     part
                                   )}
                                 </span>
                               </div>
-                              <span className="search-result-category">{product.category} • {product.subcategory}</span>
+                              <span className={styles.searchResultCategory}>{product.category} • {product.subcategory}</span>
                             </div>
                           </div>
-                          <span className="material-symbols-outlined search-result-arrow">north_west</span>
+                          <span className={`material-symbols-outlined ${styles.searchResultArrow}`}>north_west</span>
                         </div>
                       ))
                     ) : query.length > 1 ? (
-                      <div className="search-empty">No results found for "{query}"</div>
+                      <div className={styles.searchEmpty}>No results found for "{query}"</div>
                     ) : (
-                      <div className="search-empty">Start typing to see results...</div>
+                      <div className={styles.searchEmpty}>Start typing to see results...</div>
                     )}
                   </div>
 
                   {results.length > 0 && (
-                    <div className="search-view-all-container">
-                      <button onClick={handleSearch} className="search-view-all-btn">
+                    <div className={styles.searchViewAllContainer}>
+                      <button onClick={handleSearch} className={styles.searchViewAllBtn}>
                         View all results
-                        <span className="material-symbols-outlined view-all-icon">trending_flat</span>
+                        <span className={`material-symbols-outlined ${styles.viewAllIcon}`}>trending_flat</span>
                       </button>
                     </div>
                   )}
@@ -217,9 +217,9 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           </main>
 
           {/* Footer */}
-          <footer className="search-footer">
-            <div className="search-footer-inner">
-              <span>Press <kbd className="search-kbd">ESC</kbd> to exit search</span>
+          <footer className={styles.searchFooter}>
+            <div className={styles.searchFooterInner}>
+              <span>Press <kbd className={styles.searchKbd}>ESC</kbd> to exit search</span>
             </div>
           </footer>
         </motion.div>

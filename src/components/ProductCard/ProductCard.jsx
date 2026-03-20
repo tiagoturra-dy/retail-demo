@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { ShoppingBag, Star } from 'lucide-react';
 import { motion } from 'motion/react';
-import './ProductCard.css';
+import styles from './ProductCard.module.css';
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -13,40 +13,40 @@ export const ProductCard = ({ product }) => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="product-card"
+      className={styles.productCard}
     >
-      <Link to={`/product/${product.id}`} className="product-card-link">
-        <div className="product-image-container">
+      <Link to={`/product/${product.id}`} className={styles.productCardLink}>
+        <div className={styles.productImageContainer}>
           <img
             src={product.image}
             alt={product.name}
-            className="product-image"
+            className={styles.productImage}
           />
-          <div className="product-badge-container">
-            <span className="product-badge">
+          <div className={styles.productBadgeContainer}>
+            <span className={styles.productBadge}>
               {product.subcategory}
             </span>
           </div>
         </div>
       </Link>
-      <div className="product-info-container">
-        <div className="product-details">
-          <Link to={`/product/${product.id}`} className="product-name-link">
-            <h3 className="product-name">
+      <div className={styles.productInfoContainer}>
+        <div className={styles.productDetails}>
+          <Link to={`/product/${product.id}`} className={styles.productNameLink}>
+            <h3 className={styles.productName}>
               {product.name}
             </h3>
           </Link>
-          <div className="product-rating">
-            <Star className="rating-icon" />
-            <span className="rating-text">{product.rating} ({product.reviews})</span>
+          <div className={styles.productRating}>
+            <Star className={styles.ratingIcon} />
+            <span className={styles.ratingText}>{product.rating} ({product.reviews})</span>
           </div>
-          <p className="product-price">${product.price}</p>
+          <p className={styles.productPrice}>${product.price}</p>
         </div>
         <button
           onClick={() => addToCart(product)}
-          className="add-to-cart-btn"
+          className={styles.addToCartBtn}
         >
-          <ShoppingBag className="cart-icon" />
+          <ShoppingBag className={styles.cartIcon} />
         </button>
       </div>
     </motion.div>

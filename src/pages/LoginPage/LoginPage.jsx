@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
-import './LoginPage.css';
+import styles from './LoginPage.module.css';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -12,6 +12,8 @@ export const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+
+  const s = styles || {};
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,52 +27,52 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="login-page-container">
+    <div className={s.loginPageContainer}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="login-content-wrapper"
+        className={s.loginContentWrapper}
       >
-        <div className="login-header">
-          <h1 className="login-title">Welcome Back</h1>
-          <p className="login-subtitle">Enter your details to access your account.</p>
+        <div className={s.loginHeader}>
+          <h1 className={s.loginTitle}>Welcome Back</h1>
+          <p className={s.loginSubtitle}>Enter your details to access your account.</p>
         </div>
 
-        <form className="login-form" onSubmit={handleLogin}>
-          <div className="form-group">
-            <label className="form-label">Email or User ID</label>
+        <form className={s.loginForm} onSubmit={handleLogin}>
+          <div className={s.formGroup}>
+            <label className={s.formLabel}>Email or User ID</label>
             <input
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="name@example.com or User ID"
               required
-              className="form-input"
+              className={s.formInput}
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Password</label>
+          <div className={s.formGroup}>
+            <label className={s.formLabel}>Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="form-input"
+              className={s.formInput}
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="login-submit-btn"
+            className={s.loginSubmitBtn}
           >
-            {loading ? 'Signing In...' : 'Sign In'} <ArrowRight className="btn-icon" />
+            {loading ? 'Signing In...' : 'Sign In'} <ArrowRight className={s.btnIcon} />
           </button>
         </form>
 
-        <p className="login-footer-text">
+        <p className={s.loginFooterText}>
           Don't have an account?{' '}
-          <span className="login-link-disabled">
+          <span className={s.loginLinkDisabled}>
             Create one
           </span>
         </p>

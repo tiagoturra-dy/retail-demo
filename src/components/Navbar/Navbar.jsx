@@ -6,7 +6,7 @@ import { CATEGORIES } from '../../constants';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
-import './Navbar.css';
+import styles from './Navbar.module.css';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -17,6 +17,9 @@ export const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
+
+  // Safety check for styles
+  const s = styles || {};
 
   const toggleMobileCategory = (categoryName) => {
     setExpandedMobileCategory(expandedMobileCategory === categoryName ? null : categoryName);
@@ -33,29 +36,29 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="navbar-inner">
+    <nav className={s.navbar}>
+      <div className={s.navbarContainer}>
+        <div className={s.navbarInner}>
           {/* Logo */}
-          <Link to="/" className="navbar-logo">
-            <span className="navbar-logo-text">LUXE</span>
+          <Link to="/" className={s.navbarLogo}>
+            <span className={s.navbarLogoText}>LUXE</span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="navbar-desktop-menu">
+          <div className={s.navbarDesktopMenu}>
             {CATEGORIES.map((category) => (
               <div
                 key={category.name}
-                className="navbar-item-container"
+                className={s.navbarItemContainer}
                 onMouseEnter={() => setHoveredCategory(category.name)}
                 onMouseLeave={() => setHoveredCategory(null)}
               >
                 <Link
                   to={`/category/${category.name.toLowerCase()}`}
-                  className="navbar-link"
+                  className={s.navbarLink}
                 >
                   {category.name}
-                  <ChevronDown className={`navbar-chevron ${hoveredCategory === category.name ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`${s.navbarChevron} ${hoveredCategory === category.name ? s.rotate180 : ''}`} />
                 </Link>
 
                 {/* Mega Menu */}
@@ -66,22 +69,22 @@ export const Navbar = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.2 }}
-                      className="mega-menu"
+                      className={s.megaMenu}
                     >
-                      <div className="mega-menu-container">
+                      <div className={s.megaMenuContainer}>
                         {/* Sections Grid */}
-                        <div className="mega-menu-grid">
+                        <div className={s.megaMenuGrid}>
                           {category.sections.map((section) => (
-                            <div key={section.title} className="mega-menu-section">
-                              <h3 className="mega-menu-heading">
+                            <div key={section.title} className={s.megaMenuSection}>
+                              <h3 className={s.megaMenuHeading}>
                                 {section.title}
                               </h3>
-                              <ul className="mega-menu-list">
+                              <ul className={s.megaMenuList}>
                                 {section.items.map((item) => (
                                   <li key={item}>
                                     <Link
                                       to={`/category/${category.name.toLowerCase()}?sub=${section.title.toLowerCase()}&item=${item.toLowerCase()}`}
-                                      className="mega-menu-link"
+                                      className={s.megaMenuLink}
                                     >
                                       {item}
                                     </Link>
@@ -93,27 +96,27 @@ export const Navbar = () => {
                         </div>
 
                         {/* Featured Column */}
-                        <div className="mega-menu-featured">
-                          <div className="featured-image-container">
+                        <div className={s.megaMenuFeatured}>
+                          <div className={s.featuredImageContainer}>
                             <img
                               src={`https://picsum.photos/seed/${category.name}-featured/800/450`}
                               alt="Featured"
-                              className="featured-image"
+                              className={s.featuredImage}
                             />
-                            <div className="featured-overlay" />
-                            <div className="featured-text">
-                              <p className="featured-label">Editor's Choice</p>
-                              <p className="featured-title">The {category.name} Edit</p>
+                            <div className={s.featuredOverlay} />
+                            <div className={s.featuredText}>
+                              <p className={s.featuredLabel}>Editor's Choice</p>
+                              <p className={s.featuredTitle}>The {category.name} Edit</p>
                             </div>
                           </div>
                           
-                          <div className="featured-offer">
-                            <h4 className="offer-heading">Exclusive Offer</h4>
-                            <p className="offer-text">
+                          <div className={s.featuredOffer}>
+                            <h4 className={s.offerHeading}>Exclusive Offer</h4>
+                            <p className={s.offerText}>
                               Join our loyalty program and get 15% off your first purchase in the {category.name} collection.
                             </p>
-                            <Link to="/login" className="offer-link">
-                              Join Now <ArrowRight className="offer-icon" />
+                            <Link to="/login" className={s.offerLink}>
+                              Join Now <ArrowRight className={s.offerIcon} />
                             </Link>
                           </div>
                         </div>
@@ -126,30 +129,30 @@ export const Navbar = () => {
           </div>
 
           {/* Icons & Search */}
-          <div className="navbar-actions">
-            <button onClick={() => setIsSearchOpen(true)} className="action-btn">
-              <Search className="action-icon" />
+          <div className={s.navbarActions}>
+            <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn}>
+              <Search className={s.actionIcon} />
             </button>
 
             {user ? (
-              <button onClick={handleLogout} className="action-btn" title="Log Out">
-                <LogOut className="action-icon" />
+              <button onClick={handleLogout} className={s.actionBtn} title="Log Out">
+                <LogOut className={s.actionIcon} />
               </button>
             ) : (
-              <Link to="/login" className="action-btn" title="Log In">
-                <User className="action-icon" />
+              <Link to="/login" className={s.actionBtn} title="Log In">
+                <User className={s.actionIcon} />
               </Link>
             )}
             
-            <Link to="/cart" className="action-btn cart-btn">
-              <ShoppingBag className="action-icon" />
+            <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`}>
+              <ShoppingBag className={s.actionIcon} />
               {totalItems > 0 && (
-                <span className="cart-badge">{totalItems}</span>
+                <span className={s.cartBadge}>{totalItems}</span>
               )}
             </Link>
 
-            <button className="mobile-toggle-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              {isMobileMenuOpen ? <X className="action-icon" /> : <Menu className="action-icon" />}
+            <button className={s.mobileToggleBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+              {isMobileMenuOpen ? <X className={s.actionIcon} /> : <Menu className={s.actionIcon} />}
             </button>
           </div>
         </div>
@@ -163,14 +166,14 @@ export const Navbar = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="mobile-menu"
+            className={s.mobileMenu}
           >
-            <div className="mobile-menu-container">
+            <div className={s.mobileMenuContainer}>
               {CATEGORIES.map((category) => (
-                <div key={category.name} className="mobile-category">
-                  <button onClick={() => toggleMobileCategory(category.name)} className="mobile-category-btn">
+                <div key={category.name} className={s.mobileCategory}>
+                  <button onClick={() => toggleMobileCategory(category.name)} className={s.mobileCategoryBtn}>
                     {category.name}
-                    <ChevronDown className={`mobile-chevron ${expandedMobileCategory === category.name ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`${s.mobileChevron} ${expandedMobileCategory === category.name ? s.rotate180 : ''}`} />
                   </button>
                   
                   <AnimatePresence>
@@ -179,14 +182,14 @@ export const Navbar = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="mobile-category-content"
+                        className={s.mobileCategoryContent}
                       >
-                        <div className="mobile-sections">
+                        <div className={s.mobileSections}>
                           {category.sections.map((section) => (
                             <div key={section.title}>
-                              <button onClick={() => toggleMobileSection(section.title)} className="mobile-section-btn">
+                              <button onClick={() => toggleMobileSection(section.title)} className={s.mobileSectionBtn}>
                                 {section.title}
-                                <ChevronDown className={`mobile-chevron-small ${expandedMobileSection === section.title ? 'rotate-180' : ''}`} />
+                                <ChevronDown className={`${s.mobileChevronSmall} ${expandedMobileSection === section.title ? s.rotate180 : ''}`} />
                               </button>
                               
                               <AnimatePresence>
@@ -195,14 +198,14 @@ export const Navbar = () => {
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    className="mobile-section-content"
+                                    className={s.mobileSectionContent}
                                   >
-                                    <div className="mobile-items-grid">
+                                    <div className={s.mobileItemsGrid}>
                                       {section.items.map((item) => (
                                         <Link
                                           key={item}
                                           to={`/category/${category.name.toLowerCase()}?sub=${section.title.toLowerCase()}&item=${item.toLowerCase()}`}
-                                          className="mobile-item-link"
+                                          className={s.mobileItemLink}
                                           onClick={() => setIsMobileMenuOpen(false)}
                                         >
                                           {item}
@@ -217,7 +220,7 @@ export const Navbar = () => {
                           
                           <Link
                             to={`/category/${category.name.toLowerCase()}`}
-                            className="mobile-shop-all"
+                            className={s.mobileShopAll}
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
                             Shop All {category.name}
@@ -229,22 +232,22 @@ export const Navbar = () => {
                 </div>
               ))}
               
-              <div className="mobile-footer">
+              <div className={s.mobileFooter}>
                 {user ? (
-                  <button className="mobile-account-link" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
-                    <LogOut className="action-icon" />
+                  <button className={s.mobileAccountLink} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
+                    <LogOut className={s.actionIcon} />
                     <span>Log Out</span>
                   </button>
                 ) : (
-                  <Link to="/login" className="mobile-account-link" onClick={() => setIsMobileMenuOpen(false)}>
-                    <User className="action-icon" />
+                  <Link to="/login" className={s.mobileAccountLink} onClick={() => setIsMobileMenuOpen(false)}>
+                    <User className={s.actionIcon} />
                     <span>My Account</span>
                   </Link>
                 )}
-                <div className="mobile-help">
-                  <p className="help-heading">Need Help?</p>
-                  <p className="help-text">Our customer service team is available 24/7.</p>
-                  <button className="help-link">Contact Us</button>
+                <div className={s.mobileHelp}>
+                  <p className={s.mobileHelpHeading}>Need Help?</p>
+                  <p className={s.mobileHelpText}>Our customer service team is available 24/7.</p>
+                  <button className={s.mobileHelpLink}>Contact Us</button>
                 </div>
               </div>
             </div>

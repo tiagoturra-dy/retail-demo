@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { motion } from 'motion/react';
-import './SearchResultsPage.css';
+import styles from './SearchResultsPage.module.css';
 
 export const SearchResultsPage = () => {
   const [searchParams] = useSearchParams();
@@ -51,24 +51,24 @@ export const SearchResultsPage = () => {
   const paginatedResults = results.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="search-results-container">
-      <div className="search-header">
+    <div className={styles.searchResultsContainer}>
+      <div className={styles.searchHeader}>
         <div>
-          <h1 className="search-title">
+          <h1 className={styles.searchTitle}>
             Search Results
           </h1>
-          <p className="search-subtitle">
+          <p className={styles.searchSubtitle}>
             {loading ? 'Searching...' : `Found ${results.length} results for "${query}"`}
           </p>
         </div>
         
-        <div className="search-controls">
-          <div className="sort-control">
-            <span className="sort-label">Sort by:</span>
+        <div className={styles.searchControls}>
+          <div className={styles.sortControl}>
+            <span className={styles.sortLabel}>Sort by:</span>
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="sort-select"
+              className={styles.sortSelect}
             >
               <option value="relevancy">Relevancy</option>
               <option value="name-asc">Name (A-Z)</option>
@@ -80,7 +80,7 @@ export const SearchResultsPage = () => {
           {(subFilters.length > 0 || priceFilters.length > 0) && (
             <button 
               onClick={clearFilters}
-              className="clear-filters-btn"
+              className={styles.clearFiltersBtn}
             >
               Clear filters
             </button>
@@ -88,18 +88,18 @@ export const SearchResultsPage = () => {
         </div>
       </div>
 
-      <div className="search-layout">
+      <div className={styles.searchLayout}>
         {/* Sidebar Facets */}
-        <aside className="search-sidebar">
+        <aside className={styles.searchSidebar}>
           {availableSubcategories.length > 0 && (
             <div>
-              <h3 className="sidebar-title">Refine by Category</h3>
-              <div className="filter-list">
+              <h3 className={styles.sidebarTitle}>Refine by Category</h3>
+              <div className={styles.filterList}>
                 {availableSubcategories.map((sub) => (
-                  <label key={sub} className="filter-label">
+                  <label key={sub} className={styles.filterLabel}>
                     <input 
                       type="checkbox" 
-                      className="filter-checkbox"
+                      className={styles.filterCheckbox}
                       checked={subFilters.includes(sub.toLowerCase())}
                       onChange={() => handleSubFilterChange(sub)}
                     /> 
@@ -111,18 +111,18 @@ export const SearchResultsPage = () => {
           )}
 
           <div>
-            <h3 className="sidebar-title">Price Range</h3>
-            <div className="filter-list">
+            <h3 className={styles.sidebarTitle}>Price Range</h3>
+            <div className={styles.filterList}>
               {[
                 { label: 'Under $50', value: 'under-50' },
                 { label: '$50 - $100', value: '50-100' },
                 { label: '$100 - $500', value: '100-500' },
                 { label: 'Over $500', value: 'over-500' },
               ].map((range) => (
-                <label key={range.value} className="filter-label">
+                <label key={range.value} className={styles.filterLabel}>
                   <input 
                     type="checkbox" 
-                    className="filter-checkbox"
+                    className={styles.filterCheckbox}
                     checked={priceFilters.includes(range.value)}
                     onChange={() => handlePriceFilterChange(range.value)}
                   /> 
@@ -134,12 +134,12 @@ export const SearchResultsPage = () => {
         </aside>
 
         {/* Results Grid */}
-        <div className="search-results-area">
+        <div className={styles.searchResultsArea}>
           {loading ? (
-            <div className="loading-state">Searching...</div>
+            <div className={styles.loadingState}>Searching...</div>
           ) : paginatedResults.length > 0 ? (
             <>
-              <div className="product-grid">
+              <div className={styles.productGrid}>
                 {paginatedResults.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -147,20 +147,20 @@ export const SearchResultsPage = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="pagination-container">
+                <div className={styles.paginationContainer}>
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
-                    className="pagination-arrow"
+                    className={styles.paginationArrow}
                   >
                     <span className="material-symbols-outlined">chevron_left</span>
                   </button>
-                  <div className="pagination-numbers">
+                  <div className={styles.paginationNumbers}>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`pagination-number ${currentPage === page ? 'active' : ''}`}
+                        className={`${styles.paginationNumber} ${currentPage === page ? styles.active : ''}`}
                       >
                         {page}
                       </button>
@@ -169,7 +169,7 @@ export const SearchResultsPage = () => {
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
-                    className="pagination-arrow"
+                    className={styles.paginationArrow}
                   >
                     <span className="material-symbols-outlined">chevron_right</span>
                   </button>
@@ -177,11 +177,11 @@ export const SearchResultsPage = () => {
               )}
             </>
           ) : (
-            <div className="empty-state">
-              <p className="empty-state-text">No products found matching your search.</p>
+            <div className={styles.emptyState}>
+              <p className={styles.emptyStateText}>No products found matching your search.</p>
               <button 
                 onClick={clearFilters}
-                className="empty-state-btn"
+                className={styles.emptyStateBtn}
               >
                 Reset all filters
               </button>

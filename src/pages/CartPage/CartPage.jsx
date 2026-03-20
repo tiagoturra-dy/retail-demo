@@ -4,7 +4,7 @@ import { useCart } from '../../context/CartContext';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { checkoutService } from '../../services/checkoutService';
-import './CartPage.css';
+import styles from './CartPage.module.css';
 
 export const CartPage = () => {
   const navigate = useNavigate();
@@ -24,13 +24,13 @@ export const CartPage = () => {
 
   if (cart.length === 0) {
     return (
-      <div className="cart-empty-container">
-        <div className="cart-empty-icon-wrapper">
-          <ShoppingBag className="cart-empty-icon" />
+      <div className={styles.cartEmptyContainer}>
+        <div className={styles.cartEmptyIconWrapper}>
+          <ShoppingBag className={styles.cartEmptyIcon} />
         </div>
-        <h2 className="cart-empty-title">Your bag is empty</h2>
-        <p className="cart-empty-subtitle">Looks like you haven't added anything to your bag yet.</p>
-        <Link to="/category/all" className="cart-empty-btn">
+        <h2 className={styles.cartEmptyTitle}>Your bag is empty</h2>
+        <p className={styles.cartEmptySubtitle}>Looks like you haven't added anything to your bag yet.</p>
+        <Link to="/category/all" className={styles.cartEmptyBtn}>
           Start Shopping
         </Link>
       </div>
@@ -38,12 +38,12 @@ export const CartPage = () => {
   }
 
   return (
-    <div className="cart-page-container">
-      <h1 className="cart-page-title">Shopping Bag ({totalItems})</h1>
+    <div className={styles.cartPageContainer}>
+      <h1 className={styles.cartPageTitle}>Shopping Bag ({totalItems})</h1>
 
-      <div className="cart-grid">
+      <div className={styles.cartGrid}>
         {/* Cart Items */}
-        <div className="cart-items-list">
+        <div className={styles.cartItemsList}>
           <AnimatePresence>
             {cart.map((item) => (
               <motion.div
@@ -52,43 +52,43 @@ export const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="cart-item group"
+                className={`${styles.cartItem} group`}
               >
-                <Link to={`/product/${item.id}`} className="cart-item-image-link">
-                  <img src={item.image} alt={item.name} className="cart-item-image" />
+                <Link to={`/product/${item.id}`} className={styles.cartItemImageLink}>
+                  <img src={item.image} alt={item.name} className={styles.cartItemImage} />
                 </Link>
-                <div className="cart-item-details">
+                <div className={styles.cartItemDetails}>
                   <div>
-                    <div className="cart-item-header">
-                      <Link to={`/product/${item.id}`} className="cart-item-name-link">
-                        <h3 className="cart-item-name">{item.name}</h3>
+                    <div className={styles.cartItemHeader}>
+                      <Link to={`/product/${item.id}`} className={styles.cartItemNameLink}>
+                        <h3 className={styles.cartItemName}>{item.name}</h3>
                       </Link>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="cart-item-remove-btn"
+                        className={styles.cartItemRemoveBtn}
                       >
-                        <Trash2 className="remove-icon" />
+                        <Trash2 className={styles.removeIcon} />
                       </button>
                     </div>
-                    <p className="cart-item-category">{item.category} • {item.subcategory}</p>
+                    <p className={styles.cartItemCategory}>{item.category} • {item.subcategory}</p>
                   </div>
-                  <div className="cart-item-footer">
-                    <div className="cart-quantity-controls">
+                  <div className={styles.cartItemFooter}>
+                    <div className={styles.cartQuantityControls}>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="quantity-btn"
+                        className={styles.quantityBtn}
                       >
-                        <Minus className="quantity-icon" />
+                        <Minus className={styles.quantityIcon} />
                       </button>
-                      <span className="quantity-text">{item.quantity}</span>
+                      <span className={styles.quantityText}>{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="quantity-btn"
+                        className={styles.quantityBtn}
                       >
-                        <Plus className="quantity-icon" />
+                        <Plus className={styles.quantityIcon} />
                       </button>
                     </div>
-                    <p className="cart-item-price">${item.price * item.quantity}</p>
+                    <p className={styles.cartItemPrice}>${item.price * item.quantity}</p>
                   </div>
                 </div>
               </motion.div>
@@ -97,23 +97,23 @@ export const CartPage = () => {
         </div>
 
         {/* Summary */}
-        <div className="cart-summary-col">
-          <div className="cart-summary-card">
-            <h2 className="summary-title">Order Summary</h2>
-            <div className="summary-details">
-              <div className="summary-row">
+        <div className={styles.cartSummaryCol}>
+          <div className={styles.cartSummaryCard}>
+            <h2 className={styles.summaryTitle}>Order Summary</h2>
+            <div className={styles.summaryDetails}>
+              <div className={styles.summaryRow}>
                 <span>Subtotal</span>
                 <span>${totalPrice}</span>
               </div>
-              <div className="summary-row">
+              <div className={styles.summaryRow}>
                 <span>Shipping</span>
-                <span className="summary-free">Free</span>
+                <span className={styles.summaryFree}>Free</span>
               </div>
-              <div className="summary-row">
+              <div className={styles.summaryRow}>
                 <span>Tax</span>
                 <span>$0.00</span>
               </div>
-              <div className="summary-total-row">
+              <div className={styles.summaryTotalRow}>
                 <span>Total</span>
                 <span>${totalPrice}</span>
               </div>
@@ -121,11 +121,11 @@ export const CartPage = () => {
             <button
               onClick={handleCheckout}
               disabled={isCheckingOut}
-              className="checkout-btn"
+              className={styles.checkoutBtn}
             >
-              {isCheckingOut ? 'Processing...' : 'Checkout'} <ArrowRight className="checkout-icon" />
+              {isCheckingOut ? 'Processing...' : 'Checkout'} <ArrowRight className={styles.checkoutIcon} />
             </button>
-            <p className="checkout-terms">
+            <p className={styles.checkoutTerms}>
               By proceeding to checkout, you agree to our Terms of Service and Privacy Policy.
             </p>
           </div>
