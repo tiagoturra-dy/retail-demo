@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { searchService } from '../services/searchService';
+import { searchService } from '../../services/searchService';
+import './SearchOverlay.css';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -87,52 +88,52 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-white flex flex-col overflow-hidden font-body text-black"
+          className="search-overlay"
         >
           {/* Header */}
-          <header className="h-24 border-b border-zinc-100 flex-shrink-0">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full h-full flex items-center justify-between">
-              <div className="text-2xl font-black tracking-tighter text-black">
-                LUXE
-              </div>
-              <button 
-                onClick={onClose}
-                className="group flex items-center gap-2 p-2 rounded-full hover:bg-zinc-50 transition-all duration-300 cursor-pointer"
-              >
-                <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">Close</span>
-                <span className="material-symbols-outlined text-3xl text-black">close</span>
+          <header className="search-header">
+            <div className="search-header-inner">
+              <div className="search-logo">LUXE</div>
+              <button onClick={onClose} className="search-close-btn group">
+                <span className="search-close-text">Close</span>
+                <span className="material-symbols-outlined search-close-icon">close</span>
               </button>
             </div>
           </header>
 
           {/* Main Search Canvas */}
-          <main className="flex-grow overflow-y-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20">
+          <main className="search-main">
+            <div className="search-container">
               {/* Search Input Section */}
-              <form onSubmit={handleSearch} className="relative group">
+              <form onSubmit={handleSearch} className="search-form group">
+                <div className="search-input-wrapper">
                   <input
                     ref={inputRef}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search for products, categories..."
-                    className="w-full bg-transparent border-none text-4xl md:text-6xl font-headline font-light tracking-tight text-black focus:ring-0 placeholder:text-zinc-200 transition-all duration-500 p-0"
+                    className="search-input"
                   />
-                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-zinc-100 group-focus-within:h-[2px] group-focus-within:bg-black transition-all duration-500"></div>
-                </form>
+                  <button type="button" className="image-search-btn" aria-label="Search by image">
+                    <span className="material-symbols-outlined">photo_camera</span>
+                  </button>
+                </div>
+                <div className="search-input-line"></div>
+              </form>
 
-                {/* Content Grid */}
-                <div className="mt-20 grid grid-cols-1 md:grid-cols-12 gap-16">
+              {/* Content Grid */}
+              <div className="search-grid">
                 {/* Suggestions Column */}
-                <div className="md:col-span-4 space-y-12">
+                <div className="search-suggestions-col">
                   <section>
-                    <h3 className="text-[10px] uppercase tracking-[0.3em] font-extrabold text-zinc-400 mb-8">Our Suggestions</h3>
-                    <div className="flex flex-wrap gap-3">
+                    <h3 className="search-section-title">Our Suggestions</h3>
+                    <div className="search-tags">
                       {popularSuggestions.map((sub) => (
                         <button
                           key={sub}
                           onClick={() => handleSuggestionClick(sub)}
-                          className="px-6 py-2.5 bg-zinc-50 rounded-full text-sm font-medium hover:bg-black hover:text-white transition-all duration-300 cursor-pointer"
+                          className="search-tag"
                         >
                           {sub}
                         </button>
@@ -141,16 +142,16 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                   </section>
 
                   {recentSearches.length > 0 && query.length <= 1 && (
-                    <section>
-                      <h3 className="text-[10px] uppercase tracking-[0.3em] font-extrabold text-zinc-400 mb-6">Recent Searches</h3>
-                      <div className="space-y-3">
+                    <section className="recent-searches-section">
+                      <h3 className="search-section-title">Recent Searches</h3>
+                      <div className="recent-searches-list">
                         {recentSearches.map((term, i) => (
                           <button
                             key={i}
                             onClick={() => handleSuggestionClick(term)}
-                            className="flex items-center gap-3 text-sm text-zinc-500 hover:text-black transition-colors group cursor-pointer"
+                            className="recent-search-item group"
                           >
-                            <span className="material-symbols-outlined text-lg text-zinc-300 group-hover:text-black">history</span>
+                            <span className="material-symbols-outlined recent-search-icon">history</span>
                             {term}
                           </button>
                         ))}
@@ -160,11 +161,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Autocomplete / Results Preview Column */}
-                <div className="md:col-span-8">
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] font-extrabold text-zinc-400 mb-8">
+                <div className="search-results-col">
+                  <h3 className="search-section-title">
                     {query.length > 1 ? 'Refining Search' : 'Featured Products'}
                   </h3>
-                  <div className="space-y-2">
+                  <div className="search-results-list">
                     {results.length > 0 ? (
                       results.map((product) => (
                         <div
@@ -173,43 +174,40 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                             navigate(`/product/${product.id}`);
                             onClose();
                           }}
-                          className="group flex items-center justify-between p-4 bg-zinc-50/50 hover:bg-zinc-50 rounded-xl transition-all duration-300 cursor-pointer"
+                          className="search-result-item group"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-100">
-                              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                          <div className="search-result-info">
+                            <div className="search-result-image-container">
+                              <img src={product.image} alt={product.name} className="search-result-image" />
                             </div>
                             <div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-medium text-black">
+                              <div className="search-result-name-container">
+                                <span className="search-result-name">
                                   {product.name.split(new RegExp(`(${query})`, 'gi')).map((part, i) => 
                                     part.toLowerCase() === query.toLowerCase() ? 
-                                    <span key={i} className="text-zinc-400 font-bold">{part}</span> : 
+                                    <span key={i} className="search-highlight">{part}</span> : 
                                     part
                                   )}
                                 </span>
                               </div>
-                              <span className="text-xs text-zinc-400">{product.category} • {product.subcategory}</span>
+                              <span className="search-result-category">{product.category} • {product.subcategory}</span>
                             </div>
                           </div>
-                          <span className="material-symbols-outlined text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity">north_west</span>
+                          <span className="material-symbols-outlined search-result-arrow">north_west</span>
                         </div>
                       ))
                     ) : query.length > 1 ? (
-                      <div className="p-6 text-zinc-400 italic">No results found for "{query}"</div>
+                      <div className="search-empty">No results found for "{query}"</div>
                     ) : (
-                      <div className="p-6 text-zinc-400 italic">Start typing to see results...</div>
+                      <div className="search-empty">Start typing to see results...</div>
                     )}
                   </div>
 
                   {results.length > 0 && (
-                    <div className="mt-8 flex justify-center">
-                      <button 
-                        onClick={handleSearch}
-                        className="flex items-center gap-3 px-8 py-4 bg-black text-white rounded-full font-headline font-bold tracking-widest uppercase text-xs hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-xl shadow-black/10 cursor-pointer"
-                      >
+                    <div className="search-view-all-container">
+                      <button onClick={handleSearch} className="search-view-all-btn">
                         View all results
-                        <span className="material-symbols-outlined text-sm">trending_flat</span>
+                        <span className="material-symbols-outlined view-all-icon">trending_flat</span>
                       </button>
                     </div>
                   )}
@@ -219,9 +217,9 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           </main>
 
           {/* Footer */}
-          <footer className="h-16 border-t border-zinc-100 flex-shrink-0">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center text-zinc-400 text-[10px] uppercase tracking-[0.4em]">
-              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-50 font-mono">ESC</kbd> to exit search</span>
+          <footer className="search-footer">
+            <div className="search-footer-inner">
+              <span>Press <kbd className="search-kbd">ESC</kbd> to exit search</span>
             </div>
           </footer>
         </motion.div>

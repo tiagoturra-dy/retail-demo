@@ -27,15 +27,11 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "@unocss/preset-attributify": "^66.6.7",
-    "@unocss/preset-icons": "^66.6.7",
-    "@unocss/preset-uno": "^66.6.7",
     "cross-env": "^10.1.0",
     "css-loader": "^7.1.4",
     "dotenv-webpack": "^9.0.0",
     "html-webpack-plugin": "^5.6.6",
     "style-loader": "^4.0.0",
-    "unocss": "^66.6.7",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2",
     "webpack-dev-server": "^5.2.3"
