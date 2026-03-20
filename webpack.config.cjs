@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
+const UnoCSS = require('@unocss/webpack').default;
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -38,7 +39,6 @@ module.exports = {
         use: [
           'style-loader',
           'css-loader',
-          'postcss-loader',
         ],
       },
       {
@@ -50,6 +50,10 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html',
+    }),
+    UnoCSS({
+      include: [/\.jsx?$/, /\.css$/],
+      exclude: [path.resolve(__dirname, 'index.html'), /node_modules/],
     }),
     new Dotenv({
       systemvars: true, // load all system variables as well (including GEMINI_API_KEY)
