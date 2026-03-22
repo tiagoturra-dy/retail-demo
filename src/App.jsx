@@ -19,13 +19,15 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 
+const LOGO_TEXT = 'BLUEBERRY';
+
 export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <Router>
           <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
-            <Navbar />
+            <Navbar logoText={LOGO_TEXT} />
             <main>
               <AnimatePresence mode="wait">
                 <Routes>
@@ -41,7 +43,7 @@ export default function App() {
                 </Routes>
               </AnimatePresence>
             </main>
-            <Footer />
+            <Footer logoText={LOGO_TEXT} />
           </div>
         </Router>
       </CartProvider>

@@ -46,7 +46,6 @@
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #18181b;
 }
 
@@ -55,11 +54,13 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 1rem;
 }
 
 .productDetails {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .productNameLink {
@@ -112,7 +113,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #27272a;
+    filter: invert() drop-shadow(3px 3px 5px #000000);
   }
 }
 

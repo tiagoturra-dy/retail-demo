@@ -48,7 +48,6 @@
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 700;
-  letter-spacing: -0.05em;
   color: #18181b;
   cursor: pointer;
   text-decoration: none;
@@ -83,7 +82,6 @@
   line-height: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #a1a1aa;
   margin-bottom: 1.5rem;
 }

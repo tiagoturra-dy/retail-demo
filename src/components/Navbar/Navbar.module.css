@@ -40,10 +40,10 @@
 }
 
 .navbarLogoText {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   line-height: 2rem;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  letter-spacing: 0.2rem;
   color: #18181b;
 }
 
@@ -127,7 +127,6 @@
   line-height: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #18181b;
   margin-bottom: 1.25rem;
   border-bottom: 1px solid #f4f4f5;
@@ -202,7 +201,6 @@
   font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
   margin-bottom: 0.25rem;
   opacity: 0.8;
 }
@@ -211,7 +209,6 @@
   font-size: 1.25rem;
   line-height: 1.75rem;
   font-weight: 500;
-  letter-spacing: -0.025em;
 }
 
 .featuredOffer {
@@ -226,7 +223,6 @@
   line-height: 1.25rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #18181b;
   margin-bottom: 0.5rem;
 }
@@ -245,7 +241,6 @@
   line-height: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #18181b;
   text-decoration: none;
   transition: all 0.2s;
@@ -399,7 +394,6 @@
   line-height: 1.25rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #a1a1aa;
   cursor: pointer;
   background: none;
@@ -486,7 +480,6 @@
   line-height: 1.25rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
   color: #18181b;
 }

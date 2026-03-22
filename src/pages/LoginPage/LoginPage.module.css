@@ -20,7 +20,6 @@
   font-size: 2.25rem;
   line-height: 2.5rem;
   font-weight: 700;
-  letter-spacing: -0.025em;
   margin-bottom: 0.75rem;
   margin-top: 0;
 }
@@ -47,7 +46,6 @@
   line-height: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: #a1a1aa;
   margin-bottom: 0.5rem;
   margin-left: 0.25rem;
@@ -114,15 +112,10 @@
   font-weight: 700;
   text-decoration: none;
   transition: text-decoration 0.2s;
+  cursor: pointer;
 
   &:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
   }
-}
-
-.loginLinkDisabled {
-  color: #a1a1aa;
-  font-weight: 700;
-  cursor: not-allowed;
 }

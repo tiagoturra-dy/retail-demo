@@ -3,16 +3,16 @@ import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
 import styles from './Footer.module.css';
 
-export const Footer = () => {
+export const Footer = ({ logoText }) => {
   const s = styles || {};
   return (
     <footer className={s.footer}>
       <div className={s.footerContainer}>
         <div className={s.footerGrid}>
           <div className={s.footerBrand}>
-            <Link to="/" className={s.footerLogo}>LUXE</Link>
+            <Link to="/" className={s.footerLogo}>{logoText}</Link>
             <p className={s.footerDescription}>
-              Curating the world's finest fashion and lifestyle essentials since 2024. Elevate your everyday with our premium collections.
+              Curating the world's finest fashion and lifestyle essentials. Elevate your everyday with our premium collections.
             </p>
             <div className={s.footerSocial}>
               <span className={s.socialIconWrapper}><Instagram className={s.icon} /></span>
@@ -54,7 +54,7 @@ export const Footer = () => {
         </div>
 
         <div className={s.footerBottom}>
-          <p className={s.footerCopyright}>© 2024 LUXE Commerce Inc. All rights reserved.</p>
+          <p className={s.footerCopyright}>© 2024 {logoText} Commerce Inc. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
 import styles from './Navbar.module.css';
 
-export const Navbar = () => {
+export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,7 +41,7 @@ export const Navbar = () => {
         <div className={s.navbarInner}>
           {/* Logo */}
           <Link to="/" className={s.navbarLogo}>
-            <span className={s.navbarLogoText}>LUXE</span>
+            <span className={s.navbarLogoText}>{logoText}</span>
           </Link>
 
           {/* Desktop Menu */}

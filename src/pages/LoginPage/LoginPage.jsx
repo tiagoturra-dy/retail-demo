@@ -40,12 +40,12 @@ export const LoginPage = () => {
 
         <form className={s.loginForm} onSubmit={handleLogin}>
           <div className={s.formGroup}>
-            <label className={s.formLabel}>Email or User ID</label>
+            <label className={s.formLabel}>User ID</label>
             <input
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="name@example.com or User ID"
+              placeholder="User ID"
               required
               className={s.formInput}
             />
@@ -72,7 +72,7 @@ export const LoginPage = () => {
 
         <p className={s.loginFooterText}>
           Don't have an account?{' '}
-          <span className={s.loginLinkDisabled}>
+          <span className={s.loginLink}>
             Create one
           </span>
         </p>
