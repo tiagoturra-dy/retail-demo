@@ -1,7 +1,6 @@
 import { Helper } from '../helpers/helper.js';
 
 const DY_API_KEY = '02ea0c7c5ba6b60abf1e02a1b7317f62b53a07ed34a2fc09c05f1c9b128a03ab';
-// const DY_API_KEY = 'a864b4b17b0110f5c0de0a7c38a5428582a3faf21e45090e2da96c3bffb90465';
 
 const mockSuggestions = async (query) => {
   if (!query) return [];

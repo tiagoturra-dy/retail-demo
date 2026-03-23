@@ -39,7 +39,7 @@ export const contentStackService = {
       const response = await fetch(url, options);
       const data = await response.json();
       content = data?.entry;
-      console.log('Contentstack content:', content)
+      console.log(`Contentstack content for ${contentType}:`, content)
 
     } catch (e) {
       console.error(`Error in getting CONTENTSTACK content`, e);
@@ -48,7 +48,7 @@ export const contentStackService = {
     }
     return content;
   },
-  getContentMultiple: async (contentType, entryIdList) => {
+  getMultipleContent: async (contentType, entryIdList) => {
     console.log(`Fetching ContentStack entry: ${contentType}/${entryIdList.join('","')}`);
 
     let url = `https://cdn.contentstack.io/v3/content_types/${contentType}/entries/?environment=production&query={"uid": {"$in" : ["${entryIdList.join('","')}"]}}`
@@ -71,9 +71,8 @@ export const contentStackService = {
       content = data?.entries;
 
       //get the entries back in the original order
-      content.sort((a, b) => entryIds.indexOf(a['uid']) - entryIds.indexOf(b['uid']));
-
-      console.log(content)
+      content.sort((a, b) => entryIdList.indexOf(a['uid']) - entryIdList.indexOf(b['uid']));
+      console.log(`Contentstack content for ${contentType}:`, content)
 
     } catch (e) {
       console.error(`Error in getting CONTENTSTACK content`, e);
