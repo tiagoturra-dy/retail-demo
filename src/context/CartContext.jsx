@@ -70,9 +70,9 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => setCart([]);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  let subtotal = Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
   const shippingFee = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : FLAT_SHIPPING_FEE;
-  const totalPrice = subtotal + shippingFee;
+  let totalPrice = Number((subtotal + shippingFee).toFixed(2));
 
   window.getCartTotal = () => { return totalPrice }
 

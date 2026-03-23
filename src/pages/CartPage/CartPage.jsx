@@ -130,7 +130,7 @@ export const CartPage = () => {
                         <Plus className={styles.quantityIcon} />
                       </button>
                     </div>
-                    <p className={styles.cartItemPrice}>${item.price * item.quantity}</p>
+                    <p className={styles.cartItemPrice}>${(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               </motion.div>
