@@ -1,0 +1,10 @@
+.poweredByContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6b7280;
+}
