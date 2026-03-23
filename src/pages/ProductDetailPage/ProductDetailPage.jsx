@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { useCart } from '../../context/CartContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { Star, ShoppingBag, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AddToCartButton } from '../../components/AddToCartButton/AddToCartButton';
@@ -11,6 +12,7 @@ import { Helper } from '../../helpers/helper';
 export const ProductDetailPage = () => {
   const { productId } = useParams();
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -71,7 +73,7 @@ export const ProductDetailPage = () => {
             </div>
           </div>
 
-          <p className={styles.productPrice}>${product.price}</p>
+          <p className={styles.productPrice}>{formatPrice(product.price)}</p>
 
           <div className={styles.productActions}>
             <div className={styles.actionButtonsRow}>
@@ -94,7 +96,7 @@ export const ProductDetailPage = () => {
               </div>
               <div>
                 <h4 className={styles.featureTitle}>Free Shipping</h4>
-                <p className={styles.featureDesc}>Free standard shipping on orders over ${Helper.getFreeShippingThreshold()}.</p>
+                <p className={styles.featureDesc}>Free standard shipping on orders over {formatPrice(Helper.getFreeShippingThreshold())}.</p>
               </div>
             </div>
             <div className={styles.featureItem}>

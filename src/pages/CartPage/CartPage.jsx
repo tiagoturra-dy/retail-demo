@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { checkoutService } from '../../services/checkoutService';
@@ -11,6 +12,7 @@ import { ConfirmationModal } from '../../components/ConfirmationModal/Confirmati
 export const CartPage = () => {
   const navigate = useNavigate();
   const { cart, removeFromCart, updateQuantity, totalPrice, subtotal, shippingFee, shippingThreshold, totalItems, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
 
@@ -130,7 +132,7 @@ export const CartPage = () => {
                         <Plus className={styles.quantityIcon} />
                       </button>
                     </div>
-                    <p className={styles.cartItemPrice}>${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className={styles.cartItemPrice}>{formatPrice(item.price * item.quantity)}</p>
                   </div>
                 </div>
               </motion.div>
@@ -143,7 +145,7 @@ export const CartPage = () => {
           {amountToFreeShipping > 0 && (
             <div className="mb-6 rounded-xl bg-zinc-50 p-4 border border-zinc-100">
               <p className="text-sm text-zinc-600 mb-2">
-                You're <span className="font-bold text-zinc-900">${amountToFreeShipping.toFixed(2)}</span> away from free shipping!
+                You're <span className="font-bold text-zinc-900">{formatPrice(amountToFreeShipping)}</span> away from free shipping!
               </p>
               <div className="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
                 <div 
@@ -158,23 +160,23 @@ export const CartPage = () => {
             <div className={styles.summaryDetails}>
               <div className={styles.summaryRow}>
                 <span>Subtotal</span>
-                <span>${totalPrice}</span>
+                <span>{formatPrice(totalPrice)}</span>
               </div>
               <div className={styles.summaryRow}>
                 <span>Shipping</span>
                 {shippingFee === 0 ? (
                   <span className={styles.summaryFree}>Free</span>
                 ) : (
-                  <span>${shippingFee.toFixed(2)}</span>
+                  <span>{formatPrice(shippingFee.toFixed(2))}</span>
                 )}
               </div>
               <div className={styles.summaryRow}>
                 <span>Tax</span>
-                <span>$0.00</span>
+                <span>{formatPrice(0.00)}</span>
               </div>
               <div className={styles.summaryTotalRow}>
                 <span>Total</span>
-                <span>${totalPrice}</span>
+                <span>{formatPrice(totalPrice)}</span>
               </div>
             </div>
             <button

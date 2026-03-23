@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { ShoppingBag, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Helper } from '../../helpers/helper';
@@ -9,6 +10,7 @@ import styles from './ProductCard.module.css';
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <motion.div
@@ -40,7 +42,7 @@ export const ProductCard = ({ product }) => {
             <Star className={styles.ratingIcon} />
             <span className={styles.ratingText}>{product.rating || Helper.getRandomRating()} ({product.reviews || Helper.getRandomReviewCount()})</span>
           </div>
-          <p className={styles.productPrice}>${product.price}</p>
+          <p className={styles.productPrice}>{formatPrice(product.price)}</p>
         </div>
         <AddToCartButton 
           product={product} 

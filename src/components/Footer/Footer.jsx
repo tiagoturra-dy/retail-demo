@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Youtube, Globe } from 'lucide-react';
+import { useCurrency } from '../../context/CurrencyContext';
+import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import styles from './Footer.module.css';
 
 export const Footer = ({ logoText }) => {
+  const { currency, setCurrency } = useCurrency();
   const s = styles || {};
   return (
     <footer className={s.footer}>
@@ -55,6 +58,22 @@ export const Footer = ({ logoText }) => {
 
         <div className={s.footerBottom}>
           <p className={s.footerCopyright}>© 2024 {logoText} Commerce Inc. All rights reserved.</p>
+
+          <div className={s.currencySelectorContainer}>
+            <Globe className={s.globeIcon} size={16} />
+            <select 
+              id="currency-select"
+              value={currency} 
+              onChange={(e) => setCurrency(e.target.value)}
+              className={s.currencySelect}
+            >
+              {CURRENCY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label} - {option.value}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </footer>

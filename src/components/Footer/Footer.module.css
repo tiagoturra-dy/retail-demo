@@ -135,3 +135,35 @@
   line-height: 1rem;
   color: #a1a1aa;
 }
+
+.currencySelectorContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #71717a;
+  background-color: #f4f4f5;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  height: 40px;
+}
+
+.currencySelectorContainer:hover {
+  background-color: #e4e4e7;
+  cursor: pointer;
+}
+
+.globeIcon {
+  color: #a1a1aa;
+}
+
+.currencySelect {
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #18181b;
+  cursor: pointer;
+  outline: none;
+  padding-right: 0.5rem;
+}
