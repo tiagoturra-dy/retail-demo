@@ -14,6 +14,8 @@ export const CartPage = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
 
+  const amountToFreeShipping = Math.max(0, shippingThreshold - subtotal);
+
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     const result = await checkoutService.processCheckout(cart, totalPrice);
@@ -138,6 +140,19 @@ export const CartPage = () => {
 
         {/* Summary */}
         <div className={styles.cartSummaryCol}>
+          {amountToFreeShipping > 0 && (
+            <div className="mb-6 rounded-xl bg-zinc-50 p-4 border border-zinc-100">
+              <p className="text-sm text-zinc-600 mb-2">
+                You're <span className="font-bold text-zinc-900">${amountToFreeShipping.toFixed(2)}</span> away from free shipping!
+              </p>
+              <div className="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-zinc-900 transition-all duration-500" 
+                  style={{ width: `${Math.min(100, (subtotal / shippingThreshold) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
           <div className={styles.cartSummaryCard}>
             <h2 className={styles.summaryTitle}>Order Summary</h2>
             <div className={styles.summaryDetails}>
