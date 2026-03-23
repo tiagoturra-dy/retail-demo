@@ -1,10 +1,38 @@
 import { PRODUCTS } from '../helpers/productConstants.js';
 import { CATEGORIES } from '../helpers/categoryConstants.js'
 import { formatMockResponse } from '../helpers/formatMockResponse.js'
+import { searchService } from './searchService.js';
 
 export const catalogService = {
   getCategories: async () => {
     return CATEGORIES;
+  },
+  getProductById: async (id) => {
+    const filters = [
+      {
+        "field": "sku",
+        "values": [id]
+      }
+    ]
+    const searchResults = await searchService.searchProducts({
+      type: 'product',
+      query: '',
+      filters,
+      numItems: 1,
+      isImplicitKeywordSearchEvent: false,
+      enableSpellCheck: false,
+      contextType: 'OTHER'
+    })
+
+    let response = searchResults?.choices?.[0]?.variations?.[0]?.payload?.data?.slots?.[0] || null
+    if (response) {
+      response = {
+        ...response,
+        ...response.productData
+      }
+      delete response.productData
+    }
+    return response
   },
   getProducts: async (category, subcategory, priceRanges, item) => {
     let filtered = PRODUCTS.filter(p => {
@@ -29,7 +57,4 @@ export const catalogService = {
 
     return formatMockResponse(filtered, filtered.length);
   },
-  getProductById: async (id) => {
-    return PRODUCTS.find(p => p.sku === id) || null;
-  }
 };

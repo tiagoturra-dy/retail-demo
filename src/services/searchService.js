@@ -48,7 +48,7 @@ const mockSuggestions = async (query) => {
   return terms.filter(t => t.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
 }
 
-const buildBaseBody = ({type = 'search', cart = []}) => {
+const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent = true, contextType}) => {
   const dyid = Helper.getCookie('_dyid');
   const dyjsession = Helper.getCookie('_dyjsession');
 
@@ -62,14 +62,19 @@ const buildBaseBody = ({type = 'search', cart = []}) => {
       page: {}
     },
     session: { dy: '' },
+    options: {
+      returnAnalyticsMetadata: false,
+      isImplicitClientData: true,
+      isImplicitKeywordSearchEvent
+    }
   }
 
   switch (type) {
     case 'search':
       body.context.page = {
         locale: "en_US",
-        type: context.type,
-        data: context.data || [""],
+        type: contextType ?? context.type,
+        data: contextType ? [""] : context.data || [""],
         location: window.location.href
       }
       break
@@ -138,10 +143,14 @@ export const searchService = {
     subcategories, 
     priceRanges, 
     sortBy, 
+    filters,
     cart = [], 
     numItems = 48, 
     offset = 0, 
-    type = "search"
+    type = "search",
+    isImplicitKeywordSearchEvent = true,
+    enableSpellCheck = true,
+    contextType = null
   }) => {
     if (!query && type === 'search') return mockSearchProducts(query, subcategories, priceRanges, sortBy);
     const dyid = Helper.getCookie('_dyid');
@@ -150,24 +159,19 @@ export const searchService = {
     // Dynamic Yield Search API Call
     try {
       const requestBody = {
-        ...buildBaseBody({cart}),
+        ...buildBaseBody({cart, isImplicitKeywordSearchEvent, contextType}),
         selector: {
           name: "Semantic Search"
         },
         query: {
-          enableSpellCheck: true,
+          enableSpellCheck,
           text: query,
           pagination: { "numItems": numItems, "offset": offset }
         }
       };
 
-      if (subcategories && subcategories.length > 0) {
-        requestBody.query.filters = [
-          {
-            field: "categories",
-            values: subcategories
-          }
-        ];
+      if (filters && filters.length > 0) {
+        requestBody.query.filters = filters;
       }
 
       const response = await fetch('https://direct.dy-api.com/v2/serve/user/search', {
