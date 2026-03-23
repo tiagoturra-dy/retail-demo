@@ -94,7 +94,7 @@ export const ProductDetailPage = () => {
               </div>
               <div>
                 <h4 className={styles.featureTitle}>Free Shipping</h4>
-                <p className={styles.featureDesc}>Free standard shipping on orders over $150.</p>
+                <p className={styles.featureDesc}>Free standard shipping on orders over ${Helper.getFreeShippingThreshold()}.</p>
               </div>
             </div>
             <div className={styles.featureItem}>
