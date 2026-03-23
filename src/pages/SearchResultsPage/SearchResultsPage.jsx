@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { Pagination } from '../../components/Pagination/Pagination';
+import { PoweredBy } from '../../components/PoweredBy/PoweredBy';
+import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
 import { useCart } from '../../context/CartContext';
 import { motion } from 'motion/react';
 import styles from './SearchResultsPage.module.css';
-import { PoweredBy } from '../../components/PoweredBy/PoweredBy';
 
 export const SearchResultsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,39 +18,52 @@ export const SearchResultsPage = () => {
   const [facets, setFacets] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [subFilters, setSubFilters] = useState([]);
-  const [priceFilters, setPriceFilters] = useState([]);
-  const [sortBy, setSortBy] = useState('relevancy');
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const [sortBy, setSortBy] = useState('');
   const itemsPerPage = 48;
 
+  const fetchResults = useCallback(async () => {
+    setLoading(true);
+    
+    // Convert selectedFilters object to API format
+    const apiFilters = Object.entries(selectedFilters)
+      .filter(([_, values]) => values.length > 0)
+      .map(([field, values]) => ({
+        field,
+        values
+      }));
+
+    const apiSort = {
+      field: sortBy.split('-')[0],
+      order: sortBy.split('-')[1]
+    }
+
+    const response = await searchService.searchProducts({
+      query, 
+      filters: apiFilters,
+      sortBy: apiSort, 
+      cart,
+      numItems: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage
+    });
+    
+    if (response && response.choices && response.choices.length > 0) {
+      const data = response.choices[0].variations[0].payload.data;
+      setResults(data.slots || []);
+      setFacets(data.facets || []);
+      setTotalResults(data.totalNumResults || 0);
+    } else {
+      setResults([]);
+      setFacets([]);
+      setTotalResults(0);
+    }
+    
+    setLoading(false);
+  }, [query, selectedFilters, sortBy, currentPage, cart]);
+
   useEffect(() => {
-    const fetchResults = async () => {
-      setLoading(true);
-      const response = await searchService.searchProducts({
-        query, 
-        subcategories: subFilters, 
-        priceRanges: priceFilters, 
-        sortBy, 
-        cart,
-        numItems: itemsPerPage,
-        offset: (currentPage - 1) * itemsPerPage
-      });
-      
-      if (response && response.choices && response.choices.length > 0) {
-        const data = response.choices[0].variations[0].payload.data;
-        setResults(data.slots || []);
-        setFacets(data.facets || []);
-        setTotalResults(data.totalNumResults || 0);
-      } else {
-        setResults([]);
-        setFacets([]);
-        setTotalResults(0);
-      }
-      
-      setLoading(false);
-    };
     fetchResults();
-  }, [query, subFilters, priceFilters, sortBy, currentPage]);
+  }, [fetchResults]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -58,7 +72,7 @@ export const SearchResultsPage = () => {
       newParams.delete('page');
       setSearchParams(newParams);
     }
-  }, [query, subFilters, priceFilters, sortBy]);
+  }, [query, selectedFilters, sortBy]);
 
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
@@ -71,29 +85,41 @@ export const SearchResultsPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const categoryFacet = facets.find(f => f.column === 'categories');
-  const availableSubcategories = categoryFacet ? categoryFacet.values.map(v => v.name) : [];
+  const handleFilterChange = (column, value, isReplace = false) => {
+    setSelectedFilters(prev => {
+      if (isReplace) {
+        return {
+          ...prev,
+          [column]: [value]
+        };
+      }
 
-  const handleSubFilterChange = (sub) => {
-    setSubFilters(prev => 
-      prev.includes(sub.toLowerCase()) ? prev.filter(s => s !== sub.toLowerCase()) : [...prev, sub.toLowerCase()]
-    );
+      const currentValues = prev[column] || [];
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      
+      return {
+        ...prev,
+        [column]: newValues
+      };
+    });
   };
 
-  const handlePriceFilterChange = (range) => {
-    setPriceFilters(prev => 
-      prev.includes(range) ? prev.filter(r => r !== range) : [...prev, range]
-    );
+  const handleClearFacet = (column) => {
+    setSelectedFilters(prev => {
+      const newState = { ...prev };
+      delete newState[column];
+      return newState;
+    });
   };
 
   const clearFilters = () => {
-    setSubFilters([]);
-    setPriceFilters([]);
+    setSelectedFilters({});
     setSortBy('relevancy');
   };
 
   const totalPages = Math.ceil(totalResults / itemsPerPage);
-  const paginatedResults = results;
 
   return (
     <div className={styles.searchResultsContainer}>
@@ -115,77 +141,46 @@ export const SearchResultsPage = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className={styles.sortSelect}
             >
-              <option value="relevancy">Relevancy</option>
+              <option value="">Relevancy</option>
               <option value="name-asc">Name (A-Z)</option>
               <option value="name-desc">Name (Z-A)</option>
               <option value="price-asc">Price (Low to High)</option>
               <option value="price-desc">Price (High to Low)</option>
             </select>
           </div>
-          {(subFilters.length > 0 || priceFilters.length > 0) && (
-            <button 
-              onClick={clearFilters}
-              className={styles.clearFiltersBtn}
-            >
-              Clear filters
-            </button>
-          )}
         </div>
       </div>
 
       <div className={styles.searchLayout}>
         {/* Sidebar Facets */}
         <aside className={styles.searchSidebar}>
-          {availableSubcategories.length > 0 && (
-            <div>
-              <h3 className={styles.sidebarTitle}>Refine by Category</h3>
-              <div className={styles.filterList}>
-                {availableSubcategories.map((sub) => (
-                  <label key={sub} className={styles.filterLabel}>
-                    <input 
-                      type="checkbox" 
-                      className={styles.filterCheckbox}
-                      checked={subFilters.includes(sub.toLowerCase())}
-                      onChange={() => handleSubFilterChange(sub)}
-                    /> 
-                    {sub}
-                  </label>
-                ))}
-              </div>
-            </div>
+          {Object.values(selectedFilters).some(v => v.length > 0) && (
+            <button 
+              onClick={clearFilters}
+              className={styles.sidebarClearAll}
+            >
+              Clear all filters
+            </button>
           )}
-
-          <div>
-            <h3 className={styles.sidebarTitle}>Price Range</h3>
-            <div className={styles.filterList}>
-              {[
-                { label: 'Under $50', value: 'under-50' },
-                { label: '$50 - $100', value: '50-100' },
-                { label: '$100 - $500', value: '100-500' },
-                { label: 'Over $500', value: 'over-500' },
-              ].map((range) => (
-                <label key={range.value} className={styles.filterLabel}>
-                  <input 
-                    type="checkbox" 
-                    className={styles.filterCheckbox}
-                    checked={priceFilters.includes(range.value)}
-                    onChange={() => handlePriceFilterChange(range.value)}
-                  /> 
-                  {range.label}
-                </label>
-              ))}
-            </div>
-          </div>
+          {facets.map((facet) => (
+            <FacetFilter
+              key={facet.column}
+              facet={facet}
+              selectedValues={selectedFilters[facet.column] || []}
+              onFilterChange={handleFilterChange}
+              onClearFacet={handleClearFacet}
+            />
+          ))}
         </aside>
 
         {/* Results Grid */}
         <div className={styles.searchResultsArea}>
           {loading ? (
             <div className={styles.loadingState}>Searching...</div>
-          ) : paginatedResults.length > 0 ? (
+          ) : results.length > 0 ? (
             <>
               <div className={styles.productGrid}>
-                {paginatedResults.map((product) => {
+                {results.map((product) => {
                   product = {...product, ...product.productData}
                   delete product.productData;
                   return (

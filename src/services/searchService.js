@@ -171,7 +171,28 @@ export const searchService = {
       };
 
       if (filters && filters.length > 0) {
-        requestBody.query.filters = filters;
+        requestBody.query.filters = filters.map(f => {
+          // Special handling for price range filter structure
+          if (f.field === 'price' && f.values?.[0] && typeof f.values[0] === 'object') {
+            return {
+              field: 'price',
+              min: f.values[0].min,
+              max: f.values[0].max
+            };
+          }
+          return f;
+        });
+      } else if (subcategories && subcategories.length > 0) {
+        requestBody.query.filters = [
+          {
+            field: "categories",
+            values: subcategories
+          }
+        ];
+      }
+
+      if (sortBy && sortBy.field !== '') {
+        requestBody.query.sortBy = sortBy
       }
 
       const response = await fetch('https://direct.dy-api.com/v2/serve/user/search', {

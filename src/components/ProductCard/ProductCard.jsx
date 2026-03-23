@@ -28,6 +28,9 @@ export const ProductCard = ({ product }) => {
       </Link>
       <div className={styles.productInfoContainer}>
         <div className={styles.productDetails}>
+          {product.brand && 
+            <p className={styles.productBrand}>{product.brand}</p>
+          }
           <Link to={`/product/${product.id}`} className={styles.productNameLink}>
             <h3 className={styles.productName}>
               {product.name}

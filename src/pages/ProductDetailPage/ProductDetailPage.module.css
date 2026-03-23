@@ -58,6 +58,9 @@
   border-radius: 1.5rem;
   overflow: hidden;
   background-color: #f4f4f5;
+  align-self: center;
+  height: 100%;
+  max-width: 400px;
 }
 
 .mainImage {

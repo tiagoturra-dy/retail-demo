@@ -1,0 +1,115 @@
+.facetContainer {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1.5rem;
+}
+
+.facetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.facetTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0;
+}
+
+.clearFacetBtn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.clearFacetBtn:hover {
+  color: #000;
+}
+
+.searchWrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 8px 8px 32px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #000;
+}
+
+.valuesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.valueLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #444;
+  transition: color 0.2s;
+}
+
+.valueLabel:hover {
+  color: #000;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #000;
+}
+
+.valueName {
+  flex: 1;
+  text-transform: capitalize;
+}
+
+.valueCount {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.showMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.showMoreBtn:hover {
+  text-decoration: underline;
+}

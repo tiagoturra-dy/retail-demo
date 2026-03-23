@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
+import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { Pagination } from '../../components/Pagination/Pagination';
+import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
+import { useCart } from '../../context/CartContext';
 import { motion } from 'motion/react';
 import styles from './CategoryPage.module.css';
 
@@ -11,37 +14,71 @@ export const CategoryPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const subcategory = searchParams.get('sub');
-  const item = searchParams.get('item');
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const { cart } = useCart();
   const [products, setProducts] = useState([]);
+  const [facets, setFacets] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [priceFilters, setPriceFilters] = useState([]);
-  const itemsPerPage = 6;
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const itemsPerPage = 48;
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    
+    // Convert selectedFilters object to API format
+    const apiFilters = Object.entries(selectedFilters)
+      .filter(([_, values]) => values.length > 0)
+      .map(([field, values]) => ({
+        field,
+        values
+      }));
+
+    // Add category filter if not "all"
+    if (categoryName && categoryName !== 'all') {
+      const catFilter = apiFilters.find(f => f.field === 'categories');
+      if (catFilter) {
+        if (!catFilter.values.includes(categoryName)) {
+          catFilter.values.push(categoryName);
+        }
+      } else {
+        apiFilters.push({ field: 'categories', values: [categoryName] });
+      }
+    }
+
+    const [response, catData] = await Promise.all([
+      searchService.searchProducts({
+        type: 'category',
+        query: '',
+        filters: apiFilters,
+        cart,
+        numItems: itemsPerPage,
+        offset: (currentPage - 1) * itemsPerPage
+      }),
+      catalogService.getCategories()
+    ]);
+
+    console.log('Category response', response)
+    
+    if (response && response.choices && response.choices.length > 0) {
+      const data = response.choices[0].variations[0].payload.data;
+      setProducts(data.slots || []);
+      setFacets(data.facets || []);
+      setTotalResults(data.totalNumResults || 0);
+    } else {
+      setProducts([]);
+      setFacets([]);
+      setTotalResults(0);
+    }
+    
+    setCategories(catData);
+    setLoading(false);
+  }, [categoryName, selectedFilters, currentPage, cart]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const [response, catData] = await Promise.all([
-        catalogService.getProducts(categoryName, subcategory || undefined, priceFilters, item || undefined),
-        catalogService.getCategories()
-      ]);
-      
-      if (response && response.choices && response.choices.length > 0) {
-        const data = response.choices[0].variations[0].payload.data;
-        setProducts(data.slots || []);
-        setTotalResults(data.totalNumResults || 0);
-      } else {
-        setProducts([]);
-        setTotalResults(0);
-      }
-      
-      setCategories(catData);
-      setLoading(false);
-    };
     fetchData();
-  }, [categoryName, subcategory, priceFilters, item]);
+  }, [fetchData]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -50,7 +87,7 @@ export const CategoryPage = () => {
       newParams.delete('page');
       setSearchParams(newParams);
     }
-  }, [categoryName, subcategory, priceFilters, item]);
+  }, [categoryName, selectedFilters]);
 
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
@@ -63,21 +100,41 @@ export const CategoryPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const categoryInfo = categories.find((c) => c.name.toLowerCase() === categoryName?.toLowerCase());
+  const handleFilterChange = (column, value, isReplace = false) => {
+    setSelectedFilters(prev => {
+      if (isReplace) {
+        return {
+          ...prev,
+          [column]: [value]
+        };
+      }
 
-  const handlePriceFilterChange = (range) => {
-    setPriceFilters(prev => 
-      prev.includes(range) ? prev.filter(r => r !== range) : [...prev, range]
-    );
+      const currentValues = prev[column] || [];
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter(v => v !== value)
+        : [...currentValues, value];
+      
+      return {
+        ...prev,
+        [column]: newValues
+      };
+    });
+  };
+
+  const handleClearFacet = (column) => {
+    setSelectedFilters(prev => {
+      const newState = { ...prev };
+      delete newState[column];
+      return newState;
+    });
   };
 
   const clearFilters = () => {
-    setPriceFilters([]);
+    setSelectedFilters({});
     navigate(`/category/${categoryName}`);
   };
 
   const totalPages = Math.ceil(totalResults / itemsPerPage);
-  const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className={styles.categoryPageContainer}>
@@ -92,81 +149,44 @@ export const CategoryPage = () => {
             </p>
           )}
         </div>
-        {(priceFilters.length > 0 || subcategory) && (
-          <button 
-            onClick={clearFilters}
-            className={styles.clearFiltersBtn}
-          >
-            Clear all filters
-          </button>
-        )}
       </div>
 
       <div className={styles.categoryLayout}>
         {/* Sidebar Filters */}
         <aside className={styles.categorySidebar}>
-          <div>
-            <h3 className={styles.sidebarTitle}>Categories</h3>
-            <div className={styles.sidebarSectionList}>
-              {categoryInfo?.sections.map((section) => (
-                <div key={section.title}>
-                  <Link to={`/category/${categoryName}?sub=${section.title}`} 
-                    className={styles.sidebarSubtitle}
-                  >
-                    {section.title}
-                  </Link>
-                  <ul className={styles.sidebarItemList}>
-                    {section.items.map((itemStr) => {
-                      const isActive = searchParams.get('item')?.toLowerCase() === itemStr.toLowerCase();
-                      return (
-                        <li key={itemStr}>
-                          <Link
-                            to={`/category/${categoryName}?sub=${section.title}&item=${itemStr}`}
-                            className={`${styles.sidebarLink} ${isActive ? styles.active : ''}`}
-                          >
-                            {itemStr}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h3 className={styles.sidebarTitle}>Price Range</h3>
-            <div className={styles.priceFilterList}>
-              {[
-                { label: 'Under $50', value: 'under-50' },
-                { label: '$50 - $100', value: '50-100' },
-                { label: '$100 - $500', value: '100-500' },
-                { label: 'Over $500', value: 'over-500' },
-              ].map((range) => (
-                <label key={range.value} className={styles.priceFilterLabel}>
-                  <input 
-                    type="checkbox" 
-                    className={styles.priceFilterCheckbox}
-                    checked={priceFilters.includes(range.value)}
-                    onChange={() => handlePriceFilterChange(range.value)}
-                  /> 
-                  {range.label}
-                </label>
-              ))}
-            </div>
-          </div>
+          {Object.values(selectedFilters).some(v => v.length > 0) && (
+            <button 
+              onClick={clearFilters}
+              className={styles.sidebarClearAll}
+            >
+              Clear all filters
+            </button>
+          )}
+          {facets.filter(f => f.column !== 'categories').map((facet) => (
+            <FacetFilter
+              key={facet.column}
+              facet={facet}
+              selectedValues={selectedFilters[facet.column] || []}
+              onFilterChange={handleFilterChange}
+              onClearFacet={handleClearFacet}
+            />
+          ))}
         </aside>
 
         {/* Product Grid */}
         <div className={styles.categoryProductArea}>
           {loading ? (
             <div className={styles.loadingState}>Loading products...</div>
-          ) : paginatedProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <>
               <div className={styles.productGrid}>
-                {paginatedProducts.map((product) => (
-                  <ProductCard key={product.sku || product.id} product={product} />
-                ))}
+                {products.map((product) => {
+                  product = {...product, ...product.productData}
+                  delete product.productData;
+                  return (
+                    <ProductCard key={product.sku || product.id} product={product} />
+                  )
+                })}
               </div>
               
               <Pagination 

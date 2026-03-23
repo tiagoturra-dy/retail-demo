@@ -1,0 +1,54 @@
+.priceFilterContainer {
+  padding: 0.5rem 0;
+}
+
+.inputsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.inputWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.currencySymbol {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.priceInput {
+  width: 100%;
+  padding: 6px 6px 6px 18px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.priceInput::-webkit-outer-spin-button,
+.priceInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.priceInput:focus {
+  border-color: #000;
+}
+
+.separator {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.sliderWrapper {
+  padding: 0 8px;
+  margin-bottom: 1rem;
+}
