@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { searchService } from '../../services/searchService';
@@ -6,7 +6,6 @@ import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { Pagination } from '../../components/Pagination/Pagination';
 import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
 import { useCart } from '../../context/CartContext';
-import { motion } from 'motion/react';
 import styles from './CategoryPage.module.css';
 
 export const CategoryPage = () => {
@@ -16,6 +15,7 @@ export const CategoryPage = () => {
   const subcategory = searchParams.get('sub');
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const { cart } = useCart();
+  const cartRef = useRef(cart);
   const [products, setProducts] = useState([]);
   const [facets, setFacets] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
@@ -23,6 +23,10 @@ export const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState({});
   const itemsPerPage = 48;
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -52,7 +56,7 @@ export const CategoryPage = () => {
         type: 'category',
         query: '',
         filters: apiFilters,
-        cart,
+        cart: cartRef.current,
         numItems: itemsPerPage,
         offset: (currentPage - 1) * itemsPerPage
       }),
@@ -74,7 +78,7 @@ export const CategoryPage = () => {
     
     setCategories(catData);
     setLoading(false);
-  }, [categoryName, selectedFilters, currentPage, cart]);
+  }, [categoryName, selectedFilters, currentPage]);
 
   useEffect(() => {
     fetchData();

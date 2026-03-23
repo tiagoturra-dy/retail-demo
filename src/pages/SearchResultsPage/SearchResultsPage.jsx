@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
@@ -12,6 +12,7 @@ import styles from './SearchResultsPage.module.css';
 export const SearchResultsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { cart } = useCart();
+  const cartRef = useRef(cart);
   const query = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [results, setResults] = useState([]);
@@ -21,6 +22,10 @@ export const SearchResultsPage = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const itemsPerPage = 48;
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   const fetchResults = useCallback(async () => {
     setLoading(true);
@@ -42,7 +47,7 @@ export const SearchResultsPage = () => {
       query, 
       filters: apiFilters,
       sortBy: apiSort, 
-      cart,
+      cart: cartRef.current,
       numItems: itemsPerPage,
       offset: (currentPage - 1) * itemsPerPage
     });
@@ -59,7 +64,7 @@ export const SearchResultsPage = () => {
     }
     
     setLoading(false);
-  }, [query, selectedFilters, sortBy, currentPage, cart]);
+  }, [query, selectedFilters, sortBy, currentPage]);
 
   useEffect(() => {
     fetchResults();
