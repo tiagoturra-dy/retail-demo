@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Helper } from '../helpers/helper';
 
 const CartContext = createContext(undefined);
 
 export const CartProvider = ({ children }) => {
   // Configurable shipping constants
-  const SHIPPING_THRESHOLD = 150;
-  const FLAT_SHIPPING_FEE = 15;
+  const SHIPPING_THRESHOLD = Helper.getFreeShippingThreshold();
+  const FLAT_SHIPPING_FEE = Helper.getShippingValue();
 
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('retail_cart');
