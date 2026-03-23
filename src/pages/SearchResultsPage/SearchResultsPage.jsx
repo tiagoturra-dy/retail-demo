@@ -3,11 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { Pagination } from '../../components/Pagination/Pagination';
+import { useCart } from '../../context/CartContext';
 import { motion } from 'motion/react';
 import styles from './SearchResultsPage.module.css';
+import { PoweredBy } from '../../components/PoweredBy/PoweredBy';
 
 export const SearchResultsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { cart } = useCart();
   const query = searchParams.get('q') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [results, setResults] = useState([]);
@@ -17,12 +20,20 @@ export const SearchResultsPage = () => {
   const [subFilters, setSubFilters] = useState([]);
   const [priceFilters, setPriceFilters] = useState([]);
   const [sortBy, setSortBy] = useState('relevancy');
-  const itemsPerPage = 8;
+  const itemsPerPage = 48;
 
   useEffect(() => {
     const fetchResults = async () => {
       setLoading(true);
-      const response = await searchService.searchProducts(query, subFilters, priceFilters, sortBy);
+      const response = await searchService.searchProducts({
+        query, 
+        subcategories: subFilters, 
+        priceRanges: priceFilters, 
+        sortBy, 
+        cart,
+        numItems: itemsPerPage,
+        offset: (currentPage - 1) * itemsPerPage
+      });
       
       if (response && response.choices && response.choices.length > 0) {
         const data = response.choices[0].variations[0].payload.data;
@@ -38,7 +49,7 @@ export const SearchResultsPage = () => {
       setLoading(false);
     };
     fetchResults();
-  }, [query, subFilters, priceFilters, sortBy]);
+  }, [query, subFilters, priceFilters, sortBy, currentPage]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -82,7 +93,7 @@ export const SearchResultsPage = () => {
   };
 
   const totalPages = Math.ceil(totalResults / itemsPerPage);
-  const paginatedResults = results.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedResults = results;
 
   return (
     <div className={styles.searchResultsContainer}>
@@ -174,9 +185,13 @@ export const SearchResultsPage = () => {
           ) : paginatedResults.length > 0 ? (
             <>
               <div className={styles.productGrid}>
-                {paginatedResults.map((product) => (
-                  <ProductCard key={product.sku || product.id} product={product} />
-                ))}
+                {paginatedResults.map((product) => {
+                  product = {...product, ...product.productData}
+                  delete product.productData;
+                  return (
+                    <ProductCard key={product.sku || product.id} product={product} />
+                  )
+                })}
               </div>
 
               <Pagination 
@@ -184,6 +199,7 @@ export const SearchResultsPage = () => {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
               />
+              <PoweredBy />
             </>
           ) : (
             <div className={styles.emptyState}>
