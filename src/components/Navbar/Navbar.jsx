@@ -52,6 +52,7 @@ export const Navbar = ({ logoText }) => {
                 className={s.navbarItemContainer}
                 onMouseEnter={() => setHoveredCategory(category.name)}
                 onMouseLeave={() => setHoveredCategory(null)}
+                data-dy-category-menu={category.name}
               >
                 <Link to={`/category/${category.name}`} className={s.navbarLink} >
                   {category.name}
@@ -128,21 +129,21 @@ export const Navbar = ({ logoText }) => {
 
           {/* Icons & Search */}
           <div className={`nav-icons ${s.navbarActions}`}>
-            <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn}>
+            <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
               <Search className={`site-header__icon ${s.actionIcon}`} />
             </button>
 
             {user ? (
-              <button onClick={handleLogout} className={s.actionBtn} title="Log Out">
+              <button onClick={handleLogout} className={s.actionBtn} title="Log Out" data-dy-nav-icon="logout">
                 <LogOut className={`site-header__icon ${s.actionIcon}`} />
               </button>
             ) : (
-              <Link to="/login" className={s.actionBtn} title="Log In">
+              <Link to="/login" className={s.actionBtn} title="Log In" data-dy-nav-icon="login">
                 <User className={`site-header__icon ${s.actionIcon}`} />
               </Link>
             )}
             
-            <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`}>
+            <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`} data-dy-nav-icon="cart">
               <ShoppingBag className={`site-header__icon ${s.actionIcon}`} />
               {totalItems > 0 && (
                 <span className={s.cartBadge}>{totalItems}</span>
