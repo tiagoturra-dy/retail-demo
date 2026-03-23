@@ -1,46 +1,7 @@
-import { PRODUCTS } from '../helpers/productConstants.js';
-import { formatMockResponse } from '../helpers/formatMockResponse.js'
 import { Helper } from '../helpers/helper.js';
 
 const DY_API_KEY = '02ea0c7c5ba6b60abf1e02a1b7317f62b53a07ed34a2fc09c05f1c9b128a03ab';
 // const DY_API_KEY = 'a864b4b17b0110f5c0de0a7c38a5428582a3faf21e45090e2da96c3bffb90465';
-
-const mockSearchProducts = async (query, subcategories, priceRanges, sortBy) => {
-  if (!query) return formatMockResponse([], 0);
-  let filtered = PRODUCTS.filter(p => 
-    p.name.toLowerCase().includes(query.toLowerCase()) || 
-    (p.categories.split('|') || []).some(c => c.toLowerCase().includes(query.toLowerCase())) ||
-    (p.description || '').toLowerCase().includes(query.toLowerCase())
-  );
-
-  if (subcategories && subcategories.length > 0) {
-    filtered = filtered.filter(p => 
-      (p.categories.split('|')  || []).some(c => subcategories.includes(c.toLowerCase()))
-    );
-  }
-
-  if (priceRanges && priceRanges.length > 0) {
-    filtered = filtered.filter(p => {
-      return priceRanges.some(range => {
-        const price = p.price;
-        if (range === 'under-50') return price < 50;
-        if (range === '50-100') return price >= 50 && price <= 100;
-        if (range === '100-500') return price >= 100 && price <= 500;
-        if (range === 'over-500') return price > 500;
-        return false;
-      });
-    });
-  }
-
-  if (sortBy) {
-    if (sortBy === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name));
-    if (sortBy === 'name-desc') filtered.sort((a, b) => b.name.localeCompare(a.name));
-    if (sortBy === 'price-asc') filtered.sort((a, b) => a.price - b.price);
-    if (sortBy === 'price-desc') filtered.sort((a, b) => b.price - a.price);
-  }
-
-  return formatMockResponse(filtered, filtered.length);
-};
 
 const mockSuggestions = async (query) => {
   if (!query) return [];
@@ -235,6 +196,6 @@ export const searchService = {
       console.error('DY Search API Error:', error);
     }
 
-    return mockSearchProducts(query, subcategories, priceRanges, sortBy);
+    return null;
   }
 };
