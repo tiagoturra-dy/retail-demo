@@ -6,30 +6,46 @@ import { ArrowRight } from 'lucide-react';
 import { personalizationService } from '../../services/personalizationService';
 import { contentStackService } from '../../services/contentStackService';
 import styles from './Home.module.css';
+import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
 
 export const Home = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [heroBanner, setHeroBanner] = useState(null);
   const [promoBanner, setPromoBanner] = useState(null);
+  const [blogData, setBlogData] = useState(null);
+  const [categoryData, setCategoryData] = useState(null);
+  const [featureBoxData, setFeatureBoxData] = useState(null);
+  const [promoBannerData, setPromoBannerData] = useState(null);
+
+  const categoryLinks = [
+    '/category/Men',
+    '/category/Beauty',
+    '/search?q=swim',
+  ]
 
   useEffect(() => {
     const fetchData = async () => {
-      const [recData, heroData, promoData] = await Promise.all([
-        personalizationService.getRecommendations(),
-        // TODO: call choose to get first content
-        // SELECTOR: banner1
-        // JSON: 
-        // {
-        //   "cms_entry_id": "blte0ad912575f1ee77",
-        //   "cms_entry_id_type": "banner_block",
-        //   "content_type": "banner_block"
-        // }
+      const [recData, heroData, promoData, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
+        personalizationService.getRecommendations({selectors: ['hp_recs'], isImplicitPageview: false}),
+        // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
-        personalizationService.getPersonalizedBanners()
+        personalizationService.getPersonalizedBanners(),
+        // blog posts
+        contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
+        // featured categories
+        contentStackService.getMultipleContent('article_box', ['bltef643043a7c5fb9b', 'blt549fadcc70f892df', 'bltccf28b95c2a9159c']),
+        // feature box
+        contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf']),
+        // promo
+        contentStackService.getContent('banner_block', 'bltd62f6a62c5796de8'),
       ]);
       setRecommendations(recData);
       setHeroBanner(heroData);
       setPromoBanner(promoData[0]);
+      setBlogData(blogData);
+      setCategoryData(categoryData);
+      setFeatureBoxData(featureBoxData);
+      setPromoBannerData(promoBanner);
     };
     fetchData();
   }, []);
@@ -37,104 +53,66 @@ export const Home = () => {
   return (
     <div className={styles.homePage}>
       {/* Hero Section */}
-      <section className={styles.heroSection}>
-        <div className={styles.heroBg}>
-          <img
-            src={heroBanner?.background_image?.url}
-            alt="Hero"
-            className={styles.heroImage}
-          />
-          <div className={styles.heroOverlay} />
-        </div>
-        
-        <div className={styles.heroContentContainer}>
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className={styles.heroContent}
-          >
-            <h1 className={styles.heroTitle}>
-              {heroBanner?.display_title}
-            </h1>
-            <p className={styles.heroSubtitle}>
-              {heroBanner?.subtitle}
-            </p>
-            <div className={styles.heroActions}>
-              <Link
-                to={heroBanner?.link_url}
-                className={styles.heroPrimaryBtn}
-              >
-                {heroBanner?.cta_text} <ArrowRight className={styles.heroBtnIcon} />
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <PromoBanner additionalClass='banner1' content={heroBanner} />
 
-      {/* Featured Categories */}
-      <section className={styles.categoriesSection}>
-        <div className={styles.categoriesGrid}>
-          <Link to="/category/men" className={styles.categoryCard}>
-            <img
-              src="https://picsum.photos/seed/men-hero/800/1000"
-              className={styles.categoryImage}
-              alt="Men"
-            />
-            <div className={styles.categoryOverlay} />
-            <div className={styles.categoryContent}>
-              <h3 className={styles.categoryTitle}>Men</h3>
-              <p className={styles.categorySubtitle}>Explore Collection</p>
+      {/* Features */}
+      <section className={`feature__row ${styles.tileSection} ${styles.featuresSection}`}>
+        {featureBoxData && (
+          <>
+            <div className={styles.tileGrid}>
+              {featureBoxData.map((tile, idx) => (
+                <Link to={categoryLinks[idx]} className={`feature_${idx} ${styles.tileCard}`} key={tile.uid}>
+                  <img
+                    src={tile.image.url}
+                    className={styles.tileImage}
+                    alt={tile.caption}
+                  />
+                  <div className={styles.tileOverlay} />
+                  <div className={styles.tileContent}>
+                    <h3 className={styles.tileTitle}>{tile.caption}</h3>
+                    <p className={styles.tileSubtitle}>{tile.subtitle}</p>
+                  </div>
+                </Link>
+              ))}
             </div>
-          </Link>
-          <Link to="/category/women" className={styles.categoryCard}>
-            <img
-              src="https://picsum.photos/seed/women-hero/800/1000"
-              className={styles.categoryImage}
-              alt="Women"
-            />
-            <div className={styles.categoryOverlay} />
-            <div className={styles.categoryContent}>
-              <h3 className={styles.categoryTitle}>Women</h3>
-              <p className={styles.categorySubtitle}>Explore Collection</p>
-            </div>
-          </Link>
-          <Link to="/category/beauty" className={styles.categoryCard}>
-            <img
-              src="https://picsum.photos/seed/beauty-hero/800/1000"
-              className={styles.categoryImage}
-              alt="Beauty"
-            />
-            <div className={styles.categoryOverlay} />
-            <div className={styles.categoryContent}>
-              <h3 className={styles.categoryTitle}>Beauty</h3>
-              <p className={styles.categorySubtitle}>Explore Collection</p>
-            </div>
-          </Link>
-        </div>
+          </>
+        )}
       </section>
 
       {/* Recommendations Carousel */}
       <section className={styles.recommendationsSection}>
-        <div className={styles.recommendationsHeader}>
-          <div>
-            <h2 className={styles.recommendationsTitle}>Recommended For You</h2>
-            <p className={styles.recommendationsSubtitle}>Personalized picks based on your style.</p>
-          </div>
-          <Link to="/category/all" className={styles.recommendationsViewAll}>
-            View All
-          </Link>
-        </div>
-        <div className={styles.recommendationsGrid}>
-          {recommendations.map((product) => (
-            <ProductCard key={product.sku} product={product} />
-          ))}
-        </div>
+        <div id="hpRecs" className='hp__recs'></div>
+      </section>
+
+      {/* Featured Categories */}
+      <section className={`article__row ${styles.tileSection}`}>
+        {categoryData && (
+          <>
+            <div className={styles.tileGrid}>
+              {categoryData.map((tile, idx) => (
+                <Link to={categoryLinks[idx]} className={`article_${idx} ${styles.tileCard}`} key={tile.uid}>
+                  <img
+                    src={tile.image.url}
+                    className={styles.tileImage}
+                    alt={tile.title}
+                  />
+                  <div className={styles.tileOverlay} />
+                  <div className={styles.tileContent}>
+                    <h3 className={styles.tileTitle}>{tile.title}</h3>
+                    <p className={styles.tileSubtitle}>{tile.subtitle}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {/* Personalized Promo Banner */}
+      <PromoBanner additionalClass='banner2' content={promoBannerData} type="promo" />
+      {/* TODO: FIX */}
       {promoBanner && (
-        <section className={styles.promoSection}>
+        <section className={`banner2 ${styles.promoSection}`}>
           <div className={styles.promoContainer}>
             <img src={promoBanner.image} alt={promoBanner.title} className={styles.promoImage} />
             <div className={styles.promoOverlay} />
@@ -149,24 +127,28 @@ export const Home = () => {
         </section>
       )}
 
-      {/* Newsletter */}
-      <section className={styles.newsletterSection}>
-        <div className={styles.newsletterContainer}>
-          <h2 className={styles.newsletterTitle}>Join the Inner Circle</h2>
-          <p className={styles.newsletterSubtitle}>
-            Subscribe to receive updates, access to exclusive deals, and more.
-          </p>
-          <form className={styles.newsletterForm} onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className={styles.newsletterInput}
-            />
-            <button className={styles.newsletterBtn}>
-              Subscribe
-            </button>
-          </form>
-        </div>
+      {/* Blog */}
+      <section className={styles.tileSection}>
+        {blogData && (
+          <>
+            <div className={styles.tileGrid}>
+              {blogData.map((tile, idx) => (
+                <div className={`blog_${idx} ${styles.tileCard}`} key={tile.uid}>
+                  <img
+                    src={tile.image.url}
+                    className={styles.tileImage}
+                    alt={tile.title}
+                  />
+                  <div className={styles.tileOverlay} />
+                  <div className={styles.tileContent}>
+                    <h3 className={styles.tileTitle}>{tile.title}</h3>
+                    <p className={styles.tileSubtitle}>{tile.subtitle}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
     </div>
   );
