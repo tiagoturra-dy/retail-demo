@@ -73,6 +73,8 @@ export const CartProvider = ({ children }) => {
   const shippingFee = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : FLAT_SHIPPING_FEE;
   const totalPrice = subtotal + shippingFee;
 
+  window.getCartTotal = () => { return totalPrice }
+
   return (
     <CartContext.Provider
       value={{

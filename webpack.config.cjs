@@ -8,9 +8,9 @@ module.exports = {
   entry: './src/main.jsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.[contenthash].js',
+    filename: 'bundle.js',
     clean: true,
-    publicPath: '/',
+    publicPath: 'auto',
   },
   resolve: {
     extensions: ['.js', '.jsx'],

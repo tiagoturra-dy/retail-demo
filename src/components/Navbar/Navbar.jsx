@@ -36,7 +36,7 @@ export const Navbar = ({ logoText }) => {
   };
 
   return (
-    <nav className={s.navbar}>
+    <nav className={`${s.navbar} nav-div`}>
       <div className={s.navbarContainer}>
         <div className={s.navbarInner}>
           {/* Logo */}
@@ -127,23 +127,23 @@ export const Navbar = ({ logoText }) => {
           </div>
 
           {/* Icons & Search */}
-          <div className={s.navbarActions}>
+          <div className={`nav-icons ${s.navbarActions}`}>
             <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn}>
-              <Search className={s.actionIcon} />
+              <Search className={`site-header__icon ${s.actionIcon}`} />
             </button>
 
             {user ? (
               <button onClick={handleLogout} className={s.actionBtn} title="Log Out">
-                <LogOut className={s.actionIcon} />
+                <LogOut className={`site-header__icon ${s.actionIcon}`} />
               </button>
             ) : (
               <Link to="/login" className={s.actionBtn} title="Log In">
-                <User className={s.actionIcon} />
+                <User className={`site-header__icon ${s.actionIcon}`} />
               </Link>
             )}
             
             <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`}>
-              <ShoppingBag className={s.actionIcon} />
+              <ShoppingBag className={`site-header__icon ${s.actionIcon}`} />
               {totalItems > 0 && (
                 <span className={s.cartBadge}>{totalItems}</span>
               )}
