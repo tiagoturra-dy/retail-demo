@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env $env:NODE_TLS_REJECT_UNAUTHORIZED=0; NODE_ENV=development webpack serve --config webpack.config.cjs",
+    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=development webpack serve --config webpack.config.cjs",
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.cjs --mode production",
     "preview": "cross-env NODE_ENV=production webpack serve --config webpack.config.cjs --mode production",
     "clean": "rm -rf dist",
