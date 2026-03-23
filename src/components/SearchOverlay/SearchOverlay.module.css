@@ -360,10 +360,16 @@
   font-style: italic;
 }
 
+.suggestionsEmpty {
+  color: #a1a1aa;
+  font-style: italic;
+}
+
 .searchViewAllContainer {
   margin-top: 2rem;
   display: flex;
   justify-content: center;
+  flex-flow: column nowrap;
 }
 
 .searchViewAllBtn {
@@ -383,9 +389,13 @@
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  width: auto;
+  margin: auto;
 
   &:hover {
     transform: scale(1.02);
+    background-color: #fafafa;
+    color: #000;
   }
 
   &:active {
