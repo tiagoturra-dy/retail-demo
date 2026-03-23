@@ -17,7 +17,6 @@ export const Helper = {
     const randomValue = Math.random() * 5;
     return parseFloat(randomValue.toFixed(precision));
   },
-
   /**
    * 2. Generates a random number of reviews.
    * @param {number} max - The upper limit of reviews (default 2500).
@@ -63,5 +62,11 @@ export const Helper = {
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     const expires = `; expires=${date.toUTCString()}`;
     document.cookie = `${name}=${value || ""}${expires}; path=/; SameSite=Lax`;
+  },
+  getFreeShippingThreshold: () => {
+    return 175
+  },
+  getShippingValue: () => {
+    return 15
   },
 }

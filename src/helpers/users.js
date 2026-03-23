@@ -4,6 +4,28 @@ export const USERS =
   "ecomm":
   [
     {
+      "user_id": "1",
+      "Name": "Sara Khan",
+      "LoyaltyLevel": "Bronze",
+      "LoyaltyPoints": "2110",
+      "Location": "London, United Kingdom",
+      "MembershipNumber": "BRONZE-5623981",
+      "ProductInterests": "Kids & Toys, Home Decor",
+      "RecentPurchaseName": "Moschino Teddy Bear Knit Hat",
+      "RecentPurchaseSku": "214665640"
+    },
+    {
+      "user_id": "2",
+      "Name": "John Lee",
+      "LoyaltyLevel": "Silver",
+      "LoyaltyPoints": "5380",
+      "Location": "Sydney, Australia",
+      "MembershipNumber": "SILVER-1093845",
+      "ProductInterests": "Fitness, Electronics, Books",
+      "RecentPurchaseName": "5.0 Low Vulcanized Sneakers",
+      "RecentPurchaseSku": "214653464"
+    },
+    {
       "user_id": "3",
       "Name": "Alex Smith",
       "LoyaltyLevel": "Gold",
@@ -24,28 +46,6 @@ export const USERS =
       "ProductInterests": "Fashion, Skincare, Travel Gear",
       "RecentPurchaseName": "Logo Charm Pouch",
       "RecentPurchaseSku": "214663159"
-    },
-    {
-      "user_id": "2",
-      "Name": "John Lee",
-      "LoyaltyLevel": "Silver",
-      "LoyaltyPoints": "5380",
-      "Location": "Sydney, Australia",
-      "MembershipNumber": "SILVER-1093845",
-      "ProductInterests": "Fitness, Electronics, Books",
-      "RecentPurchaseName": "5.0 Low Vulcanized Sneakers",
-      "RecentPurchaseSku": "214653464"
-    },
-    {
-      "user_id": "1",
-      "Name": "Sara Khan",
-      "LoyaltyLevel": "Bronze",
-      "LoyaltyPoints": "2110",
-      "Location": "London, United Kingdom",
-      "MembershipNumber": "BRONZE-5623981",
-      "ProductInterests": "Kids & Toys, Home Decor",
-      "RecentPurchaseName": "Moschino Teddy Bear Knit Hat",
-      "RecentPurchaseSku": "214665640"
     },
     {
       "user_id": "5",
