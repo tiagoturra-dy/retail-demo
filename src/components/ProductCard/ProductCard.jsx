@@ -17,7 +17,7 @@ export const ProductCard = ({ product }) => {
       viewport={{ once: true }}
       className={styles.productCard}
     >
-      <Link to={`/product/${product.id}`} className={styles.productCardLink}>
+      <Link to={`/product/${product.sku}`} className={styles.productCardLink}>
         <div className={styles.productImageContainer}>
           <img
             src={Helper.getProductImage(product.image_url)}
