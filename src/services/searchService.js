@@ -1,4 +1,5 @@
-import { PRODUCTS } from '../constants.js';
+import { PRODUCTS } from '../helpers/productConstants.js';
+import { formatMockResponse } from '../helpers/formatMockResponse.js'
 
 export const searchService = {
   getAutocompleteTerms: async (query) => {
@@ -7,24 +8,27 @@ export const searchService = {
     return terms.filter(t => t.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
   },
   searchProducts: async (query, subcategories, priceRanges, sortBy) => {
-    if (!query) return [];
+    if (!query) return formatMockResponse([], 0);
     let filtered = PRODUCTS.filter(p => 
       p.name.toLowerCase().includes(query.toLowerCase()) || 
-      p.category.toLowerCase().includes(query.toLowerCase()) ||
-      p.subcategory.toLowerCase().includes(query.toLowerCase())
+      (p.categories.split('|') || []).some(c => c.toLowerCase().includes(query.toLowerCase())) ||
+      (p.description || '').toLowerCase().includes(query.toLowerCase())
     );
 
     if (subcategories && subcategories.length > 0) {
-      filtered = filtered.filter(p => subcategories.includes(p.subcategory.toLowerCase()));
+      filtered = filtered.filter(p => 
+        (p.categories.split('|')  || []).some(c => subcategories.includes(c.toLowerCase()))
+      );
     }
 
     if (priceRanges && priceRanges.length > 0) {
       filtered = filtered.filter(p => {
         return priceRanges.some(range => {
-          if (range === 'under-50') return p.price < 50;
-          if (range === '50-100') return p.price >= 50 && p.price <= 100;
-          if (range === '100-500') return p.price >= 100 && p.price <= 500;
-          if (range === 'over-500') return p.price > 500;
+          const price = p.price;
+          if (range === 'under-50') return price < 50;
+          if (range === '50-100') return price >= 50 && price <= 100;
+          if (range === '100-500') return price >= 100 && price <= 500;
+          if (range === 'over-500') return price > 500;
           return false;
         });
       });
@@ -37,6 +41,6 @@ export const searchService = {
       if (sortBy === 'price-desc') filtered.sort((a, b) => b.price - a.price);
     }
 
-    return filtered;
+    return formatMockResponse(filtered, filtered.length);
   }
 };

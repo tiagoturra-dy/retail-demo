@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { searchService } from '../../services/searchService';
 import styles from './SearchOverlay.module.css';
+import { ArrowUpRight, History } from 'lucide-react'
+import { Helper } from '../../helpers/helper';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           searchService.searchProducts(query)
         ]);
         setSuggestions(terms);
-        setResults(products.slice(0, 4));
+        setResults(products.choices[0].variations[0].payload.data.slots.slice(0, 4));
       } else {
         setSuggestions([]);
         setResults([]);
@@ -157,7 +159,9 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                             onClick={() => handleSuggestionClick(term)}
                             className={styles.recentSearchItem}
                           >
-                            <span className={`material-symbols-outlined ${styles.recentSearchIcon}`}>history</span>
+                            <span className={`material-symbols-outlined ${styles.recentSearchIcon}`}>
+                              <History size={16} />
+                            </span>
                             {term}
                           </button>
                         ))}
@@ -184,7 +188,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                         >
                           <div className={styles.searchResultInfo}>
                             <div className={styles.searchResultImageContainer}>
-                              <img src={product.image} alt={product.name} className={styles.searchResultImage} />
+                              <img src={Helper.getProductImage(product.image_url)} alt={product.name} className={styles.searchResultImage} />
                             </div>
                             <div>
                               <div className={styles.searchResultNameContainer}>
@@ -196,10 +200,12 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                                   )}
                                 </span>
                               </div>
-                              <span className={styles.searchResultCategory}>{product.category} • {product.subcategory}</span>
+                              <span className={styles.searchResultCategory}>{Helper.getProducCategoriesDisplay(product.categories)}</span>
                             </div>
                           </div>
-                          <span className={`material-symbols-outlined ${styles.searchResultArrow}`}>north_west</span>
+                          <span className={`material-symbols-outlined ${styles.searchResultArrow}`}>
+                            <ArrowUpRight />
+                          </span>
                         </div>
                       ))
                     ) : query.length > 1 ? (
@@ -213,7 +219,9 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                     <div className={styles.searchViewAllContainer}>
                       <button onClick={handleSearch} className={styles.searchViewAllBtn}>
                         View all results
-                        <span className={`material-symbols-outlined ${styles.viewAllIcon}`}>trending_flat</span>
+                        <span className={`material-symbols-outlined ${styles.viewAllIcon}`}>
+                          <ArrowUpRight />
+                        </span>
                       </button>
                     </div>
                   )}

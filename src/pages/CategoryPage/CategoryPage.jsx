@@ -2,36 +2,66 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { Pagination } from '../../components/Pagination/Pagination';
 import { motion } from 'motion/react';
 import styles from './CategoryPage.module.css';
 
 export const CategoryPage = () => {
   const { categoryName } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const subcategory = searchParams.get('sub');
   const item = searchParams.get('item');
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [products, setProducts] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [priceFilters, setPriceFilters] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [prodData, catData] = await Promise.all([
+      const [response, catData] = await Promise.all([
         catalogService.getProducts(categoryName, subcategory || undefined, priceFilters, item || undefined),
         catalogService.getCategories()
       ]);
-      setProducts(prodData);
+      
+      if (response && response.choices && response.choices.length > 0) {
+        const data = response.choices[0].variations[0].payload.data;
+        setProducts(data.slots || []);
+        setTotalResults(data.totalNumResults || 0);
+      } else {
+        setProducts([]);
+        setTotalResults(0);
+      }
+      
       setCategories(catData);
       setLoading(false);
-      setCurrentPage(1);
     };
     fetchData();
   }, [categoryName, subcategory, priceFilters, item]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    if (searchParams.get('page')) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('page');
+      setSearchParams(newParams);
+    }
+  }, [categoryName, subcategory, priceFilters, item]);
+
+  const handlePageChange = (page) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (page === 1) {
+      newParams.delete('page');
+    } else {
+      newParams.set('page', page.toString());
+    }
+    setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const categoryInfo = categories.find((c) => c.name.toLowerCase() === categoryName?.toLowerCase());
 
@@ -46,7 +76,7 @@ export const CategoryPage = () => {
     navigate(`/category/${categoryName}`);
   };
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const totalPages = Math.ceil(totalResults / itemsPerPage);
   const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
@@ -80,14 +110,18 @@ export const CategoryPage = () => {
             <div className={styles.sidebarSectionList}>
               {categoryInfo?.sections.map((section) => (
                 <div key={section.title}>
-                  <h4 className={styles.sidebarSubtitle}>{section.title}</h4>
+                  <Link to={`/category/${categoryName}?sub=${section.title}`} 
+                    className={styles.sidebarSubtitle}
+                  >
+                    {section.title}
+                  </Link>
                   <ul className={styles.sidebarItemList}>
                     {section.items.map((itemStr) => {
                       const isActive = searchParams.get('item')?.toLowerCase() === itemStr.toLowerCase();
                       return (
                         <li key={itemStr}>
                           <Link
-                            to={`/category/${categoryName}?sub=${section.title.toLowerCase()}&item=${itemStr.toLowerCase()}`}
+                            to={`/category/${categoryName}?sub=${section.title}&item=${itemStr}`}
                             className={`${styles.sidebarLink} ${isActive ? styles.active : ''}`}
                           >
                             {itemStr}
@@ -131,40 +165,15 @@ export const CategoryPage = () => {
             <>
               <div className={styles.productGrid}>
                 {paginatedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.sku || product.id} product={product} />
                 ))}
               </div>
               
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className={styles.paginationContainer}>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                    className={styles.paginationArrow}
-                  >
-                    <span className="material-symbols-outlined">chevron_left</span>
-                  </button>
-                  <div className={styles.paginationNumbers}>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`${styles.paginationNumber} ${currentPage === page ? styles.active : ''}`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                    className={styles.paginationArrow}
-                  >
-                    <span className="material-symbols-outlined">chevron_right</span>
-                  </button>
-                </div>
-              )}
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </>
           ) : (
             <div className={styles.emptyState}>

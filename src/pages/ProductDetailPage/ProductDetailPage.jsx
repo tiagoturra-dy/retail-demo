@@ -4,13 +4,17 @@ import { catalogService } from '../../services/catalogService';
 import { useCart } from '../../context/CartContext';
 import { Star, ShoppingBag, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
 import { motion } from 'motion/react';
+import { AddToCartButton } from '../../components/AddToCartButton/AddToCartButton';
 import styles from './ProductDetailPage.module.css';
+import { Helper } from '../../helpers/helper';
 
 export const ProductDetailPage = () => {
   const { productId } = useParams();
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const productRating = Helper.getRandomRating();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -46,33 +50,24 @@ export const ProductDetailPage = () => {
             animate={{ opacity: 1 }}
             className={styles.mainImageContainer}
           >
-            <img src={product.image} alt={product.name} className={styles.mainImage} />
+            <img src={Helper.getProductImage(product.image_url)} alt={product.name} className={styles.mainImage} />
           </motion.div>
-          <div className={styles.thumbnailGrid}>
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className={styles.thumbnailContainer}>
-                <img src={`https://picsum.photos/seed/${product.id}-${i}/200/200`} alt="" className={styles.thumbnailImage} />
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Product Info */}
         <div className={styles.productInfoCol}>
           <div className={styles.productHeader}>
             <div className={styles.breadcrumbs}>
-              <Link to={`/category/${product.category.toLowerCase()}`} className={styles.breadcrumbLink}>{product.category}</Link>
-              <span className={styles.breadcrumbSeparator}>/</span>
-              <span className={styles.breadcrumbCurrent}>{product.subcategory}</span>
+              <span className={styles.breadcrumbLink}>{Helper.getProducCategoriesDisplay(product.categories)}</span>
             </div>
             <h1 className={styles.productTitle}>{product.name}</h1>
             <div className={styles.productRating}>
               <div className={styles.starsContainer}>
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className={`${styles.starIcon} ${i <= Math.floor(product.rating) ? styles.filled : styles.empty}`} />
+                  <Star key={i} className={`${styles.starIcon} ${i <= Math.floor(product.rating || productRating) ? styles.filled : styles.empty}`} />
                 ))}
               </div>
-              <span className={styles.reviewsText}>{product.rating} ({product.reviews} reviews)</span>
+              <span className={styles.reviewsText}>{product.rating || productRating} ({product.reviews || Helper.getRandomReviewCount()} reviews)</span>
             </div>
           </div>
 
@@ -80,12 +75,12 @@ export const ProductDetailPage = () => {
 
           <div className={styles.productActions}>
             <div className={styles.actionButtonsRow}>
-              <button
-                onClick={() => addToCart(product)}
-                className={styles.addToCartBtn}
-              >
-                <ShoppingBag className={styles.btnIcon} /> Add to Cart
-              </button>
+              <AddToCartButton 
+                product={product} 
+                className={styles.addToCartBtn} 
+                iconClass={styles.btnIcon} 
+                showText={true} 
+              />
               <button className={styles.wishlistBtn}>
                 <Heart className={styles.wishlistIcon} />
               </button>

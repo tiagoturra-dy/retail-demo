@@ -1,19 +1,54 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext(undefined);
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+  // Configurable shipping constants
+  const SHIPPING_THRESHOLD = 150;
+  const FLAT_SHIPPING_FEE = 15;
+
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('retail_cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('retail_cart', JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
+      let newCart;
       if (existing) {
-        return prev.map((item) =>
+        newCart = prev.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
+      } else {
+        newCart = [...prev, { ...product, quantity: 1 }];
       }
-      return [...prev, { ...product, quantity: 1 }];
+
+      // Trigger Dynamic Yield Event
+      if (window.DY && typeof window.DY.API === 'function') {
+        window.DY.API("event", {
+          name: "Add to Cart",
+          properties: {
+            dyType: "add-to-cart-v1",
+            value: product.price,
+            currency: "USD",
+            productId: String(product.id),
+            quantity: 1,
+            cart: newCart.map(item => ({
+              productId: String(item.id),
+              quantity: item.quantity,
+              itemPrice: item.price
+            }))
+          }
+        });
+        console.log('[Dynamic Yield] Add to Cart event triggered for product:', product.id);
+      }
+
+      return newCart;
     });
   };
 
@@ -34,11 +69,24 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => setCart([]);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shippingFee = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : FLAT_SHIPPING_FEE;
+  const totalPrice = subtotal + shippingFee;
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalItems,
+        subtotal,
+        totalPrice,
+        shippingFee,
+        shippingThreshold: SHIPPING_THRESHOLD,
+      }}
     >
       {children}
     </CartContext.Provider>

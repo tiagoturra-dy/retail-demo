@@ -2,32 +2,66 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { Pagination } from '../../components/Pagination/Pagination';
 import { motion } from 'motion/react';
 import styles from './SearchResultsPage.module.css';
 
 export const SearchResultsPage = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [results, setResults] = useState([]);
+  const [facets, setFacets] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
   const [subFilters, setSubFilters] = useState([]);
   const [priceFilters, setPriceFilters] = useState([]);
   const [sortBy, setSortBy] = useState('relevancy');
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
   useEffect(() => {
     const fetchResults = async () => {
       setLoading(true);
-      const data = await searchService.searchProducts(query, subFilters, priceFilters, sortBy);
-      setResults(data);
+      const response = await searchService.searchProducts(query, subFilters, priceFilters, sortBy);
+      
+      if (response && response.choices && response.choices.length > 0) {
+        const data = response.choices[0].variations[0].payload.data;
+        setResults(data.slots || []);
+        setFacets(data.facets || []);
+        setTotalResults(data.totalNumResults || 0);
+      } else {
+        setResults([]);
+        setFacets([]);
+        setTotalResults(0);
+      }
+      
       setLoading(false);
-      setCurrentPage(1);
     };
     fetchResults();
   }, [query, subFilters, priceFilters, sortBy]);
 
-  const availableSubcategories = Array.from(new Set(results.map(p => p.subcategory)));
+  // Reset page when filters change
+  useEffect(() => {
+    if (searchParams.get('page')) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('page');
+      setSearchParams(newParams);
+    }
+  }, [query, subFilters, priceFilters, sortBy]);
+
+  const handlePageChange = (page) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (page === 1) {
+      newParams.delete('page');
+    } else {
+      newParams.set('page', page.toString());
+    }
+    setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const categoryFacet = facets.find(f => f.column === 'categories');
+  const availableSubcategories = categoryFacet ? categoryFacet.values.map(v => v.name) : [];
 
   const handleSubFilterChange = (sub) => {
     setSubFilters(prev => 
@@ -47,7 +81,7 @@ export const SearchResultsPage = () => {
     setSortBy('relevancy');
   };
 
-  const totalPages = Math.ceil(results.length / itemsPerPage);
+  const totalPages = Math.ceil(totalResults / itemsPerPage);
   const paginatedResults = results.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
@@ -58,7 +92,7 @@ export const SearchResultsPage = () => {
             Search Results
           </h1>
           <p className={styles.searchSubtitle}>
-            {loading ? 'Searching...' : `Found ${results.length} results for "${query}"`}
+            {loading ? 'Searching...' : `Found ${totalResults} results for "${query}"`}
           </p>
         </div>
         
@@ -141,40 +175,15 @@ export const SearchResultsPage = () => {
             <>
               <div className={styles.productGrid}>
                 {paginatedResults.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.sku || product.id} product={product} />
                 ))}
               </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className={styles.paginationContainer}>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                    className={styles.paginationArrow}
-                  >
-                    <span className="material-symbols-outlined">chevron_left</span>
-                  </button>
-                  <div className={styles.paginationNumbers}>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`${styles.paginationNumber} ${currentPage === page ? styles.active : ''}`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                    className={styles.paginationArrow}
-                  >
-                    <span className="material-symbols-outlined">chevron_right</span>
-                  </button>
-                </div>
-              )}
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </>
           ) : (
             <div className={styles.emptyState}>

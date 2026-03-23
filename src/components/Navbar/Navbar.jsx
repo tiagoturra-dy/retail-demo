@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CATEGORIES } from '../../constants';
+import { CATEGORIES } from '../../helpers/categoryConstants';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
@@ -53,10 +53,7 @@ export const Navbar = ({ logoText }) => {
                 onMouseEnter={() => setHoveredCategory(category.name)}
                 onMouseLeave={() => setHoveredCategory(null)}
               >
-                <Link
-                  to={`/category/${category.name.toLowerCase()}`}
-                  className={s.navbarLink}
-                >
+                <Link to={`/category/${category.name}`} className={s.navbarLink} >
                   {category.name}
                   <ChevronDown className={`${s.navbarChevron} ${hoveredCategory === category.name ? s.rotate180 : ''}`} />
                 </Link>
@@ -76,14 +73,15 @@ export const Navbar = ({ logoText }) => {
                         <div className={s.megaMenuGrid}>
                           {category.sections.map((section) => (
                             <div key={section.title} className={s.megaMenuSection}>
-                              <h3 className={s.megaMenuHeading}>
+                              <Link to={`/category/${category.name}?sub=${section.title}`}
+                                className={s.megaMenuHeading}
+                              >
                                 {section.title}
-                              </h3>
+                              </Link>
                               <ul className={s.megaMenuList}>
                                 {section.items.map((item) => (
                                   <li key={item}>
-                                    <Link
-                                      to={`/category/${category.name.toLowerCase()}?sub=${section.title.toLowerCase()}&item=${item.toLowerCase()}`}
+                                    <Link to={`/category/${category.name}?sub=${section.title}&item=${item}`}
                                       className={s.megaMenuLink}
                                     >
                                       {item}

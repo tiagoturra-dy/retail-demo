@@ -4,12 +4,15 @@ import { useCart } from '../../context/CartContext';
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { checkoutService } from '../../services/checkoutService';
+import { Helper } from '../../helpers/helper';
 import styles from './CartPage.module.css';
+import { ConfirmationModal } from '../../components/ConfirmationModal/ConfirmationModal';
 
 export const CartPage = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, totalPrice, subtotal, shippingFee, shippingThreshold, totalItems, clearCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState(null);
 
   const handleCheckout = async () => {
     setIsCheckingOut(true);
@@ -17,8 +20,39 @@ export const CartPage = () => {
     setIsCheckingOut(false);
     if (result.success) {
       const orderId = result.orderId;
+
+      // Trigger Dynamic Yield Purchase Event
+      if (window.DY && typeof window.DY.API === 'function') {
+        window.DY.API("event", {
+          name: "Purchase",
+          properties: {
+            uniqueTransactionId: String(orderId),
+            dyType: "purchase-v1",
+            value: Number(totalPrice),
+            currency: "USD",
+            cart: cart.map(item => ({
+              productId: String(item.id),
+              quantity: item.quantity,
+              itemPrice: Number(item.price)
+            }))
+          }
+        });
+        console.log('[Dynamic Yield] Purchase event triggered for order:', orderId);
+      }
+
       clearCart();
       navigate('/thank-you', { state: { orderId } });
+    }
+  };
+
+  const handleRemoveClick = (item) => {
+    setItemToRemove(item);
+  };
+
+  const handleConfirmRemove = () => {
+    if (itemToRemove) {
+      removeFromCart(itemToRemove.id);
+      setItemToRemove(null);
     }
   };
 
@@ -55,7 +89,7 @@ export const CartPage = () => {
                 className={`${styles.cartItem} group`}
               >
                 <Link to={`/product/${item.id}`} className={styles.cartItemImageLink}>
-                  <img src={item.image} alt={item.name} className={styles.cartItemImage} />
+                  <img src={Helper.getProductImage(item.image)} alt={item.name} className={styles.cartItemImage} />
                 </Link>
                 <div className={styles.cartItemDetails}>
                   <div>
@@ -64,18 +98,24 @@ export const CartPage = () => {
                         <h3 className={styles.cartItemName}>{item.name}</h3>
                       </Link>
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => handleRemoveClick(item)}
                         className={styles.cartItemRemoveBtn}
                       >
                         <Trash2 className={styles.removeIcon} />
                       </button>
                     </div>
-                    <p className={styles.cartItemCategory}>{item.category} • {item.subcategory}</p>
+                    <p className={styles.cartItemCategory}>{Helper.getProducCategoriesDisplay(item.categories)}</p>
                   </div>
                   <div className={styles.cartItemFooter}>
                     <div className={styles.cartQuantityControls}>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => {
+                          if (item.quantity === 1) {
+                            handleRemoveClick(item);
+                          } else {
+                            updateQuantity(item.id, item.quantity - 1);
+                          }
+                        }}
                         className={styles.quantityBtn}
                       >
                         <Minus className={styles.quantityIcon} />
@@ -107,7 +147,11 @@ export const CartPage = () => {
               </div>
               <div className={styles.summaryRow}>
                 <span>Shipping</span>
-                <span className={styles.summaryFree}>Free</span>
+                {shippingFee === 0 ? (
+                  <span className={styles.summaryFree}>Free</span>
+                ) : (
+                  <span>${shippingFee.toFixed(2)}</span>
+                )}
               </div>
               <div className={styles.summaryRow}>
                 <span>Tax</span>
@@ -131,6 +175,16 @@ export const CartPage = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={!!itemToRemove}
+        onClose={() => setItemToRemove(null)}
+        onConfirm={handleConfirmRemove}
+        title="Remove item?"
+        message={`Are you sure you want to remove "${itemToRemove?.name}" from your bag?`}
+        confirmText="Remove"
+        cancelText="Keep it"
+      />
     </div>
   );
 };

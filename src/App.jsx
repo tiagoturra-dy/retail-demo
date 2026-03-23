@@ -18,6 +18,7 @@ import { NotFoundPage } from './pages/NotFoundPage/NotFoundPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
+import { DYManager } from './components/DYManager/DYManager';
 
 const LOGO_TEXT = 'BLUEBERRY';
 
@@ -26,6 +27,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          <DYManager />
           <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
             <Navbar logoText={LOGO_TEXT} />
             <main>

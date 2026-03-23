@@ -248,7 +248,7 @@
 .recentSearchItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.25rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: #71717a;

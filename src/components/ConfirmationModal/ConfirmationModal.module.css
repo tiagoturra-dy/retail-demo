@@ -1,0 +1,143 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.modalContent {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background-color: #ffffff;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border-radius: 9999px;
+  padding: 0.25rem;
+  color: #a1a1aa;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background-color: #f4f4f5;
+  color: #52525b;
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.iconWrapper {
+  margin-bottom: 1rem;
+  display: flex;
+  height: 3.5rem;
+  width: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+
+.iconDanger {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.iconDefault {
+  background-color: #f4f4f5;
+  color: #52525b;
+}
+
+.title {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #18181b;
+}
+
+.message {
+  margin-bottom: 2rem;
+  color: #71717a;
+  line-height: 1.625;
+}
+
+.buttonGroup {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+}
+
+.btn {
+  flex: 1;
+  border-radius: 0.75rem;
+  padding: 0.875rem 0;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3.25rem;
+  box-sizing: border-box;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btnCancel {
+  border: 1px solid #e4e4e7;
+  color: #52525b;
+  background-color: transparent;
+}
+
+.btnCancel:hover {
+  background-color: #fafafa;
+}
+
+.btnConfirm {
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btnDanger {
+  background-color: #ef4444;
+}
+
+.btnDanger:hover {
+  background-color: #dc2626;
+}
+
+.btnDefault {
+  background-color: #18181b;
+}
+
+.btnDefault:hover {
+  background-color: #27272a;
+}

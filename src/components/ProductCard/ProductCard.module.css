@@ -1,5 +1,6 @@
 .productCard {
   display: block;
+  max-width: 282px;
 
   &:hover {
     .productImage {
@@ -70,9 +71,14 @@
 .productName {
   font-size: 0.875rem;
   line-height: 1.25rem;
+  height: 2.5rem;
   font-weight: 500;
   color: #18181b;
   margin: 0;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
 }
 
 .productRating {

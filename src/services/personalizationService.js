@@ -1,4 +1,4 @@
-import { PRODUCTS } from '../constants.js';
+import { PRODUCTS } from '../helpers/productConstants.js';
 
 export const personalizationService = {
   getRecommendations: async (userId) => {

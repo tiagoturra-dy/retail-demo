@@ -16,7 +16,15 @@ export const Home = () => {
     const fetchData = async () => {
       const [recData, heroData, promoData] = await Promise.all([
         personalizationService.getRecommendations(),
-        contentStackService.getEntry('hero_banner', 'main-hero'),
+        // TODO: call choose to get first content
+        // SELECTOR: banner1
+        // JSON: 
+        // {
+        //   "cms_entry_id": "blte0ad912575f1ee77",
+        //   "cms_entry_id_type": "banner_block",
+        //   "content_type": "banner_block"
+        // }
+        contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
         personalizationService.getPersonalizedBanners()
       ]);
       setRecommendations(recData);
@@ -32,7 +40,7 @@ export const Home = () => {
       <section className={styles.heroSection}>
         <div className={styles.heroBg}>
           <img
-            src={heroBanner?.image || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1920"}
+            src={heroBanner?.background_image?.url}
             alt="Hero"
             className={styles.heroImage}
           />
@@ -47,23 +55,17 @@ export const Home = () => {
             className={styles.heroContent}
           >
             <h1 className={styles.heroTitle}>
-              {heroBanner?.title || "DEFINE YOUR ELEGANCE."}
+              {heroBanner?.display_title}
             </h1>
             <p className={styles.heroSubtitle}>
-              {heroBanner?.subtitle || "Experience the pinnacle of luxury with our curated collection of premium fashion and lifestyle essentials."}
+              {heroBanner?.subtitle}
             </p>
             <div className={styles.heroActions}>
               <Link
-                to={heroBanner?.cta_link || "/category/all"}
+                to={heroBanner?.link_url}
                 className={styles.heroPrimaryBtn}
               >
-                {heroBanner?.cta_text || "Shop Collection"} <ArrowRight className={styles.heroBtnIcon} />
-              </Link>
-              <Link
-                to="/category/women"
-                className={styles.heroSecondaryBtn}
-              >
-                View Lookbook
+                {heroBanner?.cta_text} <ArrowRight className={styles.heroBtnIcon} />
               </Link>
             </div>
           </motion.div>
@@ -125,7 +127,7 @@ export const Home = () => {
         </div>
         <div className={styles.recommendationsGrid}>
           {recommendations.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.sku} product={product} />
           ))}
         </div>
       </section>

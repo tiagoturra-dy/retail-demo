@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { ShoppingBag, Star } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Helper } from '../../helpers/helper';
+import { AddToCartButton } from '../AddToCartButton/AddToCartButton';
 import styles from './ProductCard.module.css';
 
 export const ProductCard = ({ product }) => {
@@ -18,15 +20,10 @@ export const ProductCard = ({ product }) => {
       <Link to={`/product/${product.id}`} className={styles.productCardLink}>
         <div className={styles.productImageContainer}>
           <img
-            src={product.image}
+            src={Helper.getProductImage(product.image_url)}
             alt={product.name}
             className={styles.productImage}
           />
-          <div className={styles.productBadgeContainer}>
-            <span className={styles.productBadge}>
-              {product.subcategory}
-            </span>
-          </div>
         </div>
       </Link>
       <div className={styles.productInfoContainer}>
@@ -38,16 +35,15 @@ export const ProductCard = ({ product }) => {
           </Link>
           <div className={styles.productRating}>
             <Star className={styles.ratingIcon} />
-            <span className={styles.ratingText}>{product.rating} ({product.reviews})</span>
+            <span className={styles.ratingText}>{product.rating || Helper.getRandomRating()} ({product.reviews || Helper.getRandomReviewCount()})</span>
           </div>
           <p className={styles.productPrice}>${product.price}</p>
         </div>
-        <button
-          onClick={() => addToCart(product)}
-          className={styles.addToCartBtn}
-        >
-          <ShoppingBag className={styles.cartIcon} />
-        </button>
+        <AddToCartButton 
+          product={product} 
+          className={styles.addToCartBtn} 
+          iconClass={styles.cartIcon} 
+        />
       </div>
     </motion.div>
   );

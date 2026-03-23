@@ -114,12 +114,8 @@
 
 .breadcrumbLink {
   text-decoration: none;
-  color: inherit;
+  color: #18181b;
   transition: color 0.2s;
-
-  &:hover {
-    color: #18181b;
-  }
 }
 
 .breadcrumbSeparator {
