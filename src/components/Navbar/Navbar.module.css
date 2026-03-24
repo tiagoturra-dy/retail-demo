@@ -33,7 +33,7 @@
 }
 
 .navbarLogo {
-  flex-shrink: 0;
+  flex: 1;
   display: flex;
   align-items: center;
   text-decoration: none;
@@ -292,6 +292,8 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  justify-content: flex-end;
+  flex: 1;
 }
 
 .actionBtn {
