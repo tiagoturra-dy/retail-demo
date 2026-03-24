@@ -1,6 +1,8 @@
 export const USERS = 
 {
-  "admin": [],
+  "admin": [
+    "dy_se"
+  ],
   "ecomm":
   [
     {

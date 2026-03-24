@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut } from 'lucide-react';
+import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CATEGORIES } from '../../helpers/categoryConstants';
 import { useCart } from '../../context/CartContext';
@@ -132,6 +132,12 @@ export const Navbar = ({ logoText }) => {
             <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
               <Search className={`site-header__icon ${s.actionIcon}`} />
             </button>
+
+            {user && user.role === 'admin' && (
+              <Link to="/admin" className={s.actionBtn} title="Admin Dashboard" data-dy-nav-icon="admin">
+                <LayoutDashboard className={`site-header__icon ${s.actionIcon}`} />
+              </Link>
+            )}
 
             {user ? (
               <button onClick={handleLogout} className={s.actionBtn} title="Log Out" data-dy-nav-icon="logout">

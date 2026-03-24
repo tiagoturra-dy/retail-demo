@@ -12,6 +12,10 @@ export const WelcomeBackPage = () => {
     return <Navigate to="/login" replace />;
   }
 
+  if (user.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
   return (
     <div className={styles.welcomePageContainer}>
       <motion.div
@@ -20,7 +24,7 @@ export const WelcomeBackPage = () => {
         className={styles.welcomeContent}
       >
         <div className={styles.welcomeHeader}>
-          <h1 className={styles.welcomeTitle}>Welcome back, {user.name}!</h1>
+          <h1 className={styles.welcomeTitle}>Welcome back, {user.Name || user.name}!</h1>
           <p className={styles.welcomeSubtitle}>Here is a summary of your account and loyalty status.</p>
         </div>
 
@@ -28,11 +32,11 @@ export const WelcomeBackPage = () => {
           <div className={styles.loyaltyHeader}>
             <div className={styles.loyaltyBadge}>
               <Award className={styles.loyaltyIcon} />
-              <span className={styles.loyaltyStatus}>{user.loyaltyStatus}</span>
+              <span className={styles.loyaltyStatus}>{user.LoyaltyLevel || 'Bronze'}</span>
             </div>
             <div className={styles.pointsDisplay}>
               <Star className={styles.pointsIcon} />
-              <span className={styles.pointsValue}>{user.points}</span>
+              <span className={styles.pointsValue}>{user.LoyaltyPoints || 0}</span>
               <span className={styles.pointsLabel}>Points</span>
             </div>
           </div>
@@ -40,7 +44,7 @@ export const WelcomeBackPage = () => {
             <div className={styles.loyaltyProgressBar}>
               <div className={styles.loyaltyProgressFill} style={{ width: '75%' }}></div>
             </div>
-            <p className={styles.loyaltyProgressText}>750 points away from Platinum Tier</p>
+            <p className={styles.loyaltyProgressText}>Membership Number: {user.MembershipNumber}</p>
           </div>
         </div>
 
@@ -50,8 +54,8 @@ export const WelcomeBackPage = () => {
               <Package className={styles.chipIcon} />
             </div>
             <div className={styles.chipContent}>
-              <h3 className={styles.chipTitle}>Recent Orders</h3>
-              <p className={styles.chipDesc}>2 items in transit</p>
+              <h3 className={styles.chipTitle}>Recent Purchase</h3>
+              <p className={styles.chipDesc}>{user.RecentPurchaseName || 'No recent purchases'}</p>
             </div>
           </div>
           
@@ -60,8 +64,8 @@ export const WelcomeBackPage = () => {
               <User className={styles.chipIcon} />
             </div>
             <div className={styles.chipContent}>
-              <h3 className={styles.chipTitle}>Account Info</h3>
-              <p className={styles.chipDesc}>Manage your details</p>
+              <h3 className={styles.chipTitle}>Location</h3>
+              <p className={styles.chipDesc}>{user.Location}</p>
             </div>
           </div>
         </div>

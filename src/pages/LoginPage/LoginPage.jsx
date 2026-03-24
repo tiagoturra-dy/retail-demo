@@ -5,12 +5,15 @@ import { ArrowRight } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import styles from './LoginPage.module.css';
+import { LoginErrorModal } from '../../components/LoginErrorModal/LoginErrorModal';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { login } = useAuth();
 
   const s = styles || {};
@@ -18,11 +21,18 @@ export const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const result = await authService.login(identifier, password);
+    const userData = login(identifier);
     setLoading(false);
-    if (result.success) {
-      login(result.user);
-      navigate('/welcome');
+
+    if (userData) {
+      if (userData.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/welcome');
+      }
+    } else {
+      setErrorMessage('User not found. Please use a User ID.');
+      setIsErrorModalOpen(true);
     }
   };
 
@@ -77,6 +87,12 @@ export const LoginPage = () => {
           </span>
         </p>
       </motion.div>
+
+      <LoginErrorModal 
+        isOpen={isErrorModalOpen} 
+        onClose={() => setIsErrorModalOpen(false)} 
+        message={errorMessage} 
+      />
     </div>
   );
 };

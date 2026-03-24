@@ -79,6 +79,11 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY),
+      'process.env.API_URL': JSON.stringify(
+        process.env.NODE_ENV === 'production' 
+        ? '' // In production, it's the same domain
+        : 'http://localhost:5000' // In dev, it's the local Express server
+      )
     }),
   ],
   devServer: {
@@ -89,5 +94,12 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    ]
   },
 };

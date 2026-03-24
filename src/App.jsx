@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { DYManager } from './components/DYManager/DYManager';
 import { ScrollToTop } from './components/ScrollToTop/ScrollToTop';
 import { CurrencyProvider } from './context/CurrencyContext';
+import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPage';
 
 const LOGO_TEXT = 'BLUEBERRY';
 
@@ -43,6 +44,7 @@ export default function App() {
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/welcome" element={<WelcomeBackPage />} />
+                    <Route path="/admin" element={<AdminDashboardPage />} />
                     <Route path="/search" element={<SearchResultsPage />} />
                     <Route path="/thank-you" element={<ThankYouPage />} />
                     <Route path="*" element={<NotFoundPage />} />

@@ -1,8 +1,6 @@
 import { Helper } from '../helpers/helper.js'
 import { PRODUCTS } from '../helpers/productConstants.js'
 
-const DY_API_KEY = '02ea0c7c5ba6b60abf1e02a1b7317f62b53a07ed34a2fc09c05f1c9b128a03ab';
-
 const getPublicIpAddress = async () => {
   try {
     const response = await fetch('https://api.ipify.org/?format=json')
@@ -90,16 +88,24 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, contextTyp
 }
 
 const getPersonalizationData = async (body) => {
-  const response = await fetch('https://direct.dy-api.com/v2/serve/user/choose', {
-    headers: {
-      accept: 'application/json',
-      'cache-control': 'no-cache',
-      'content-type': 'application/json',
-      'dy-api-key': DY_API_KEY,
-    },
-    body: JSON.stringify(body),
+  const profile = await fetch(`/api/profile`, {
     method: 'POST',
-    credentials: 'omit',
+    headers: {
+      'Accept': 'application/json',
+      'Accept-Charset': 'utf-8',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({cuid: 1}),
+  })
+
+  const response = await fetch(`/api/choose`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Accept-Charset': 'utf-8',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({bodyData: JSON.stringify(body)}),
   })
 
   const data = await response.json()

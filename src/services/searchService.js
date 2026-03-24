@@ -1,7 +1,5 @@
 import { Helper } from '../helpers/helper.js';
 
-const DY_API_KEY = '02ea0c7c5ba6b60abf1e02a1b7317f62b53a07ed34a2fc09c05f1c9b128a03ab';
-
 const mockSuggestions = async (query) => {
   if (!query) return [];
   const terms = ['T-shirt', 'Dress', 'Watch', 'Bag', 'Jacket', 'Serum', 'Sofa', 'Lamp'];
@@ -21,12 +19,7 @@ const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent
     context: {
       page: {}
     },
-    session: { dy: '' },
-    options: {
-      returnAnalyticsMetadata: false,
-      isImplicitClientData: true,
-      isImplicitKeywordSearchEvent
-    }
+    session: { dy: '' }
   }
 
   switch (type) {
@@ -36,6 +29,11 @@ const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent
         type: contextType ?? context.type,
         data: contextType ? [""] : context.data || [""],
         location: window.location.href
+      }
+      body.options = {
+        returnAnalyticsMetadata: false,
+        isImplicitClientData: true,
+        isImplicitKeywordSearchEvent
       }
       break
   
@@ -74,17 +72,15 @@ export const searchService = {
           ],
         },
       }
-  
-      const response = await fetch('https://direct.dy-api.com/v2/serve/user/suggest', {
-        headers: {
-          accept: 'application/json',
-          'cache-control': 'no-cache',
-          'content-type': 'application/json',
-          'dy-api-key': DY_API_KEY,
-        },
-        body: JSON.stringify(body),
+
+      const response = await fetch(`/api/suggest`, {
         method: 'POST',
-        credentials: 'omit',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({bodyData: JSON.stringify(body)}),
       })
 
       const data = await response.json()
@@ -155,15 +151,14 @@ export const searchService = {
         requestBody.query.sortBy = sortBy
       }
 
-      const response = await fetch('https://direct.dy-api.com/v2/serve/user/search', {
+      const response = await fetch(`/api/search`, {
         method: 'POST',
         headers: {
-          'accept': 'application/json',
-          'content-type': 'application/json',
-          'dy-api-key': DY_API_KEY
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody),
-        credentials: 'omit',
+        body: JSON.stringify({bodyData: JSON.stringify(requestBody)})
       });
 
       if (response.ok) {

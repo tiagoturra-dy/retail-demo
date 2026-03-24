@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { USERS } from '../helpers/users.js';
 
 const AuthContext = createContext();
 
@@ -16,9 +17,25 @@ export const AuthProvider = ({ children }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('authUser', JSON.stringify(userData));
+  const login = (id) => {
+    // Check if admin
+    if (USERS.admin.includes(id)) {
+      const userData = { id, role: 'admin', name: 'Admin User' };
+      setUser(userData);
+      localStorage.setItem('authUser', JSON.stringify(userData));
+      return userData;
+    }
+
+    // Check if ecomm user
+    const ecommUser = USERS.ecomm.find(u => u.user_id === id);
+    if (ecommUser) {
+      const userData = { ...ecommUser, role: 'ecomm' };
+      setUser(userData);
+      localStorage.setItem('authUser', JSON.stringify(userData));
+      return userData;
+    }
+
+    return null;
   };
 
   const logout = () => {
@@ -26,8 +43,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authUser');
   };
 
+  const isAdmin = user?.role === 'admin';
+  const isEcomm = user?.role === 'ecomm';
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isEcomm }}>
       {children}
     </AuthContext.Provider>
   );

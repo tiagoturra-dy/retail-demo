@@ -1,8 +1,3 @@
-const config = {
-  API_KEY: "blt7059d89c7bd4a5bb",
-  ACCESS_TOKEN: "csd19b933e28af6dfdb52cd2a7",
-}
-
 const getMockContent = (contentType) => {
   // Mock response for a banner_block
   if (contentType === 'banner_block') {
@@ -20,23 +15,20 @@ const getMockContent = (contentType) => {
 
 export const contentStackService = {
   getContent: async (contentType, entryId) => {
-    console.log(`Fetching ContentStack entry: ${contentType}/${entryId}`);
-
-    let url = `https://cdn.contentstack.io/v3/content_types/${contentType}/entries/${entryId}?environment=production`
-    const options = {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Charset': 'utf-8',
-        'api_key': config.API_KEY,
-        'access_token': config.ACCESS_TOKEN
-      }
-    };
+    console.log(`Fetching ContentStack entry:`, contentType, entryId);
 
     var content = {};
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(`/api/csSingleContent`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Accept-Charset': 'utf-8',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ contentType, entryId })
+        });
       const data = await response.json();
       content = data?.entry;
       console.log(`Contentstack content for ${contentType}:`, content)
@@ -51,22 +43,18 @@ export const contentStackService = {
   getMultipleContent: async (contentType, entryIdList) => {
     console.log(`Fetching ContentStack entry: ${contentType}/${entryIdList.join('","')}`);
 
-    let url = `https://cdn.contentstack.io/v3/content_types/${contentType}/entries/?environment=production&query={"uid": {"$in" : ["${entryIdList.join('","')}"]}}`
-
-    const options = {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Charset': 'utf-8',
-        'api_key': config.API_KEY,
-        'access_token': config.ACCESS_TOKEN
-      }
-    };
-
     var content = {};
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(`/api/csMultipleContent`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Accept-Charset': 'utf-8',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ contentType, entryIdList })
+        });
       const data = await response.json();
       content = data?.entries;
 
