@@ -11,6 +11,7 @@ export const CurrencyProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, currency);
+    window.getCurrencySymbol = () => currency; // Expose a global function for testing purposes
   }, [currency]);
 
   const formatPrice = (price) => {
