@@ -1,8 +1,7 @@
-import 'dotenv/config'; // Modern way to load .env
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import https from 'node:https';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -16,31 +15,30 @@ app.post('/api/choose', async (req, res) => {
     const { bodyData } = req.body
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
-    const options = {
-      hostname: 'direct.dy-api.com',
-      path: '/v2/serve/user/suggest',
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'application/json',
-        'dy-api-key': process.env.DY_API_KEY,
-        'Content-Length': Buffer.byteLength(dataToSend)
+    const response = await fetch(
+      `https://direct.dy-api.com/v2/serve/user/choose`, 
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+          'dy-api-key': process.env.DY_API_KEY,
+          'Content-Length': Buffer.byteLength(dataToSend)
+        },
+        body: dataToSend
       }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
     }
 
-    const proxyReq = https.request(options, (proxyRes) => {
-      let data = '';
-      proxyRes.on('data', (chunk) => (data += chunk));
-      proxyRes.on('end', () => {
-        res.status(proxyRes.statusCode).json(JSON.parse(data));
-      });
-    });
-
-    proxyReq.on('error', (e) => res.status(500).json({ error: JSON.stringify(error) }));
-    proxyReq.write(dataToSend);
-    proxyReq.end();
-    
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
   }
@@ -51,30 +49,29 @@ app.post('/api/suggest', async (req, res) => {
     const { bodyData } = req.body
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
-    const options = {
-      hostname: 'direct.dy-api.com',
-      path: '/v2/serve/user/suggest',
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'application/json',
-        'dy-api-key': process.env.DY_API_KEY,
-        'Content-Length': Buffer.byteLength(dataToSend)
+    const response = await fetch(
+      `https://direct.dy-api.com/v2/serve/user/suggest`, 
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+          'dy-api-key': process.env.DY_API_KEY,
+          'Content-Length': Buffer.byteLength(dataToSend)
+        },
+        body: dataToSend
       }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
     }
-
-    const proxyReq = https.request(options, (proxyRes) => {
-      let data = '';
-      proxyRes.on('data', (chunk) => (data += chunk));
-      proxyRes.on('end', () => {
-        res.status(proxyRes.statusCode).json(JSON.parse(data));
-      });
-    });
-
-    proxyReq.on('error', (e) => res.status(500).json({ error: JSON.stringify(error) }));
-    proxyReq.write(dataToSend);
-    proxyReq.end();
 
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
@@ -86,30 +83,29 @@ app.post('/api/search', async (req, res) => {
     const { bodyData } = req.body
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
-    const options = {
-      hostname: 'direct.dy-api.com',
-      path: '/v2/serve/user/search',
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'application/json',
-        'dy-api-key': process.env.DY_API_KEY,
-        'Content-Length': Buffer.byteLength(dataToSend)
+    const response = await fetch(
+      `https://direct.dy-api.com/v2/serve/user/search`, 
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+          'dy-api-key': process.env.DY_API_KEY,
+          'Content-Length': Buffer.byteLength(dataToSend)
+        },
+        body: dataToSend
       }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
     }
-
-    const proxyReq = https.request(options, (proxyRes) => {
-      let data = '';
-      proxyRes.on('data', (chunk) => (data += chunk));
-      proxyRes.on('end', () => {
-        res.status(proxyRes.statusCode).json(JSON.parse(data));
-      });
-    });
-
-    proxyReq.on('error', (e) => res.status(500).json({ error: JSON.stringify(error) }));
-    proxyReq.write(dataToSend);
-    proxyReq.end();
     
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
@@ -120,29 +116,27 @@ app.post('/api/csSingleContent', async (req, res) => {
   try {
     const { contentType, entryId } = req.body;
 
-    const options = {
-      hostname: 'cdn.contentstack.io',
-      path: `/v3/content_types/${contentType}/entries/${entryId}?environment=production`,
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Charset': 'utf-8',
-        'api_key': process.env.CS_API_KEY,
-        'access_token': process.env.CS_ACCESS_TOKEN
+    const response = await fetch(
+      `https://cdn.contentstack.io/v3/content_types/${contentType}/entries/${entryId}?environment=production`, 
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'api_key': process.env.CS_API_KEY,
+          'access_token': process.env.CS_ACCESS_TOKEN
+        }
       }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
     }
-
-    const proxyReq = https.get(options, (proxyRes) => {
-      let data = '';
-      proxyRes.on('data', (chunk) => (data += chunk));
-      proxyRes.on('end', () => {
-        res.status(proxyRes.statusCode).json(JSON.parse(data));
-      });
-    });
-
-    proxyReq.on('error', (e) => res.status(500).json({ error: e.message }));
-    // proxyReq.write(body);
-    proxyReq.end();
 
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
@@ -153,29 +147,27 @@ app.post('/api/csMultipleContent', async (req, res) => {
   try {
     const { contentType, entryIdList } = req.body;
 
-    const options = {
-      hostname: 'cdn.contentstack.io',
-      path: encodeURI(`/v3/content_types/${contentType}/entries/?environment=production&query={"uid": {"$in" : ["${entryIdList.join('","')}"]}}`),
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Charset': 'utf-8',
-        'api_key': process.env.CS_API_KEY,
-        'access_token': process.env.CS_ACCESS_TOKEN
+    const response = await fetch(
+      encodeURI(`https://cdn.contentstack.io/v3/content_types/${contentType}/entries/?environment=production&query={"uid": {"$in" : ["${entryIdList.join('","')}"]}}`), 
+      {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'api_key': process.env.CS_API_KEY,
+          'access_token': process.env.CS_ACCESS_TOKEN
+        }
       }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
     }
-
-    const proxyReq = https.get(options, (proxyRes) => {
-      let data = '';
-      proxyRes.on('data', (chunk) => (data += chunk));
-      proxyRes.on('end', () => {
-        res.status(proxyRes.statusCode).json(JSON.parse(data));
-      });
-    });
-
-    proxyReq.on('error', (e) => res.status(500).json({ error: e.message }));
-    // proxyReq.write(body);
-    proxyReq.end();
 
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
@@ -186,7 +178,6 @@ app.post('/api/profile', async (req, res) => {
   try {
     const { cuid } = req.body;
 
-    // 1. Make the request using the modern fetch API
     const response = await fetch(`https://dy-api.com/v2/userprofile?cuidType=id&cuid=${cuid}`, {
       method: 'GET',
       headers: {
@@ -196,13 +187,11 @@ app.post('/api/profile', async (req, res) => {
       }
     });
 
-    // 2. Check if the response is actually JSON before parsing
     const contentType = response.headers.get("content-type");
     if (response.ok && contentType && contentType.includes("application/json")) {
       const data = await response.json();
       res.json(data);
     } else {
-      // Handle non-JSON or error responses gracefully
       const text = await response.text(); 
       res.status(response.status).send(text || "No content from API");
     }
