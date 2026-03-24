@@ -151,13 +151,13 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                   <section>
                     <h3 className={styles.searchSectionTitle}>Our Suggestions</h3>
                     <div className={styles.searchTags}>
-                      {displaySuggestions.length > 0 ? displaySuggestions.map((sub) => (
+                      {displaySuggestions.length > 0 ? displaySuggestions.map((suggestion) => (
                         <button
-                          key={sub}
-                          onClick={() => handleSuggestionClick(sub)}
+                          key={suggestion.term}
+                          onClick={() => handleSuggestionClick(suggestion.term)}
                           className={styles.searchTag}
                         >
-                          {sub}
+                          {suggestion.term}
                         </button>
                       )) : 
                       (
