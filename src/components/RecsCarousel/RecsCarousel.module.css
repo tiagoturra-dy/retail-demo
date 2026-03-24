@@ -54,8 +54,9 @@
 }
 
 .navButton {
-  width: 3.5rem;
-  height: 3.5rem;
+  --_size: 2rem;
+  width: var(--_size);
+  height: var(--_size);
   border-radius: 50%;
   border: 1px solid #e4e4e7;
   background: white;
