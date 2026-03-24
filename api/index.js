@@ -201,6 +201,36 @@ app.post('/api/profile', async (req, res) => {
   }
 })
 
+app.post('/api/engage', async (req, res) => {
+  try {
+    const { bodyData } = req.body
+    const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
+
+    const response = await fetch(
+      `https://direct-collect.dy-api.com/v2/collect/user/engagement`, 
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+          'dy-api-key': process.env.DY_API_KEY,
+          'Content-Length': Buffer.byteLength(dataToSend)
+        },
+        body: dataToSend
+      }
+    );
+
+    if (response.status === 204) {
+      // Operation was successful, but there is no body.
+      res.status(response.status).send("Engagements reported successfully."); 
+    }
+
+  } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+})
+
 // Serve the Webpack 'dist' folder (Production)
 app.use(express.static(path.join(__dirname, 'dist')));
 
