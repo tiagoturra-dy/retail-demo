@@ -3,7 +3,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import https from 'node:https';
-import { hostname } from 'node:os';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
