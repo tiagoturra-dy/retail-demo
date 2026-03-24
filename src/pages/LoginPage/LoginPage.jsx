@@ -28,6 +28,18 @@ export const LoginPage = () => {
       if (userData.role === 'admin') {
         navigate('/admin');
       } else {
+        // Send login event to Dynamic Yield
+        if (window.DY && window.DY.API) {
+          window.DY.API("event", {
+            name: "Login",
+            properties: {
+              dyType: "login-v1",
+              cuid: userData.user_id,
+              cuidType: "id"
+            }
+          });
+        }
+
         navigate('/welcome');
       }
     } else {
