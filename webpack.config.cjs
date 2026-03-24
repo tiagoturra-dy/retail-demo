@@ -12,7 +12,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     clean: true,
-    publicPath: isProduction ? 'auto' : '/',
+    publicPath: isProduction ? '/retail-demo/' : '/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -75,14 +75,14 @@ module.exports = {
       template: './index.html',
     }),
     new Dotenv({
-      systemvars: true, // load all system variables as well (including GEMINI_API_KEY)
+      systemvars: true,
     }),
     new webpack.DefinePlugin({
       'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY),
       'process.env.API_URL': JSON.stringify(
         process.env.NODE_ENV === 'production' 
-        ? '' // In production, it's the same domain
-        : 'http://localhost:5000' // In dev, it's the local Express server
+        ? '/api' // prod
+        : 'http://localhost:5000' // dev - local Express server
       )
     }),
   ],
