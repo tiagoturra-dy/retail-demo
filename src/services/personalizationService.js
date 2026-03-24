@@ -122,8 +122,7 @@ export const personalizationService = {
     console.debug('Personazliation Request Body:', body)
 
     const recs = await getPersonalizationData(body)
-    // Return a subset of products as recommendations
-    return PRODUCTS.slice(0, 4)
+    return recs
   },
   getPersonalizedBanners: async () => {
     return [

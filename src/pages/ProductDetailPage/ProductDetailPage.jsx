@@ -4,19 +4,34 @@ import { catalogService } from '../../services/catalogService';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { Star, ShoppingBag, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
+import { personalizationService } from '../../services/personalizationService';
 import { motion } from 'motion/react';
 import { AddToCartButton } from '../../components/AddToCartButton/AddToCartButton';
 import styles from './ProductDetailPage.module.css';
 import { Helper } from '../../helpers/helper';
+import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const ProductDetailPage = () => {
+  const productRating = Helper.getRandomRating();
+
   const { productId } = useParams();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState([]);
 
-  const productRating = Helper.getRandomRating();
+  useEffect(() => {
+    const fetchData = async () => {
+      const [recData] = await Promise.all([
+        personalizationService.getRecommendations({selectors: ['pdpRecs'], isImplicitPageview: false}),
+      ]);
+      setRecommendations(recData);
+    };
+    fetchData();
+  }, []);
+
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -120,6 +135,9 @@ export const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Recommendations */}
+      <RecsCarousel recommendations={recommendations} additionalClass='pdp__recs' />
     </div>
   );
 };

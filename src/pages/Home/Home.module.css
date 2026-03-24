@@ -95,68 +95,6 @@
   margin-top: 0.75rem;
 }
 
-.recommendationsSection {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-
-  @media (min-width: 640px) {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-.recommendationsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 3rem;
-}
-
-.recommendationsTitle {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 700;
-  color: #18181b;
-  margin: 0;
-}
-
-.recommendationsSubtitle {
-  color: #71717a;
-  margin-top: 0.5rem;
-}
-
-.recommendationsViewAll {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  cursor: pointer;
-  color: #18181b;
-}
-
-.recommendationsGrid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 2rem;
-
-  @media (min-width: 640px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 .promoSection {
   max-width: 80rem;
   margin-left: auto;
