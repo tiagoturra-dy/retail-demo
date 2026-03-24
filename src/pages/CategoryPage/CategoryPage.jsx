@@ -24,6 +24,7 @@ export const CategoryPage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [sortBy, setSortBy] = useState('');
   const itemsPerPage = 48;
 
   const categoryConfig = CATEGORIES.find(c => c.name === categoryName);
@@ -55,11 +56,17 @@ export const CategoryPage = () => {
       }
     }
 
+    const apiSort = {
+      field: sortBy.split('-')[0],
+      order: sortBy.split('-')[1]
+    };
+
     const [response, catData] = await Promise.all([
       searchService.searchProducts({
         type: 'category',
         query: '',
         filters: apiFilters,
+        sortBy: apiSort,
         cart: cartRef.current,
         numItems: itemsPerPage,
         offset: (currentPage - 1) * itemsPerPage
@@ -82,7 +89,7 @@ export const CategoryPage = () => {
     
     setCategories(catData);
     setLoading(false);
-  }, [categoryName, selectedFilters, currentPage]);
+  }, [categoryName, selectedFilters, sortBy, currentPage]);
 
   useEffect(() => {
     fetchData();
@@ -95,7 +102,7 @@ export const CategoryPage = () => {
       newParams.delete('page');
       setSearchParams(newParams);
     }
-  }, [categoryName, selectedFilters]);
+  }, [categoryName, selectedFilters, sortBy]);
 
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
@@ -139,6 +146,7 @@ export const CategoryPage = () => {
 
   const clearFilters = () => {
     setSelectedFilters({});
+    setSortBy('');
     navigate(`/category/${categoryName}`);
   };
 
@@ -159,6 +167,23 @@ export const CategoryPage = () => {
               Showing results for <span className={styles.categorySubtitleHighlight}>{subcategory}</span>
             </p>
           )}
+        </div>
+        
+        <div className={styles.searchControls}>
+          <div className={styles.sortControl}>
+            <span className={styles.sortLabel}>Sort by:</span>
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className={styles.sortSelect}
+            >
+              <option value="">Relevancy</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+              <option value="price-asc">Price (Low to High)</option>
+              <option value="price-desc">Price (High to Low)</option>
+            </select>
+          </div>
         </div>
       </div>
 
