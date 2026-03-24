@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -6,6 +6,7 @@ import { CATEGORIES } from '../../helpers/categoryConstants';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
+import { useContent } from '../../context/ContentContext';
 import styles from './Navbar.module.css';
 
 export const Navbar = ({ logoText }) => {
@@ -17,6 +18,7 @@ export const Navbar = ({ logoText }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
+  const { banners, loading, fetchBanner } = useContent();
 
   // Safety check for styles
   const s = styles || {};
@@ -34,6 +36,15 @@ export const Navbar = ({ logoText }) => {
     logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    if (hoveredCategory) {
+      const category = CATEGORIES.find(c => c.name === hoveredCategory);
+      if (category?.banner) {
+        fetchBanner(category.banner.contentType, category.banner.entryId);
+      }
+    }
+  }, [hoveredCategory, fetchBanner]);
 
   return (
     <nav className={`${s.navbar} nav-div`}>
@@ -96,28 +107,49 @@ export const Navbar = ({ logoText }) => {
 
                         {/* Featured Column */}
                         <div className={s.megaMenuFeatured}>
-                          <div className={s.featuredImageContainer}>
-                            <img
-                              src={`https://picsum.photos/seed/${category.name}-featured/800/450`}
-                              alt="Featured"
-                              className={s.featuredImage}
-                            />
-                            <div className={s.featuredOverlay} />
-                            <div className={s.featuredText}>
-                              <p className={s.featuredLabel}>Editor's Choice</p>
-                              <p className={s.featuredTitle}>The {category.name} Edit</p>
-                            </div>
-                          </div>
-                          
-                          <div className={s.featuredOffer}>
-                            <h4 className={s.offerHeading}>Exclusive Offer</h4>
-                            <p className={s.offerText}>
-                              Join our loyalty program and get 15% off your first purchase in the {category.name} collection.
-                            </p>
-                            <Link to="/login" className={s.offerLink}>
-                              Join Now <ArrowRight className={s.offerIcon} />
-                            </Link>
-                          </div>
+                          {(() => {
+                            const bannerData = category.banner ? banners[category.banner.entryId] : null;
+                            const isBannerLoading = category.banner ? loading[category.banner.entryId] : false;
+
+                            if (isBannerLoading) {
+                              return (
+                                <div className={s.megaMenuSkeleton}>
+                                  <div className={s.skeletonImage} />
+                                  <div className={s.skeletonText} />
+                                  <div className={s.skeletonOffer} />
+                                </div>
+                              );
+                            }
+
+                            if (!bannerData) return null;
+
+                            return (
+                              <>
+                                <div className={`categoryMenu__banner ${s.featuredImageContainer}`}>
+                                  <img
+                                    src={bannerData.banner_image?.url}
+                                    alt={bannerData.caption}
+                                    className={s.featuredImage}
+                                  />
+                                  <div className={s.featuredOverlay} />
+                                  <div className={s.featuredText}>
+                                    <p className={s.featuredLabel}>{bannerData?.caption || "Editor's Choice"}</p>
+                                    <p className={s.featuredTitle}>{bannerData?.subtitle || `The ${category.name} Edit`}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className={`categoryMenu__featuredOffer ${s.featuredOffer}`}>
+                                  <h4 className={s.offerHeading}>{"Exclusive Offer"}</h4>
+                                  <p className={s.offerText}>
+                                    {`Join our loyalty program and get 15% off your first purchase in the ${category.name} collection.`}
+                                  </p>
+                                  <Link to={"/login"} className={s.offerLink}>
+                                    {"Join Now"} <ArrowRight className={s.offerIcon} />
+                                  </Link>
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </motion.div>

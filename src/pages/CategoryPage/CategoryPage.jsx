@@ -5,7 +5,9 @@ import { searchService } from '../../services/searchService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { Pagination } from '../../components/Pagination/Pagination';
 import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
+import { CategoryBanner } from '../../components/CategoryBanner/CategoryBanner';
 import { useCart } from '../../context/CartContext';
+import { CATEGORIES } from '../../helpers/categoryConstants';
 import styles from './CategoryPage.module.css';
 
 export const CategoryPage = () => {
@@ -23,6 +25,8 @@ export const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState({});
   const itemsPerPage = 48;
+
+  const categoryConfig = CATEGORIES.find(c => c.name === categoryName);
 
   useEffect(() => {
     cartRef.current = cart;
@@ -142,6 +146,9 @@ export const CategoryPage = () => {
 
   return (
     <div className={styles.categoryPageContainer}>
+      {categoryConfig?.banner && (
+        <CategoryBanner bannerConfig={categoryConfig.banner} />
+      )}
       <div className={styles.categoryHeader}>
         <div>
           <h1 className={styles.categoryTitle}>

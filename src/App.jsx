@@ -22,40 +22,43 @@ import { DYManager } from './components/DYManager/DYManager';
 import { ScrollToTop } from './components/ScrollToTop/ScrollToTop';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPage';
+import { ContentProvider } from './context/ContentContext';
 
 const LOGO_TEXT = 'BLUEBERRY';
 
 export default function App() {
   return (
     <AuthProvider>
-      <CurrencyProvider>
-        <CartProvider>
-          <Router>
-            <ScrollToTop />
-            <DYManager />
-            <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
-              <Navbar logoText={LOGO_TEXT} />
-              <main>
-                <AnimatePresence mode="wait">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/category/:categoryName" element={<CategoryPage />} />
-                    <Route path="/product/:productId" element={<ProductDetailPage />} />
-                    <Route path="/cart" element={<CartPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/welcome" element={<WelcomeBackPage />} />
-                    <Route path="/admin" element={<AdminDashboardPage />} />
-                    <Route path="/search" element={<SearchResultsPage />} />
-                    <Route path="/thank-you" element={<ThankYouPage />} />
-                    <Route path="*" element={<NotFoundPage />} />
-                  </Routes>
-                </AnimatePresence>
-              </main>
-              <Footer logoText={LOGO_TEXT} />
-            </div>
-          </Router>
-        </CartProvider>
-      </CurrencyProvider>
+      <ContentProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <Router>
+              <ScrollToTop />
+              <DYManager />
+              <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
+                <Navbar logoText={LOGO_TEXT} />
+                <main>
+                  <AnimatePresence mode="wait">
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/category/:categoryName" element={<CategoryPage />} />
+                      <Route path="/product/:productId" element={<ProductDetailPage />} />
+                      <Route path="/cart" element={<CartPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/welcome" element={<WelcomeBackPage />} />
+                      <Route path="/admin" element={<AdminDashboardPage />} />
+                      <Route path="/search" element={<SearchResultsPage />} />
+                      <Route path="/thank-you" element={<ThankYouPage />} />
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  </AnimatePresence>
+                </main>
+                <Footer logoText={LOGO_TEXT} />
+              </div>
+            </Router>
+          </CartProvider>
+        </CurrencyProvider>
+      </ContentProvider>
     </AuthProvider>
   );
 }

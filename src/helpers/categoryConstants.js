@@ -18,7 +18,8 @@ export const CATEGORIES = [
         "title": "Men's Shoes",
         "items": ["Boots", "Driving Shoes", "Formal Shoes", "Loafers", "Sandals", "Sneakers"]
       }
-    ]
+    ],
+    "banner": { "entryId": "blt21433dedc5524d1e", "contentType": "category_banner" }
   },
   {
     "name": "Women",
@@ -39,7 +40,8 @@ export const CATEGORIES = [
         "title": "Women's Shoes",
         "items": ["Boots", "Flats", "Heels", "Mules", "Sandals", "Sneakers"]
       }
-    ]
+    ],
+    "banner": { "entryId": "bltf764523660f2080c", "contentType": "category_banner" }
   },
   {
     "name": "Kids",
@@ -56,7 +58,8 @@ export const CATEGORIES = [
         "title": "Girls",
         "items": ["Girl's Accessories", "Girl's Shoes", "Girls Clothing"]
       }
-    ]
+    ],
+    "banner": { "entryId": "bltf0329416d7716b65", "contentType": "category_banner" }
   },
   {
     "name": "Beauty",
@@ -77,7 +80,8 @@ export const CATEGORIES = [
         "title": "Skincare",
         "items": ["Male Grooming", "Skincare tools"]
       }
-    ]
+    ],
+    "banner": { "entryId": "blt7c148b0acf38b0ca", "contentType": "category_banner" }
   },
   {
     "name": "Home",
@@ -106,6 +110,7 @@ export const CATEGORIES = [
         "title": "Home Furnishing & Accessories",
         "items": ["Artwork & Paintings", "Bathroom Décor & Accessories", "Bedding", "Candles & Home Fragrance", "Cushions & Poufs", "Decorative Accessories", "Lighting", "Mats And Rugs", "Mirrors", "Photo Frames & Accessories", "Rugs", "Throws & Blankets", "Towels"]
       }
-    ]
+    ],
+    "banner": { "entryId": "blt24b45ca8ba0b5548", "contentType": "category_banner" }
   }
 ];
