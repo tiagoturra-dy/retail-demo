@@ -1,5 +1,4 @@
 import { Helper } from '../helpers/helper.js'
-import { PRODUCTS } from '../helpers/productConstants.js'
 
 const getPublicIpAddress = async () => {
   try {
