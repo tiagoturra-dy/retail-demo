@@ -7,6 +7,7 @@ import { personalizationService } from '../../services/personalizationService';
 import { contentStackService } from '../../services/contentStackService';
 import styles from './Home.module.css';
 import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
+import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const Home = () => {
   const [recommendations, setRecommendations] = useState([]);
@@ -107,6 +108,9 @@ export const Home = () => {
           </>
         )}
       </section>
+
+      {/* Recommendations */}
+      <RecsCarousel recommendations={recommendations} additionalClass='home__recs' />
 
       {/* Personalized Promo Banner */}
       <PromoBanner additionalClass='banner2' content={promoBannerData} type="promo" />
