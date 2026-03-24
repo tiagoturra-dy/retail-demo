@@ -5,12 +5,22 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { ShoppingBag, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Helper } from '../../helpers/helper';
+import { personalizationService } from '../../services/personalizationService';
 import { AddToCartButton } from '../AddToCartButton/AddToCartButton';
 import styles from './ProductCard.module.css';
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
+
+  const handleTrackClick = () => {
+    console.log('ProductCard clicked:', product.name, 'DecisionId:', product.decisionId);
+    if (product.decisionId) {
+      personalizationService.trackClick({ decisionId: product.decisionId, variationId: product.variationId });
+    } else {
+      console.warn('No decisionId found for product:', product.name);
+    }
+  };
 
   return (
     <motion.div
@@ -19,7 +29,7 @@ export const ProductCard = ({ product }) => {
       viewport={{ once: true }}
       className={styles.productCard}
     >
-      <Link to={`/product/${product.sku}`} className={styles.productCardLink}>
+      <Link to={`/product/${product.sku}`} className={styles.productCardLink} onClick={handleTrackClick} data-skyu={product.sku}>
         <div className={styles.productImageContainer}>
           <img
             src={Helper.getProductImage(product.image_url)}
@@ -33,7 +43,7 @@ export const ProductCard = ({ product }) => {
           {product.brand && 
             <p className={styles.productBrand}>{product.brand}</p>
           }
-          <Link to={`/product/${product.id}`} className={styles.productNameLink}>
+          <Link to={`/product/${product.id}`} className={styles.productNameLink} onClick={handleTrackClick}>
             <h3 className={styles.productName}>
               {product.name}
             </h3>

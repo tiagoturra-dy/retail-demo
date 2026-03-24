@@ -108,7 +108,7 @@ export const searchService = {
     enableSpellCheck = true,
     contextType = null
   }) => {
-    if (!query && type === 'search') return mockSearchProducts(query, subcategories, priceRanges, sortBy);
+    if (!query && type === 'search') return mockSearchProducts(query, subcategories, priceRanges, sortBy, filters);
     const dyid = Helper.getCookie('_dyid');
     const dyjsession = Helper.getCookie('_dyjsession');
 

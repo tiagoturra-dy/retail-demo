@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ProductCard } from '../../components/ProductCard/ProductCard';
-import { motion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
 import { personalizationService } from '../../services/personalizationService';
 import { contentStackService } from '../../services/contentStackService';
+import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
+import { useCart } from '../../context/CartContext';
 import styles from './Home.module.css';
 import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
-import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const Home = () => {
+  const { cart } = useCart();
   const [recommendations, setRecommendations] = useState([]);
   const [heroBanner, setHeroBanner] = useState(null);
   const [promoBanner, setPromoBanner] = useState(null);
@@ -27,10 +26,10 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [recData, heroData, promoData, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
-        personalizationService.getRecommendations({selectors: ['hp_recs'], isImplicitPageview: false}),
+        personalizationService.getRecommendations({selectors: ['hp_recs'], isImplicitPageview: false, cart}),
         // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
-        personalizationService.getPersonalizedBanners(),
+        personalizationService.getPersonalizedBanners({ cart }),
         // blog posts
         contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
         // featured categories
@@ -49,7 +48,7 @@ export const Home = () => {
       setPromoBannerData(promoBanner);
     };
     fetchData();
-  }, []);
+  }, [cart]);
 
   return (
     <div className={styles.homePage}>
@@ -113,23 +112,21 @@ export const Home = () => {
       <RecsCarousel recommendations={recommendations} additionalClass='home__recs' />
 
       {/* Personalized Promo Banner */}
-      <PromoBanner additionalClass='banner2' content={promoBannerData} type="promo" />
-      {/* TODO: FIX */}
-      {promoBanner && (
-        <section className={`banner2 ${styles.promoSection}`}>
-          <div className={styles.promoContainer}>
-            <img src={promoBanner.image} alt={promoBanner.title} className={styles.promoImage} />
-            <div className={styles.promoOverlay} />
-            <div className={styles.promoContent}>
-              <h2 className={styles.promoTitle}>{promoBanner.title}</h2>
-              <p className={styles.promoSubtitle}>{promoBanner.subtitle}</p>
-              <button className={styles.promoBtn}>
-                Claim Offer
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
+      {promoBanner ? (
+        <PromoBanner 
+          additionalClass='banner2' 
+          content={{
+            background_image: { url: promoBanner.image },
+            display_title: promoBanner.title,
+            subtitle: promoBanner.subtitle,
+            link_url: promoBanner.link_url || '#',
+            cta_text: promoBanner.cta_text || 'Claim Offer'
+          }} 
+          type="promo" 
+        />
+      ) : promoBannerData ? (
+        <PromoBanner additionalClass='banner2' content={promoBannerData} type="promo" />
+      ) : null}
 
       {/* Blog */}
       <section className={styles.tileSection}>

@@ -44,7 +44,7 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, contextTyp
   const dyjsession = Helper.getCookie('_dyjsession')
 
   const context = Helper.getDYContext(cart)
-  const browserData = getBrowserData()
+  const browserData = await getBrowserData()
 
   let body = {
     user: {
@@ -87,16 +87,6 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, contextTyp
 }
 
 const getPersonalizationData = async (body) => {
-  const profile = await fetch(`/api/profile`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Accept-Charset': 'utf-8',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({cuid: 1}),
-  })
-
   const response = await fetch(`/api/choose`, {
     method: 'POST',
     headers: {
@@ -123,7 +113,68 @@ export const personalizationService = {
     const recs = await getPersonalizationData(body)
     return recs
   },
-  getPersonalizedBanners: async () => {
+  trackClick: async ({ decisionId, variationId, cart = [] }) => {
+    if (!decisionId || !variationId) return;
+
+    console.log('Tracking click for decisionId:', decisionId, variationId);
+
+    let body = await buildBaseBody({ cart });
+    body.engagements = [{ 
+      type: 'CLICK',
+      decisionId,
+      variations: [variationId]
+    }];
+
+    try {
+      const response = await fetch(`/api/engage`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({bodyData: JSON.stringify(body)}),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to track engagement');
+      }
+
+      if (response.status === 204) {
+        const data = await response.text();
+        console.debug('Engagement Tracked', data);
+        return true
+      }
+
+    } catch (error) {
+      console.error('Error tracking engagement:', error);
+    }
+  },
+  getPersonalizedBanners: async ({ cart = [] } = {}) => {
+    console.log('Fetching personalized banners');
+
+    let body = await buildBaseBody({ cart });
+    body.selector = { names: ['hp_banners'] };
+    console.debug('Banner Request Body:', body);
+
+    const response = await getPersonalizationData(body);
+    
+    if (response?.choices?.[0]?.variations?.[0]) {
+      const variation = response.choices[0].variations[0];
+      const data = variation.payload.data;
+      return [
+        {
+          id: variation.id,
+          decisionId: variation.decisionId,
+          title: data.title || data.display_title || 'Exclusive Offer for You',
+          subtitle: data.subtitle || 'Get 20% off your next purchase',
+          image: data.image_url || data.image || 'https://picsum.photos/seed/promo/1200/400',
+          link_url: data.link_url || '#',
+          cta_text: data.cta_text || 'Claim Offer'
+        },
+      ]
+    }
+
     return [
       {
         id: 'banner-1',

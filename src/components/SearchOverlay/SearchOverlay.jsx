@@ -7,6 +7,7 @@ import { ArrowUpRight, History } from 'lucide-react'
 import { Helper } from '../../helpers/helper';
 import { PoweredBy } from '../PoweredBy/PoweredBy';
 import { CameraIcon } from '../../icons/CameraIcon/CameraIcon';
+import { personalizationService } from '../../services/personalizationService';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -62,8 +63,24 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
             searchService.getTermsSuggestions({text: query, numItems: 5}),
             searchService.searchProducts({query, numItems: 4})
           ]);
+
+          if (products && products.choices && products.choices.length > 0) {
+            const variation = products.choices[0].variations[0];
+            const decisionId = products.choices[0].decisionId;
+            const data = variation.payload.data;
+
+            const processedResults = (data.slots || []).map(slot => ({
+              ...slot,
+              ...slot.productData,
+              decisionId,
+              variationId: variation.id
+            }));
+            setResults(processedResults);
+          } else {
+            setResults([]);
+          }
+            
           setSuggestions(terms || []);
-          setResults(products?.choices?.[0]?.variations?.[0]?.payload?.data?.slots || []);
         } catch (error) {
           console.error('Error fetching search data:', error);
           setSuggestions([]);
@@ -98,6 +115,17 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
     setQuery(term);
     saveSearch(term);
     navigate(`/search?q=${encodeURIComponent(term)}`);
+    onClose();
+  };
+
+  const handleTrackClick = (product) => {
+    console.log('ProductCard clicked:', product.name, 'DecisionId:', product.decisionId);
+    if (product.decisionId) {
+      personalizationService.trackClick({ decisionId: product.decisionId, variationId: product.variationId });
+    } else {
+      console.warn('No decisionId found for product:', product.name);
+    }
+    navigate(`/product/${product.sku}`);
     onClose();
   };
 
@@ -201,8 +229,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                         <div
                           key={product.sku}
                           onClick={() => {
-                            navigate(`/product/${product.sku}`);
-                            onClose();
+                            handleTrackClick(product)
                           }}
                           className={styles.searchResultItem}
                         >

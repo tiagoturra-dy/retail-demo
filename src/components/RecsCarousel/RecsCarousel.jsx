@@ -22,10 +22,19 @@ export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
 
   // Extract products from recommendations
   const allProducts = useMemo(() => {
+    console.log('RecsCarousel recommendations:', recommendations);
     if (!recommendations?.choices) return [];
     return recommendations.choices.flatMap(choice => 
       choice.variations.flatMap(variation => 
-        variation.payload.data.slots.map(slot => ({ ...slot, ...slot.productData }))
+        variation.payload.data.slots.map(slot => {
+          const product = { 
+            ...slot, 
+            ...slot.productData, 
+            decisionId: choice.decisionId, 
+            variationId: variation.id
+          };
+          return product;
+        })
       )
     );
   }, [recommendations]);

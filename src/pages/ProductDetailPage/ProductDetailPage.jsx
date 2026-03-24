@@ -16,7 +16,7 @@ export const ProductDetailPage = () => {
   const productRating = Helper.getRandomRating();
 
   const { productId } = useParams();
-  const { addToCart } = useCart();
+  const { cart, addToCart } = useCart();
   const { formatPrice } = useCurrency();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,12 +25,12 @@ export const ProductDetailPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [recData] = await Promise.all([
-        personalizationService.getRecommendations({selectors: ['pdpRecs'], isImplicitPageview: false}),
+        personalizationService.getRecommendations({selectors: ['pdpRecs'], isImplicitPageview: false, cart}),
       ]);
       setRecommendations(recData);
     };
     fetchData();
-  }, []);
+  }, [cart]);
 
 
   useEffect(() => {

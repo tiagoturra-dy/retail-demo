@@ -62,8 +62,18 @@ export const SearchResultsPage = () => {
     });
     
     if (response && response.choices && response.choices.length > 0) {
-      const data = response.choices[0].variations[0].payload.data;
-      setResults(data.slots || []);
+      const variation = response.choices[0].variations[0];
+      const decisionId = response.choices[0].decisionId;
+      const data = variation.payload.data;
+
+      const processedResults = (data.slots || []).map(slot => ({
+        ...slot,
+        ...slot.productData,
+        decisionId,
+        variationId: variation.id
+      }));
+
+      setResults(processedResults);
       setFacets(data.facets || []);
       setTotalResults(data.totalNumResults || 0);
     } else {
@@ -187,13 +197,9 @@ export const SearchResultsPage = () => {
           ) : results.length > 0 ? (
             <>
               <div className={styles.productGrid}>
-                {results.map((product) => {
-                  product = {...product, ...product.productData}
-                  delete product.productData;
-                  return (
-                    <ProductCard key={product.sku || product.id} product={product} />
-                  )
-                })}
+                {results.map((product) => (
+                  <ProductCard key={product.sku || product.id} product={product} />
+                ))}
               </div>
 
               <Pagination 

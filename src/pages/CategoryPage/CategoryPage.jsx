@@ -86,8 +86,18 @@ export const CategoryPage = () => {
     console.log('Category response', response)
     
     if (response && response.choices && response.choices.length > 0) {
-      const data = response.choices[0].variations[0].payload.data;
-      setProducts(data.slots || []);
+      const variation = response.choices[0].variations[0];
+      const decisionId = response.choices[0].decisionId;
+      const data = variation.payload.data;
+
+      const processedProducts = (data.slots || []).map(slot => ({
+        ...slot,
+        ...slot.productData,
+        decisionId,
+        variationId: variation.id
+      }));
+
+      setProducts(processedProducts);
       setFacets(data.facets || []);
       setTotalResults(data.totalNumResults || 0);
     } else {
@@ -218,13 +228,9 @@ export const CategoryPage = () => {
           ) : products.length > 0 ? (
             <>
               <div className={styles.productGrid}>
-                {products.map((product) => {
-                  product = {...product, ...product.productData}
-                  delete product.productData;
-                  return (
-                    <ProductCard key={product.sku || product.id} product={product} />
-                  )
-                })}
+                {products.map((product) => (
+                  <ProductCard key={product.sku || product.id} product={product} />
+                ))}
               </div>
               
               <Pagination 
