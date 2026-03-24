@@ -121,7 +121,7 @@ export const SearchResultsPage = () => {
 
   const clearFilters = () => {
     setSelectedFilters({});
-    setSortBy('relevancy');
+    setSortBy('');
   };
 
   const totalPages = Math.ceil(totalResults / itemsPerPage);

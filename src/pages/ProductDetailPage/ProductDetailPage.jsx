@@ -88,9 +88,10 @@ export const ProductDetailPage = () => {
             </div>
           </div>
 
-          <p className={styles.productPrice}>{formatPrice(product.price)}</p>
+          <p id="pricep" className={styles.productPrice}>{formatPrice(product.price)}</p>
 
           <div className={styles.productActions}>
+            <div id="qty"></div>
             <div className={styles.actionButtonsRow}>
               <AddToCartButton 
                 product={product} 
@@ -102,6 +103,7 @@ export const ProductDetailPage = () => {
                 <Heart className={styles.wishlistIcon} />
               </button>
             </div>
+            <div className="buybtn"></div>
           </div>
 
           <div className={styles.productFeatures}>

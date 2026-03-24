@@ -62,7 +62,7 @@ export const CartPage = () => {
 
   if (cart.length === 0) {
     return (
-      <div className={styles.cartEmptyContainer}>
+      <div className={`cart__emptyContainer ${styles.cartEmptyContainer}`}>
         <div className={styles.cartEmptyIconWrapper}>
           <ShoppingBag className={styles.cartEmptyIcon} />
         </div>
@@ -76,12 +76,12 @@ export const CartPage = () => {
   }
 
   return (
-    <div className={styles.cartPageContainer}>
+    <div className={`cart__container ${styles.cartPageContainer}`}>
       <h1 className={styles.cartPageTitle}>Shopping Bag ({totalItems})</h1>
 
       <div className={styles.cartGrid}>
         {/* Cart Items */}
-        <div className={styles.cartItemsList}>
+        <div className={`cart__itemList ${styles.cartItemsList}`}>
           <AnimatePresence>
             {cart.map((item) => (
               <motion.div
@@ -90,7 +90,7 @@ export const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className={`${styles.cartItem} group`}
+                className={`${styles.cartItem} group cart__item`}
               >
                 <Link to={`/product/${item.id}`} className={styles.cartItemImageLink}>
                   <img src={Helper.getProductImage(item.image)} alt={item.name} className={styles.cartItemImage} />
@@ -143,7 +143,7 @@ export const CartPage = () => {
         {/* Summary */}
         <div className={styles.cartSummaryCol}>
           {amountToFreeShipping > 0 && (
-            <div className="mb-6 rounded-xl bg-zinc-50 p-4 border border-zinc-100">
+            <div className="cart__freeShipping mb-6 rounded-xl bg-zinc-50 p-4 border border-zinc-100">
               <p className="text-sm text-zinc-600 mb-2">
                 You're <span className="font-bold text-zinc-900">{formatPrice(amountToFreeShipping)}</span> away from free shipping!
               </p>
