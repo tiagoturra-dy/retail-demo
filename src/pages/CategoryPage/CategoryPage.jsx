@@ -6,6 +6,7 @@ import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { Pagination } from '../../components/Pagination/Pagination';
 import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
 import { CategoryBanner } from '../../components/CategoryBanner/CategoryBanner';
+import { CustomSelect } from '../../components/CustomSelect/CustomSelect';
 import { useCart } from '../../context/CartContext';
 import { CATEGORIES } from '../../helpers/categoryConstants';
 import styles from './CategoryPage.module.css';
@@ -26,6 +27,14 @@ export const CategoryPage = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const itemsPerPage = 48;
+
+  const sortOptions = [
+    { value: '', label: 'Relevancy' },
+    { value: 'name-asc', label: 'Name (A-Z)' },
+    { value: 'name-desc', label: 'Name (Z-A)' },
+    { value: 'price-asc', label: 'Price (Low to High)' },
+    { value: 'price-desc', label: 'Price (High to Low)' }
+  ];
 
   const categoryConfig = CATEGORIES.find(c => c.name === categoryName);
 
@@ -170,20 +179,13 @@ export const CategoryPage = () => {
         </div>
         
         <div className={styles.searchControls}>
-          <div className={styles.sortControl}>
-            <span className={styles.sortLabel}>Sort by:</span>
-            <select 
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className={styles.sortSelect}
-            >
-              <option value="">Relevancy</option>
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
-              <option value="price-asc">Price (Low to High)</option>
-              <option value="price-desc">Price (High to Low)</option>
-            </select>
-          </div>
+          <CustomSelect 
+            label="Sort by:"
+            options={sortOptions}
+            value={sortBy}
+            onChange={setSortBy}
+            variant="ghost"
+          />
         </div>
       </div>
 

@@ -1,27 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Facebook, Youtube, Globe, ChevronDown } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Youtube, Globe } from 'lucide-react';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
+import { CustomSelect } from '../CustomSelect/CustomSelect';
 import styles from './Footer.module.css';
 
 export const Footer = ({ logoText }) => {
   const { currency, setCurrency } = useCurrency();
-  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const s = styles || {};
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsCurrencyOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const selectedCurrency = CURRENCY_OPTIONS.find(opt => opt.value === currency) || CURRENCY_OPTIONS[0];
+  const currencyOptions = CURRENCY_OPTIONS.map(opt => ({
+    value: opt.value,
+    label: `${opt.label} - ${opt.value}`
+  }));
 
   return (
     <footer className={s.footer}>
@@ -74,37 +66,13 @@ export const Footer = ({ logoText }) => {
         <div className={s.footerBottom}>
           <p className={s.footerCopyright}>© 2024 {logoText} Commerce Inc. All rights reserved.</p>
 
-          <div className={s.currencySelectorContainer} ref={dropdownRef}>
-            <button 
-              className={s.currencyButton} 
-              onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
-              aria-expanded={isCurrencyOpen}
-              aria-haspopup="listbox"
-            >
-              <Globe className={s.globeIcon} size={16} />
-              <span className={s.currencyText}>{selectedCurrency.label} - {selectedCurrency.value}</span>
-              <ChevronDown size={14} className={`${s.chevronIcon} ${isCurrencyOpen ? s.chevronOpen : ''}`} />
-            </button>
-            
-            {isCurrencyOpen && (
-              <ul className={s.currencyDropdown} role="listbox">
-                {CURRENCY_OPTIONS.map((option) => (
-                  <li 
-                    key={option.value} 
-                    role="option"
-                    aria-selected={currency === option.value}
-                    className={`${s.currencyOption} ${currency === option.value ? s.currencyOptionSelected : ''}`}
-                    onClick={() => {
-                      setCurrency(option.value);
-                      setIsCurrencyOpen(false);
-                    }}
-                  >
-                    {option.label} - {option.value}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <CustomSelect 
+            options={currencyOptions}
+            value={currency}
+            onChange={setCurrency}
+            icon={Globe}
+            variant="pill"
+          />
         </div>
       </div>
     </footer>

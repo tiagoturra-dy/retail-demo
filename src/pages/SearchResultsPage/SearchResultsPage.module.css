@@ -41,54 +41,6 @@
   margin-top: 0.5rem;
 }
 
-.searchControls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.sortControl {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.sortLabel {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #71717a;
-}
-
-.sortSelect {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 500;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-  }
-}
-
-.clearFiltersBtn {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 500;
-  color: #71717a;
-  background: none;
-  border: none;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  cursor: pointer;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #18181b;
-  }
-}
-
 .searchLayout {
   display: flex;
   flex-direction: column;
