@@ -95,6 +95,19 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
     return () => clearTimeout(timer);
   }, [query]);
 
+  useEffect(() => {
+    if (isOpen && window.DYO) {
+      // Small delay to ensure the DOM element is rendered
+      const timer = setTimeout(() => {
+        window.DYO.smartObject("Image Search", {
+          target: "dy_Image_Search",
+          inline: true
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   const saveSearch = (term) => {
     if (!term.trim()) return;
     const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 10);
@@ -165,9 +178,10 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                     placeholder="Search for products, categories..."
                     className={styles.searchInput}
                   />
-                  <button type="button" className={styles.imageSearchBtn} aria-label="Search by image">
+                  {/* <button type="button" className={styles.imageSearchBtn} aria-label="Search by image">
                     <CameraIcon />
-                  </button>
+                  </button> */}
+                  <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
                 </div>
                 <div className={styles.searchInputLine}></div>
               </form>
