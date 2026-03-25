@@ -23,6 +23,8 @@ export const Navbar = ({ logoText }) => {
   // Safety check for styles
   const s = styles || {};
 
+  const LEAF_CATEGORY_LIMIT = 7
+
   const toggleMobileCategory = (categoryName) => {
     setExpandedMobileCategory(expandedMobileCategory === categoryName ? null : categoryName);
     setExpandedMobileSection(null);
@@ -91,7 +93,7 @@ export const Navbar = ({ logoText }) => {
                                 {section.title}
                               </Link>
                               <ul className={s.megaMenuList}>
-                                {section.items.map((item) => (
+                                {section.items.slice(0, LEAF_CATEGORY_LIMIT).map((item) => (
                                   <li key={item}>
                                     <Link to={`/category/${category.name}?sub=${section.title}&item=${item}`}
                                       className={s.megaMenuLink}
@@ -100,6 +102,15 @@ export const Navbar = ({ logoText }) => {
                                     </Link>
                                   </li>
                                 ))}
+                                {section.items.length > LEAF_CATEGORY_LIMIT && (
+                                  <li>
+                                    <Link to={`/category/${category.name}?sub=${section.title}`}
+                                      className={s.megaMenuViewAll}
+                                    >
+                                      View All
+                                    </Link>
+                                  </li>
+                                )}
                               </ul>
                             </div>
                           ))}
