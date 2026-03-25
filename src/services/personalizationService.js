@@ -153,38 +153,17 @@ export const personalizationService = {
       console.error('Error tracking engagement:', error);
     }
   },
-  getPersonalizedBanners: async ({ cart = [] } = {}) => {
+  getPersonalizedBanners: async ({ selectors = null, groups = null, cart = [], isImplicitPageview = false } = {}) => {
     console.log('Fetching personalized banners');
 
     let body = await buildBaseBody({ cart });
-    body.selector = { names: ['hp_banners'] };
+    if (selectors) 
+      body.selector = { names: selectors }
+    if (groups)
+      body.selector = { groups }
     console.debug('Banner Request Body:', body);
 
     const response = await getPersonalizationData(body);
-    
-    if (response?.choices?.[0]?.variations?.[0]) {
-      const variation = response.choices[0].variations[0];
-      const data = variation.payload.data;
-      return [
-        {
-          id: variation.id,
-          decisionId: variation.decisionId,
-          title: data.title || data.display_title || 'Exclusive Offer for You',
-          subtitle: data.subtitle || 'Get 20% off your next purchase',
-          image: data.image_url || data.image || 'https://picsum.photos/seed/promo/1200/400',
-          link_url: data.link_url || '#',
-          cta_text: data.cta_text || 'Claim Offer'
-        },
-      ]
-    }
-
-    return [
-      {
-        id: 'banner-1',
-        title: 'Exclusive Offer for You',
-        subtitle: 'Get 20% off your next purchase',
-        image: 'https://picsum.photos/seed/promo/1200/400',
-      },
-    ]
+    return response
   },
 }

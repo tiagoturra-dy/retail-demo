@@ -6,6 +6,7 @@ import { personalizationService } from '../../services/personalizationService';
 import styles from './PromoBanner.module.css';
 
 export const PromoBanner = ({ additionalClass = '', content, type = "main" }) => {
+  console.log('PromoBanner Content', content)
   const handleTrackClick = () => {
     if (content?.decisionId && content?.variationId) {
       personalizationService.trackClick({ decisionId: content.decisionId, variationId: content.variationId });
@@ -16,8 +17,8 @@ export const PromoBanner = ({ additionalClass = '', content, type = "main" }) =>
     <section className={`${additionalClass} ${styles.heroSection}`} onMouseDown={handleTrackClick}>
       <div className={styles.heroBg}>
         <img
-          src={content?.background_image?.url}
-          alt={content?.display_title}
+          src={content?.image}
+          alt={content?.title}
           className={styles.heroImage}
         />
         <div className={styles.heroOverlay} />
@@ -31,17 +32,17 @@ export const PromoBanner = ({ additionalClass = '', content, type = "main" }) =>
           className={type === 'main' ? styles.heroContent : styles.promoContent}
         >
           <h1 className={styles.heroTitle}>
-            {content?.display_title}
+            {content?.title}
           </h1>
           <p className={styles.heroSubtitle}>
             {content?.subtitle}
           </p>
           <div className={styles.heroActions}>
             <Link
-              to={content?.link_url}
+              to={content?.link}
               className={styles.heroPrimaryBtn}
             >
-              {content?.cta_text} <ArrowRight className={styles.heroBtnIcon} />
+              {content?.cta} <ArrowRight className={styles.heroBtnIcon} />
             </Link>
           </div>
         </motion.div>

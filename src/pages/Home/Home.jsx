@@ -6,12 +6,13 @@ import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 import { useCart } from '../../context/CartContext';
 import styles from './Home.module.css';
 import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
+import { BannerCarousel } from '../../components/BannerCarousel/BannerCarousel';
 
 export const Home = () => {
   const { cart } = useCart();
   const [recommendations, setRecommendations] = useState([]);
   const [heroBanner, setHeroBanner] = useState(null);
-  const [promoBanner, setPromoBanner] = useState(null);
+  const [dyBanner, setDyBanner] = useState(null);
   const [blogData, setBlogData] = useState(null);
   const [categoryData, setCategoryData] = useState(null);
   const [featureBoxData, setFeatureBoxData] = useState(null);
@@ -25,11 +26,12 @@ export const Home = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [recData, heroData, promoData, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
+      const [recData, heroData, dyBanner, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
         personalizationService.getRecommendations({groups: ['home_page_recs'], isImplicitPageview: false, cart}),
         // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
-        personalizationService.getPersonalizedBanners({ cart }),
+        // dy banners
+        personalizationService.getPersonalizedBanners({selectors: ['hp_hero'], isImplicitPageview: false, cart}),
         // blog posts
         contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
         // featured categories
@@ -41,7 +43,7 @@ export const Home = () => {
       ]);
       setRecommendations(recData);
       setHeroBanner(heroData);
-      setPromoBanner(promoData[0]);
+      setDyBanner(dyBanner);
       setBlogData(blogData);
       setCategoryData(categoryData);
       setFeatureBoxData(featureBoxData);
@@ -50,10 +52,31 @@ export const Home = () => {
     fetchData();
   }, [cart]);
 
+  const transformCSBanner = (data) => {
+    if (!data) return null
+    return {
+      image: data.background_image.url,
+      title: data.display_title,
+      subtitle: data.subtitle,
+      link: data.link_url,
+      cta: data.cta_text
+    }
+  }
+
   return (
     <div className={styles.homePage}>
       {/* Hero Section */}
-      <PromoBanner id="dy-banner-1" additionalClass='dy-home-banner' content={heroBanner} />
+      {dyBanner?.choices?.length > 0 ? (
+        <BannerCarousel 
+          id="dy-banner-1" 
+          additionalClass='dy-home-banner' 
+          type="hero" 
+          choice={dyBanner.choices[0]} 
+        />
+      ) : promoBannerData ? (
+        <PromoBanner id="dy-banner-1" additionalClass='dy-home-banner' content={transformCSBanner(heroBanner)} type="hero" />
+      ) : null}
+      
 
       {/* Recommendations */}
       {recommendations?.choices?.some(choice => choice.name === 'hp_recs1') &&
@@ -117,22 +140,9 @@ export const Home = () => {
         )}
       </section>
 
-      {/* Personalized Promo Banner */}
-      {promoBanner ? (
-        <PromoBanner 
-          id="dy-banner-2"
-          additionalClass='dy-home-banner' 
-          content={{
-            background_image: { url: promoBanner.image },
-            display_title: promoBanner.title,
-            subtitle: promoBanner.subtitle,
-            link_url: promoBanner.link_url || '#',
-            cta_text: promoBanner.cta_text || 'Claim Offer'
-          }} 
-          type="promo" 
-        />
-      ) : promoBannerData ? (
-        <PromoBanner additionalClass='banner2' content={promoBannerData} type="promo" />
+      {/* Promo Banner */}
+      {promoBannerData ? (
+        <PromoBanner additionalClass='banner2' content={transformCSBanner(promoBannerData)} type="promo" />
       ) : null}
 
       {/* Blog */}
