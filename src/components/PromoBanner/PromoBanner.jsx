@@ -6,7 +6,6 @@ import { personalizationService } from '../../services/personalizationService';
 import styles from './PromoBanner.module.css';
 
 export const PromoBanner = ({ additionalClass = '', content, type = "main" }) => {
-  console.log('PromoBanner Content', content)
   const handleTrackClick = () => {
     if (content?.decisionId && content?.variationId) {
       personalizationService.trackClick({ decisionId: content.decisionId, variationId: content.variationId });
