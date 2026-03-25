@@ -8,6 +8,18 @@ import { useCart } from '../../context/CartContext';
 import { Helper } from '../../helpers/helper';
 import styles from './ShoppingMuse.module.css';
 
+const CONSTANTS = {
+  TITLE: "Personal Shopper",
+  SUBTITLE: "Your AI shopping assistant",
+  RESET_CHAT: "Reset Chat",
+  RESET: "Reset",
+  PLACEHOLDER: "Ask me anything...",
+  THINKING: "Thinking...",
+  INITIAL_BOT_MESSAGE: "I'm here to help you find the perfect products. Just tell me what you need!",
+  ERROR_BOT_MESSAGE: "I'm having a bit of trouble connecting right now. Please try again in a moment.",
+  FALLBACK_BOT_MESSAGE: "I'm sorry, I couldn't find a specific answer for that. How else can I help you?"
+};
+
 const MuseCarousel = ({ slots }) => {
   const [emblaRef] = useEmblaCarousel({ 
     align: 'start',
@@ -52,14 +64,26 @@ export const ShoppingMuse = () => {
   }, [messages, isLoading, scrollToBottom]);
 
   useEffect(() => {
-    const initialQuery = window.retailDemo?.museQuery;
-    if (initialQuery) {
-      handleSendMessage(initialQuery);
-      // Clear the variable after use
-      if (window.retailDemo) {
-        window.retailDemo.museQuery = null;
+    const storedData = localStorage.getItem('retailDemo');
+    let initialQuery = null;
+
+    if (storedData) {
+      try {
+        const retailDemo = JSON.parse(storedData);
+        initialQuery = retailDemo?.museQuery;
+        
+        if (initialQuery) {
+          handleSendMessage(initialQuery);
+          // Clear the variable after use in localStorage
+          retailDemo.museQuery = null;
+          localStorage.setItem('retailDemo', JSON.stringify(retailDemo));
+        }
+      } catch (e) {
+        console.error('Error parsing retailDemo from localStorage', e);
       }
-    } else if (messages.length === 0) {
+    }
+
+    if (!initialQuery && messages.length === 0) {
       // Default query if not set and no messages yet
       handleSendMessage('');
     }
@@ -70,7 +94,7 @@ export const ShoppingMuse = () => {
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        text: "I'm here to help you find the perfect products. Just tell me what you need!",
+        text: CONSTANTS.INITIAL_BOT_MESSAGE,
         widgets: [],
         timestamp: new Date()
       };
@@ -99,7 +123,7 @@ export const ShoppingMuse = () => {
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        text: response.answer || "I'm sorry, I couldn't find a specific answer for that. How else can I help you?",
+        text: response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE,
         widgets: response.widgets || [],
         timestamp: new Date()
       };
@@ -110,7 +134,7 @@ export const ShoppingMuse = () => {
       const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        text: "I'm having a bit of trouble connecting right now. Please try again in a moment.",
+        text: CONSTANTS.ERROR_BOT_MESSAGE,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -137,18 +161,18 @@ export const ShoppingMuse = () => {
           <div className={styles.headerTop}>
             <div className={styles.logoContainer}>
               <Bot className={styles.botIcon} />
-              <h1 className={styles.title}>Personal Shopper</h1>
+              <h1 className={styles.title}>{CONSTANTS.TITLE}</h1>
             </div>
 
-            <p className={styles.subtitle}>Your AI shopping assistant</p>
+            <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
             
             <button 
               onClick={handleReset} 
               className={styles.resetButton}
-              title="Reset Chat"
+              title={CONSTANTS.RESET_CHAT}
             >
               <RotateCcw size={18} />
-              <span>Reset</span>
+              <span>{CONSTANTS.RESET}</span>
             </button>
           </div>
         </div>
@@ -206,7 +230,7 @@ export const ShoppingMuse = () => {
               <div className={styles.messageContent}>
                 <div className={styles.loadingBubble}>
                   <Loader2 className={styles.spinner} size={18} />
-                  <span>Thinking...</span>
+                  <span>{CONSTANTS.THINKING}</span>
                 </div>
               </div>
             </motion.div>
@@ -220,7 +244,7 @@ export const ShoppingMuse = () => {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask me anything..."
+              placeholder={CONSTANTS.PLACEHOLDER}
               className={styles.input}
               disabled={isLoading}
               maxLength={MESSAGE_MAX_LEN}
