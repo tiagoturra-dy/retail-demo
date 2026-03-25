@@ -34,19 +34,20 @@ export const ShoppingMuse = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesListRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    if (messagesListRef.current) {
-      messagesListRef.current.scrollTo({
-        top: messagesListRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      // Small timeout to ensure DOM has updated and animations have started
+      setTimeout(() => {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 150);
     }
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading, scrollToBottom]);
 
   useEffect(() => {
     const initialQuery = window.retailDemo?.museQuery;
@@ -155,6 +156,8 @@ export const ShoppingMuse = () => {
             {messages.map((msg) => (
               <motion.div
                 key={msg.id}
+                layout
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`${styles.messageWrapper} ${msg.type === 'user' ? styles.userWrapper : styles.botWrapper}`}
@@ -186,7 +189,13 @@ export const ShoppingMuse = () => {
             ))}
           </AnimatePresence>
           {isLoading && (
-            <div className={`${styles.messageWrapper} ${styles.botWrapper}`}>
+            <motion.div 
+              layout
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`${styles.messageWrapper} ${styles.botWrapper}`}
+            >
               <div className={styles.avatar}>
                 <Bot size={18} />
               </div>
@@ -196,8 +205,9 @@ export const ShoppingMuse = () => {
                   <span>Muse is thinking...</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
+          <div ref={messagesEndRef} style={{ height: '1px', scrollMarginBottom: '2rem' }} />
         </div>
 
         <form onSubmit={handleSubmit} className={styles.inputArea}>
