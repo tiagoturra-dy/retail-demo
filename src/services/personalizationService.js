@@ -39,8 +39,9 @@ const getBrowserData = async () => {
   };
 }
 
-const buildBaseBody = async ({ cart = [], isImplicitPageview = false, contextType }) => {
+const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' }) => {
   const dyid = Helper.getCookie('_dyid')
+  const dyid_server = Helper.getCookie('_dyid_server')
   const dyjsession = Helper.getCookie('_dyjsession')
 
   const context = Helper.getDYContext(cart)
@@ -67,17 +68,32 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, contextTyp
       channel: 'WEB',
     },
     session: { dy: '' },
-    options: {
-      isImplicitPageview,
-      returnAnalyticsMetadata: false,
-      isImplicitImpressionMode: true,
-      isImplicitClientData: false,
-    },
+  }
+
+  switch (type) {
+    case 'muse':
+      body['options'] = {
+        returnAnalyticsMetadata: false,
+        isImplicitClientData: false,
+        isImplicitKeywordSearchEvent: false
+      }
+      break;
+  
+    default:
+      body['options'] = {
+        isImplicitPageview,
+        returnAnalyticsMetadata: false,
+        isImplicitImpressionMode: true,
+        isImplicitClientData: false,
+      }
+      break;
   }
 
   if (dyid) {
     body.user['dyid'] = dyid
-    body.user['dyid_server'] = dyid
+  }
+  if (dyid_server) {
+    body.user['dyid_server'] = dyid_server
   }
   if (dyjsession) {
     body.session.dy = dyjsession
@@ -114,6 +130,12 @@ export const personalizationService = {
     console.debug('Personazliation Request Body:', body)
 
     const recs = await getPersonalizationData(body)
+
+    // set cookies
+    recs?.cookes?.array.forEach(cookie => {
+      Helper.setCookie(cookie.name, cookie.value, cookie.maxAge);
+    });
+    
     return recs
   },
   trackClick: async ({ decisionId, variationId, cart = [] }) => {
@@ -164,6 +186,73 @@ export const personalizationService = {
     console.debug('Banner Request Body:', body);
 
     const response = await getPersonalizationData(body);
+    // set cookies
+    response?.cookes?.array.forEach(cookie => {
+      Helper.setCookie(cookie.name, cookie.value, cookie.maxAge);
+    });
+
     return response
+  },
+  getMuseResponse: async ({ query, cart = [], isImplicitPageview = false }) => {
+    console.log('Fetching Muse response for:', query);
+    const CHAT_ID_KEY = '_dyMuseChatId'
+    const chatId = Helper.getCookie(CHAT_ID_KEY);
+
+    let body = await buildBaseBody({ cart, isImplicitPageview, type: 'muse' });
+    body.query = {
+      text: query
+    };
+    
+    if (chatId && chatId !== '')
+      body.query.chatId = chatId
+
+    body.selector = {
+      "name": "Shopping Muse"
+    }
+    console.debug('Muse Request Body:', body);
+
+    const response = await fetch(`/api/muse`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Accept-Charset': 'utf-8',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({bodyData: JSON.stringify(body)}),
+    });
+
+    const data = await response.json();
+    console.debug('DY Muse Results', data);
+
+    // Store chatId if returned in the response
+    // set cookies
+    data?.cookes?.array.forEach(cookie => {
+      Helper.setCookie(cookie.name, cookie.value, cookie.maxAge);
+    });
+
+    const museData = data?.choices?.[0]?.variations?.[0]?.payload?.data;
+
+    // handle muse chatId for session persistence
+    if (museData && museData.chatId && museData.chatId !== chatId) {
+      Helper.setCookie(CHAT_ID_KEY, museData.chatId);
+    }
+
+    return {
+      decisionId: data?.choices?.[0]?.decisionId,
+      variationId: data?.choices?.[0]?.variations?.[0].id,
+      answer: museData?.assistant,
+      widgets: museData?.widgets.map(widget => {
+        const slots = widget.slots.map(s => ({
+          ...s.productData,
+          sku: s.sku,
+          slotId: s.slotId
+        }))
+
+        return {
+          title: widget.title,
+          slots
+        }
+      }) || []
+    };
   },
 }

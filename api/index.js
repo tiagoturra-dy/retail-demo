@@ -231,6 +231,40 @@ app.post('/api/engage', async (req, res) => {
   }
 })
 
+app.post('/api/muse', async (req, res) => {
+  try {
+    const { bodyData } = req.body
+    const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
+
+    const response = await fetch(
+      `https://direct.dy-api.com/v2/serve/user/assistant`, 
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+          'dy-api-key': process.env.DY_API_KEY,
+          'Content-Length': Buffer.byteLength(dataToSend)
+        },
+        body: dataToSend
+      }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
+    }
+    
+  } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+})
+
 // Serve the Webpack 'dist' folder (Production)
 app.use(express.static(path.join(__dirname, 'dist')));
 

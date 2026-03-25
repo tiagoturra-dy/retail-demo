@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut, LayoutDashboard } from 'lucide-react';
+import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut, LayoutDashboard, BotMessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CATEGORIES } from '../../helpers/categoryConstants';
 import { useCart } from '../../context/CartContext';
@@ -172,6 +172,11 @@ export const Navbar = ({ logoText }) => {
 
           {/* Icons & Search */}
           <div className={`dy-nav-icons ${s.navbarActions}`}>
+
+            <Link to="/muse" className={s.actionBtn} title="Shopper Assistant" data-dy-nav-icon="muse">
+              <BotMessageSquare className={`dy-nav-icon ${s.actionIcon}`} />
+            </Link>
+
             <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
               <Search className={`dy-nav-icon ${s.actionIcon}`} />
             </button>

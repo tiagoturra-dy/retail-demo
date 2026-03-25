@@ -57,9 +57,9 @@ export const Helper = {
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
   },
-  setCookie: (name, value, days = 365) => {
+  setCookie: (name, value, maxAge = 31536000000) => {
     const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    date.setTime(date.getTime() + maxAge);
     const expires = `; expires=${date.toUTCString()}`;
     document.cookie = `${name}=${value || ""}${expires}; path=/; SameSite=Lax`;
   },

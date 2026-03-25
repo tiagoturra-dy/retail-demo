@@ -23,6 +23,7 @@ import { ScrollToTop } from './components/ScrollToTop/ScrollToTop';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPage';
 import { ContentProvider } from './context/ContentContext';
+import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
 
 const LOGO_TEXT = 'BLUEBERRY';
 
@@ -48,6 +49,7 @@ export default function App() {
                       <Route path="/welcome" element={<WelcomeBackPage />} />
                       <Route path="/admin" element={<AdminDashboardPage />} />
                       <Route path="/search" element={<SearchResultsPage />} />
+                      <Route path="/muse" element={<ShoppingMuse />} />
                       <Route path="/thank-you" element={<ThankYouPage />} />
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
