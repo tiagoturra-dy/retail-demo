@@ -13,8 +13,8 @@ export const Helper = {
    * 1. Generates a random rating between 0 and 5.
    * @param {number} precision - Number of decimal places (default is 1).
    */
-  getRandomRating: (precision = 1) => {
-    const randomValue = Math.random() * 5;
+  getRandomRating: (precision = 1, min = 2.5) => {
+    const randomValue = Number((Math.random() * (5 - min) + min).toFixed(1));
     return parseFloat(randomValue.toFixed(precision));
   },
   /**
