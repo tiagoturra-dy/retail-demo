@@ -31,12 +31,14 @@ export const PromoBanner = ({ additionalClass = '', content, type = "main" }) =>
           transition={{ duration: 0.8 }}
           className={type === 'main' ? styles.heroContent : styles.promoContent}
         >
-          <h1 className={styles.heroTitle}>
-            {content?.title}
-          </h1>
-          <p className={styles.heroSubtitle}>
-            {content?.subtitle}
-          </p>
+          <div className={styles.heroTexts}>
+            <h1 className={styles.heroTitle}>
+              {content?.title}
+            </h1>
+            <p className={styles.heroSubtitle}>
+              {content?.subtitle}
+            </p>
+          </div>
           <div className={styles.heroActions}>
             <Link
               to={content?.link}
