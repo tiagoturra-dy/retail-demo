@@ -36,6 +36,8 @@ export const ShoppingMuse = () => {
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
 
+  const MESSAGE_MAX_LEN = 150;
+
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
       // Small timeout to ensure DOM has updated and animations have started
@@ -120,7 +122,7 @@ export const ShoppingMuse = () => {
   const handleReset = () => {
     setMessages([]);
     Helper.setCookie('_dyMuseChatId', '', -1); // Clear the cookie
-    handleSendMessage("Show me some trendy outfits for this season");
+    handleSendMessage('');
   };
 
   const handleSubmit = (e) => {
@@ -135,8 +137,11 @@ export const ShoppingMuse = () => {
           <div className={styles.headerTop}>
             <div className={styles.logoContainer}>
               <Bot className={styles.botIcon} />
-              <h1 className={styles.title}>Shopping Muse</h1>
+              <h1 className={styles.title}>Personal Shopper</h1>
             </div>
+
+            <p className={styles.subtitle}>Your AI shopping assistant</p>
+            
             <button 
               onClick={handleReset} 
               className={styles.resetButton}
@@ -146,7 +151,6 @@ export const ShoppingMuse = () => {
               <span>Reset</span>
             </button>
           </div>
-          <p className={styles.subtitle}>Your personal AI shopping assistant</p>
         </div>
       </div>
 
@@ -182,7 +186,7 @@ export const ShoppingMuse = () => {
                   )}
                   
                   <span className={styles.timestamp}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                   </span>
                 </div>
               </motion.div>
@@ -202,7 +206,7 @@ export const ShoppingMuse = () => {
               <div className={styles.messageContent}>
                 <div className={styles.loadingBubble}>
                   <Loader2 className={styles.spinner} size={18} />
-                  <span>Muse is thinking...</span>
+                  <span>Thinking...</span>
                 </div>
               </div>
             </motion.div>
@@ -211,14 +215,20 @@ export const ShoppingMuse = () => {
         </div>
 
         <form onSubmit={handleSubmit} className={styles.inputArea}>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Muse anything..."
-            className={styles.input}
-            disabled={isLoading}
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask me anything..."
+              className={styles.input}
+              disabled={isLoading}
+              maxLength={MESSAGE_MAX_LEN}
+            />
+            <span className={`${styles.charCount} ${input.length >= 140 ? styles.charCountWarning : ''}`}>
+              {input.length}/{MESSAGE_MAX_LEN}
+            </span>
+          </div>
           <button 
             type="submit" 
             className={styles.sendButton}

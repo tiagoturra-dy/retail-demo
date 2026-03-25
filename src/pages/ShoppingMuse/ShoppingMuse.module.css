@@ -23,6 +23,10 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    flex-flow: column wrap;
+  }
 }
 
 .logoContainer {
@@ -67,6 +71,13 @@
 .subtitle {
   font-size: 0.875rem;
   color: #71717a;
+  flex: 1;
+  padding: 10px 20px 0;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 }
 
 .chatContainer {
@@ -239,14 +250,35 @@
   background-color: #ffffff;
 }
 
-.input {
+.inputWrapper {
   flex: 1;
-  padding: 0.75rem 1.25rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 4.5rem 0.75rem 1.25rem;
   border: 1px solid #e4e4e7;
   border-radius: 9999px;
   outline: none;
   font-size: 0.9375rem;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.charCount {
+  position: absolute;
+  right: 1.25rem;
+  font-size: 0.7rem;
+  color: #a1a1aa;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.charCountWarning {
+  color: #ef4444;
+  font-weight: 600;
 }
 
 .input:focus {
