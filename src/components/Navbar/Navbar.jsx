@@ -47,7 +47,7 @@ export const Navbar = ({ logoText }) => {
   }, [hoveredCategory, fetchBanner]);
 
   return (
-    <nav className={`${s.navbar} nav-div`}>
+    <nav className={`${s.navbar} dy-nav`}>
       <div className={s.navbarContainer}>
         <div className={s.navbarInner}>
           {/* Logo */}
@@ -56,7 +56,7 @@ export const Navbar = ({ logoText }) => {
           </Link>
 
           {/* Desktop Menu */}
-          <div className={s.navbarDesktopMenu}>
+          <div className={`dy-nav-menu ${s.navbarDesktopMenu}`}>
             {CATEGORIES.map((category) => (
               <div
                 key={category.name}
@@ -125,7 +125,7 @@ export const Navbar = ({ logoText }) => {
 
                             return (
                               <>
-                                <div className={`categoryMenu__banner ${s.featuredImageContainer}`}>
+                                <div className={`dy-categoryMenu-banner ${s.featuredImageContainer}`}>
                                   <img
                                     src={bannerData.banner_image?.url}
                                     alt={bannerData.caption}
@@ -138,7 +138,7 @@ export const Navbar = ({ logoText }) => {
                                   </div>
                                 </div>
                                 
-                                <div className={`categoryMenu__featuredOffer ${s.featuredOffer}`}>
+                                <div className={`dy-categoryMenu-offer ${s.featuredOffer}`}>
                                   <h4 className={s.offerHeading}>{"Exclusive Offer"}</h4>
                                   <p className={s.offerText}>
                                     {`Join our loyalty program and get 15% off your first purchase in the ${category.name} collection.`}
@@ -160,29 +160,29 @@ export const Navbar = ({ logoText }) => {
           </div>
 
           {/* Icons & Search */}
-          <div className={`nav-icons ${s.navbarActions}`}>
+          <div className={`dy-nav-icons ${s.navbarActions}`}>
             <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
-              <Search className={`site-header__icon ${s.actionIcon}`} />
+              <Search className={`dy-nav-icon ${s.actionIcon}`} />
             </button>
 
             {user && user.role === 'admin' && (
               <Link to="/admin" className={s.actionBtn} title="Admin Dashboard" data-dy-nav-icon="admin">
-                <LayoutDashboard className={`site-header__icon ${s.actionIcon}`} />
+                <LayoutDashboard className={`dy-nav-icon ${s.actionIcon}`} />
               </Link>
             )}
 
             {user ? (
               <button onClick={handleLogout} className={s.actionBtn} title="Log Out" data-dy-nav-icon="logout">
-                <LogOut className={`site-header__icon ${s.actionIcon}`} />
+                <LogOut className={`dy-nav-icon ${s.actionIcon}`} />
               </button>
             ) : (
               <Link to="/login" className={s.actionBtn} title="Log In" data-dy-nav-icon="login">
-                <User className={`site-header__icon ${s.actionIcon}`} />
+                <User className={`dy-nav-icon ${s.actionIcon}`} />
               </Link>
             )}
             
             <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`} data-dy-nav-icon="cart">
-              <ShoppingBag className={`site-header__icon ${s.actionIcon}`} />
+              <ShoppingBag className={`dy-nav-icon ${s.actionIcon}`} />
               {totalItems > 0 && (
                 <span className={s.cartBadge}>{totalItems}</span>
               )}

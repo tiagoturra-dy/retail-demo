@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './RecsCarousel.module.css';
 
 export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
+  console.log(recommendations)
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true,
     align: 'start',

@@ -103,11 +103,14 @@ const getPersonalizationData = async (body) => {
 }
 
 export const personalizationService = {
-  getRecommendations: async ({ selectors = [''], cart = [], isImplicitPageview = false }) => {
-    console.log('Fetching recommendations for:', selectors)
+  getRecommendations: async ({ selectors = null, groups = null, cart = [], isImplicitPageview = false }) => {
+    console.log('Fetching recommendations for:', selectors, groups)
 
     let body = await buildBaseBody({ cart, isImplicitPageview })
-    body.selector = { names: selectors }
+    if (selectors) 
+      body.selector = { names: selectors }
+    if (groups)
+      body.selector = { groups }
     console.debug('Personazliation Request Body:', body)
 
     const recs = await getPersonalizationData(body)

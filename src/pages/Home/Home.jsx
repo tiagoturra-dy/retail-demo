@@ -26,7 +26,7 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [recData, heroData, promoData, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
-        personalizationService.getRecommendations({selectors: ['hp_recs'], isImplicitPageview: false, cart}),
+        personalizationService.getRecommendations({groups: ['home_page_recs'], isImplicitPageview: false, cart}),
         // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
         personalizationService.getPersonalizedBanners({ cart }),
@@ -53,15 +53,29 @@ export const Home = () => {
   return (
     <div className={styles.homePage}>
       {/* Hero Section */}
-      <PromoBanner additionalClass='banner1' content={heroBanner} />
+      <PromoBanner id="dy-banner-1" additionalClass='dy-home-banner' content={heroBanner} />
+
+      {/* Recommendations */}
+      {recommendations?.choices?.some(choice => choice.name === 'hp_recs1') &&
+        recommendations?.choices?.filter(choice => choice.name === 'hp_recs1').map(choice => (
+          <RecsCarousel id="dy-recs-1" key={choice.name} recommendations={{choices: [choice]}} additionalClass='dy-home-recs' />
+        ))
+      }
+
+      {/* Recommendations */}
+      {recommendations?.choices?.some(choice => choice.name === 'hp_recs2') &&
+        recommendations?.choices?.filter(choice => choice.name === 'hp_recs2').map(choice => (
+          <RecsCarousel id="dy-recs-2" key={choice.name} recommendations={{choices: [choice]}} additionalClass='dy-home-recs' />
+        ))
+      }
 
       {/* Features */}
-      <section className={`feature__row ${styles.tileSection} ${styles.featuresSection}`}>
+      <section className={`dy-feature-row ${styles.tileSection} ${styles.featuresSection}`}>
         {featureBoxData && (
           <>
             <div className={styles.tileGrid}>
               {featureBoxData.map((tile, idx) => (
-                <Link to={categoryLinks[idx]} className={`feature_${idx} ${styles.tileCard}`} key={tile.uid}>
+                <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.tileCard}`} key={tile.uid}>
                   <img
                     src={tile.image.url}
                     className={styles.tileImage}
@@ -79,18 +93,13 @@ export const Home = () => {
         )}
       </section>
 
-      {/* Recommendations Carousel */}
-      <section className={styles.recommendationsSection}>
-        <div id="hpRecs" className='hp__recs'></div>
-      </section>
-
       {/* Featured Categories */}
-      <section className={`article__row ${styles.tileSection}`}>
+      <section className={`dy-article-row ${styles.tileSection}`}>
         {categoryData && (
           <>
             <div className={styles.tileGrid}>
               {categoryData.map((tile, idx) => (
-                <Link to={categoryLinks[idx]} className={`article_${idx} ${styles.tileCard}`} key={tile.uid}>
+                <Link to={categoryLinks[idx]} className={`dy-article-${idx} ${styles.tileCard}`} key={tile.uid}>
                   <img
                     src={tile.image.url}
                     className={styles.tileImage}
@@ -108,13 +117,11 @@ export const Home = () => {
         )}
       </section>
 
-      {/* Recommendations */}
-      <RecsCarousel recommendations={recommendations} additionalClass='home__recs' />
-
       {/* Personalized Promo Banner */}
       {promoBanner ? (
         <PromoBanner 
-          additionalClass='banner2' 
+          id="dy-banner-2"
+          additionalClass='dy-home-banner' 
           content={{
             background_image: { url: promoBanner.image },
             display_title: promoBanner.title,
@@ -129,12 +136,12 @@ export const Home = () => {
       ) : null}
 
       {/* Blog */}
-      <section className={styles.tileSection}>
+      <section className={`dy-blog-row ${styles.tileSection}`}>
         {blogData && (
           <>
             <div className={styles.tileGrid}>
               {blogData.map((tile, idx) => (
-                <div className={`blog_${idx} ${styles.tileCard}`} key={tile.uid}>
+                <div className={`dy-blog-${idx} ${styles.tileCard}`} key={tile.uid}>
                   <img
                     src={tile.image.url}
                     className={styles.tileImage}

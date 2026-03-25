@@ -91,25 +91,25 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
 .ratingIcon {
-  width: 0.75rem;
-  height: 0.75rem;
+  width: 0.875rem;
+  height: 0.875rem;
   fill: #facc15;
   color: #facc15;
 }
 
 .ratingText {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1rem;
   color: #71717a;
 }
 
 .productPrice {
   margin-top: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1.25rem;
   line-height: 1.25rem;
   font-weight: 700;
   color: #18181b;

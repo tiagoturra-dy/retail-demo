@@ -72,7 +72,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: path.resolve(__dirname, './public/index.html'),
+      favicon: path.resolve(__dirname, './public/favicon-194x194.webp'),
     }),
     new Dotenv({
       systemvars: true,

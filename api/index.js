@@ -183,7 +183,7 @@ app.post('/api/profile', async (req, res) => {
       headers: {
         'Accept': 'application/json',
         'Accept-Charset': 'utf-8',
-        'dy-api-key': process.env.PROFILE_ANYWHERE_KEY
+        'dy-api-key': process.env.PROFILE_API_KEY
       }
     });
 
