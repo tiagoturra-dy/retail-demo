@@ -7,7 +7,14 @@ export const BannerCarousel = ({ choice = {}, additionalClass = '', autoPlay = t
   if (!choice || !choice.variations || choice.variations.length === 0) return null;
   const variations = choice.variations;
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: transitionSpeed, draggable: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true, 
+    draggable: true,
+    stopOnInteraction: true,
+    stopOnMouseEnter: true,
+    slidesToScroll: 1,
+    duration: transitionSpeed, 
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const onSelect = useCallback(() => {
