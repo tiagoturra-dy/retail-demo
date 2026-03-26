@@ -24,7 +24,7 @@ export const WelcomeBackPage = () => {
         className={styles.welcomeContent}
       >
         <div className={styles.welcomeHeader}>
-          <h1 className={styles.welcomeTitle}>Welcome back, {user.Name || user.name}!</h1>
+          <h1 className={styles.welcomeTitle}>Welcome back, {user.DisplayName || user.Name}!</h1>
           <p className={styles.welcomeSubtitle}>Here is a summary of your account and loyalty status.</p>
         </div>
 
@@ -32,11 +32,11 @@ export const WelcomeBackPage = () => {
           <div className={styles.loyaltyHeader}>
             <div className={styles.loyaltyBadge}>
               <Award className={styles.loyaltyIcon} />
-              <span className={styles.loyaltyStatus}>{user.LoyaltyLevel || 'Bronze'}</span>
+              <span className={styles.loyaltyStatus}>{user.LoyaltyLevel}</span>
             </div>
             <div className={styles.pointsDisplay}>
               <Star className={styles.pointsIcon} />
-              <span className={styles.pointsValue}>{user.LoyaltyPoints || 0}</span>
+              <span className={styles.pointsValue}>{user.LoyaltyPoints}</span>
               <span className={styles.pointsLabel}>Points</span>
             </div>
           </div>

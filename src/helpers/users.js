@@ -8,6 +8,7 @@ export const USERS =
     {
       "user_id": "1",
       "Name": "Sara Khan",
+      "DisplayName": "Sara",
       "LoyaltyLevel": "Bronze",
       "LoyaltyPoints": "2110",
       "Location": "London, United Kingdom",
@@ -19,6 +20,7 @@ export const USERS =
     {
       "user_id": "2",
       "Name": "John Lee",
+      "DisplayName": "John",
       "LoyaltyLevel": "Silver",
       "LoyaltyPoints": "5380",
       "Location": "Sydney, Australia",
@@ -30,6 +32,7 @@ export const USERS =
     {
       "user_id": "3",
       "Name": "Alex Smith",
+      "DisplayName": "Alex",
       "LoyaltyLevel": "Gold",
       "LoyaltyPoints": "12450",
       "Location": "Toronto, Canada",
@@ -41,6 +44,7 @@ export const USERS =
     {
       "user_id": "4",
       "Name": "Maria Lopez",
+      "DisplayName": "Maria",
       "LoyaltyLevel": "Platinum",
       "LoyaltyPoints": "23890",
       "Location": "Madrid, Spain",
@@ -52,6 +56,7 @@ export const USERS =
     {
       "user_id": "5",
       "Name": "Emma Davis",
+      "DisplayName": "Emma",
       "LoyaltyLevel": "Gold",
       "LoyaltyPoints": "11970",
       "Location": "Cape Town, South Africa",
@@ -63,6 +68,7 @@ export const USERS =
     {
       "user_id": "6",
       "Name": "Daniel Chen",
+      "DisplayName": "Daniel",
       "LoyaltyLevel": "Platinum",
       "LoyaltyPoints": "25340",
       "Location": "Singapore",
@@ -74,6 +80,7 @@ export const USERS =
     {
       "user_id": "7",
       "Name": "Lucy Patel",
+      "DisplayName": "Lucy",
       "LoyaltyLevel": "Silver",
       "LoyaltyPoints": "6520",
       "Location": "London, United Kingdom",
@@ -85,6 +92,7 @@ export const USERS =
     {
       "user_id": "8",
       "Name": "Adam Brown",
+      "DisplayName": "Adam",
       "LoyaltyLevel": "Bronze",
       "LoyaltyPoints": "1860",
       "Location": "Dublin, Ireland",
@@ -96,6 +104,7 @@ export const USERS =
     {
       "user_id": "9",
       "Name": "Nina Park",
+      "DisplayName": "Nina",
       "LoyaltyLevel": "Gold",
       "LoyaltyPoints": "13760",
       "Location": "Seoul, South Korea",
@@ -107,6 +116,7 @@ export const USERS =
     {
       "user_id": "10",
       "Name": "Leo Martin",
+      "DisplayName": "Leo",
       "LoyaltyLevel": "Silver",
       "LoyaltyPoints": "7200",
       "Location": "São Paulo, Brazil",

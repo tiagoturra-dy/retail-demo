@@ -25,7 +25,7 @@ export const ProductDetailPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [recData] = await Promise.all([
-        personalizationService.getRecommendations({selectors: ['pdpRecs'], isImplicitPageview: false, cart}),
+        personalizationService.getRecommendations({groups: ['pdp_recs'], isImplicitPageview: false, cart}),
       ]);
       setRecommendations(recData);
     };
@@ -139,7 +139,11 @@ export const ProductDetailPage = () => {
       </div>
 
       {/* Recommendations */}
-      <RecsCarousel recommendations={recommendations} additionalClass='pdp__recs' />
+      {recommendations?.choices?.some(choice => choice.name === 'pdp_recs1') &&
+        recommendations?.choices?.filter(choice => choice.name === 'pdp_recs1').map(choice => (
+          <RecsCarousel id="dy-recs-1" key={choice.name} recommendations={{choices: [choice]}} additionalClass='dy-pdp-recs' />
+        ))
+      }
     </div>
   );
 };
