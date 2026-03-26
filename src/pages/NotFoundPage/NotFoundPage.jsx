@@ -5,6 +5,11 @@ import { ArrowRight, Search } from 'lucide-react';
 import styles from './NotFoundPage.module.css';
 
 export const NotFoundPage = () => {
+  const openSearch = (e) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent('open-search-overlay'));
+  };
+
   return (
     <div className={styles.notFoundContainer}>
       <motion.div
@@ -22,9 +27,11 @@ export const NotFoundPage = () => {
           <Link to="/" className={`${styles.notFoundBtn} ${styles.primaryBtn}`}>
             Back to Home <ArrowRight className={styles.btnIcon} />
           </Link>
-          <Link to="/search" className={`${styles.notFoundBtn} ${styles.secondaryBtn}`}>
+          <button onClick={openSearch} 
+            className={`${styles.notFoundBtn} ${styles.secondaryBtn}`}
+          >
             Search Products <Search className={styles.btnIcon} />
-          </Link>
+          </button>
         </div>
       </motion.div>
     </div>

@@ -68,6 +68,7 @@
 .secondaryBtn {
   background-color: #f4f4f5;
   color: #18181b;
+  cursor: pointer;
 
   &:hover {
     background-color: #e4e4e7;

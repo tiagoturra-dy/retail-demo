@@ -329,7 +329,16 @@
   &:hover {
     color: #18181b;
     background-color: #fafafa;
+    animation: wiggle 0.4s ease-in-out;
   }
+}
+
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
 }
 
 .actionIcon {

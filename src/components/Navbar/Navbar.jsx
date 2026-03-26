@@ -48,6 +48,12 @@ export const Navbar = ({ logoText }) => {
     }
   }, [hoveredCategory, fetchBanner]);
 
+  useEffect(() => {
+    const handleOpenSearch = () => setIsSearchOpen(true);
+    window.addEventListener('open-search-overlay', handleOpenSearch);
+    return () => window.removeEventListener('open-search-overlay', handleOpenSearch);
+  }, []);
+
   return (
     <nav className={`${s.navbar} dy-nav`}>
       <div className={s.navbarContainer}>
