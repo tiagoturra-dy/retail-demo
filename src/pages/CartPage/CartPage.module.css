@@ -160,6 +160,9 @@
 
   &:hover {
     color: #000;
+    .removeIcon {
+      animation: var(--animate-wiggle);
+    }
   }
 }
 

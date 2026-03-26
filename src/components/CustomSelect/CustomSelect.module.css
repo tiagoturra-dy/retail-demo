@@ -25,10 +25,12 @@
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
-}
-
-.selectButton:hover {
-  background-color: #f4f4f5;
+  &:hover {
+    background-color: #f4f4f5;
+    svg {
+      animation: var(--animate-wiggle);
+    }
+  }
 }
 
 .selectButton.pill {

@@ -48,11 +48,13 @@
   color: #71717a;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.resetButton:hover {
-  background-color: #e4e4e7;
-  color: #18181b;
+  &:hover{
+    background-color: #e4e4e7;
+    color: #18181b;
+    svg {
+      animation: var(--animate-wiggle);
+    }
+  }
 }
 
 .botIcon {
@@ -308,6 +310,7 @@
 
 .sendButton:hover:not(:disabled) {
   background-color: #000000;
+  animation: var(--animate-wiggle);
 }
 
 .sendButton:active:not(:disabled) {

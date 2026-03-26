@@ -203,6 +203,9 @@
 
   &:hover {
     background-color: #27272a;
+    .btnIcon {
+      animation: var(--animate-wiggle);
+    }
   }
 }
 
@@ -225,6 +228,9 @@
 
   &:hover {
     border-color: #d4d4d8;
+    .wishlistIcon {
+      animation: var(--animate-wiggle);
+    }
   }
 }
 

@@ -40,9 +40,11 @@
 }
 
 .searchLogo {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: #000000;
+  font-size: 1.75rem;
+  line-height: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+  color: #18181b;
 }
 
 .searchCloseBtn {
@@ -61,6 +63,10 @@
 
     .searchCloseText {
       opacity: 1;
+    }
+
+    .searchCloseIcon {
+      animation: var(--animate-wiggle);
     }
   }
 }

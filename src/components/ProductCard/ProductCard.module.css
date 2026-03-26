@@ -126,6 +126,7 @@
 
   &:hover {
     filter: invert() drop-shadow(3px 3px 5px #000000);
+    animation: var(--animate-wiggle);
   }
 }
 

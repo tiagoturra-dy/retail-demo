@@ -156,7 +156,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           {/* Header */}
           <header className={styles.searchHeader}>
             <div className={styles.searchHeaderInner}>
-              <div className={styles.searchLogo}>LUXE</div>
+              <div className={styles.searchLogo}>BLUEBERRY</div>
               <button onClick={onClose} className={styles.searchCloseBtn}>
                 <span className={styles.searchCloseText}>Close</span>
                 <span className={`material-symbols-outlined ${styles.searchCloseIcon}`}>x</span>
