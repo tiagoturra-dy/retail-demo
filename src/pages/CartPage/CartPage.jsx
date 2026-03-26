@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -8,6 +8,8 @@ import { checkoutService } from '../../services/checkoutService';
 import { Helper } from '../../helpers/helper';
 import styles from './CartPage.module.css';
 import { ConfirmationModal } from '../../components/ConfirmationModal/ConfirmationModal';
+import { personalizationService } from '../../services/personalizationService';
+import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const CartPage = () => {
   const navigate = useNavigate();
@@ -15,6 +17,17 @@ export const CartPage = () => {
   const { formatPrice } = useCurrency();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      const [recData] = await Promise.all([
+        personalizationService.getRecommendations({groups: ['cart_recs'], isImplicitPageview: false, cart}),
+      ]);
+      setRecommendations(recData);
+    };
+    fetchData();
+  }, [cart]);
 
   const amountToFreeShipping = Math.max(0, shippingThreshold - subtotal);
 
@@ -76,12 +89,12 @@ export const CartPage = () => {
   }
 
   return (
-    <div className={`cart__container ${styles.cartPageContainer}`}>
+    <div className={`dy-cart-container ${styles.cartPageContainer}`}>
       <h1 className={styles.cartPageTitle}>Shopping Bag ({totalItems})</h1>
 
       <div className={styles.cartGrid}>
         {/* Cart Items */}
-        <div className={`cart__itemList ${styles.cartItemsList}`}>
+        <div className={`dy-cart-items ${styles.cartItemsList}`}>
           <AnimatePresence>
             {cart.map((item) => (
               <motion.div
@@ -90,7 +103,7 @@ export const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className={`${styles.cartItem} group cart__item`}
+                className={`${styles.cartItem} group dy-cart-item`}
               >
                 <Link to={`/product/${item.id}`} className={styles.cartItemImageLink}>
                   <img src={Helper.getProductImage(item.image)} alt={item.name} className={styles.cartItemImage} />
@@ -158,11 +171,11 @@ export const CartPage = () => {
           <div className={styles.cartSummaryCard}>
             <h2 className={styles.summaryTitle}>Order Summary</h2>
             <div className={styles.summaryDetails}>
-              <div className={styles.summaryRow}>
+              <div className={`dy-subtotal-value ${styles.summaryRow}`}>
                 <span>Subtotal</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
-              <div className={styles.summaryRow}>
+              <div className={`dy-shipping-value ${styles.summaryRow}`}>
                 <span>Shipping</span>
                 {shippingFee === 0 ? (
                   <span className={styles.summaryFree}>Free</span>
@@ -170,11 +183,11 @@ export const CartPage = () => {
                   <span>{formatPrice(shippingFee.toFixed(2))}</span>
                 )}
               </div>
-              <div className={styles.summaryRow}>
+              <div className={`dy-tax-value ${styles.summaryRow}`}>
                 <span>Tax</span>
                 <span>{formatPrice(0.00)}</span>
               </div>
-              <div className={styles.summaryTotalRow}>
+              <div className={`dy-total-value ${styles.summaryTotalRow}`}>
                 <span>Total</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
@@ -192,6 +205,13 @@ export const CartPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Recommendations */}
+      {recommendations?.choices?.some(choice => choice.name === 'cart_recs1') &&
+        recommendations?.choices?.filter(choice => choice.name === 'cart_recs1').map(choice => (
+          <RecsCarousel id="dy-recs-1" key={choice.name} recommendations={{choices: [choice]}} additionalClass='dy-cart-recs' />
+        ))
+      }
 
       <ConfirmationModal
         isOpen={!!itemToRemove}
