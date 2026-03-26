@@ -1,11 +1,5 @@
 import { Helper } from '../helpers/helper.js';
 
-const mockSuggestions = async (query) => {
-  if (!query) return [];
-  const terms = ['T-shirt', 'Dress', 'Watch', 'Bag', 'Jacket', 'Serum', 'Sofa', 'Lamp'];
-  return terms.filter(t => t.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
-}
-
 const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent = true, contextType}) => {
   const dyid = Helper.getCookie('_dyid');
   const dyjsession = Helper.getCookie('_dyjsession');
@@ -92,7 +86,7 @@ export const searchService = {
       console.error('DY Suggestions API Error:', error);
     }
 
-    return mockSuggestions()
+    return;
   },
   searchProducts: async ({
     query, 
@@ -108,7 +102,7 @@ export const searchService = {
     enableSpellCheck = true,
     contextType = null
   }) => {
-    if (!query && type === 'search') return mockSearchProducts(query, subcategories, priceRanges, sortBy, filters);
+    if (!query && type === 'search') return;
     const dyid = Helper.getCookie('_dyid');
     const dyjsession = Helper.getCookie('_dyjsession');
 
