@@ -16,20 +16,20 @@
   font-size: 8rem;
   line-height: 1;
   font-weight: 900;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin: 0 0 1rem 0;
 }
 
 .notFoundSubtitle {
   font-size: 2rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin: 0 0 1rem 0;
 }
 
 .notFoundText {
   font-size: 1.125rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
   margin: 0 0 2.5rem 0;
 }
 
@@ -57,21 +57,21 @@
 }
 
 .primaryBtn {
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
 
   &:hover {
-    background-color: #27272a;
+    background-color: var(--color-zinc-800);
   }
 }
 
 .secondaryBtn {
-  background-color: #f4f4f5;
-  color: #18181b;
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-900);
   cursor: pointer;
 
   &:hover {
-    background-color: #e4e4e7;
+    background-color: var(--color-zinc-200);
   }
 }
 

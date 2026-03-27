@@ -39,7 +39,7 @@
   aspect-ratio: 4 / 5;
   border-radius: 1.5rem;
   overflow: hidden;
-  background-color: #f4f4f5;
+  background-color: var(--color-zinc-100);
   cursor: pointer;
   display: block;
   text-decoration: none;
@@ -68,7 +68,7 @@
   position: absolute;
   bottom: 2rem;
   left: 2rem;
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 .featuresSection {
@@ -153,7 +153,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #ffffff;
+  color: var(--color-white);
   padding: 2rem;
 }
 
@@ -172,13 +172,13 @@
 .promoSubtitle {
   font-size: 1.25rem;
   line-height: 1.75rem;
-  color: #e4e4e7;
+  color: var(--color-zinc-200);
   margin-bottom: 2rem;
 }
 
 .promoBtn {
-  background-color: #ffffff;
-  color: #18181b;
+  background-color: var(--color-white);
+  color: var(--color-zinc-900);
   padding: 1rem 2rem;
   border-radius: 9999px;
   font-weight: 700;
@@ -187,6 +187,6 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #f4f4f5;
+    background-color: var(--color-zinc-100);
   }
 }

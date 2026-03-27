@@ -30,7 +30,7 @@
 }
 
 .clearFacetBtn:hover {
-  color: #000;
+  color: var(--color-black);
 }
 
 .searchWrapper {
@@ -56,7 +56,7 @@
 }
 
 .searchInput:focus {
-  border-color: #000;
+  border-color: var(--color-black);
 }
 
 .valuesList {
@@ -76,14 +76,14 @@
 }
 
 .valueLabel:hover {
-  color: #000;
+  color: var(--color-black);
 }
 
 .checkbox {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #000;
+  accent-color: var(--color-black);
 }
 
 .valueName {
@@ -103,7 +103,7 @@
   margin-top: 1rem;
   background: none;
   border: none;
-  color: #000;
+  color: var(--color-black);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;

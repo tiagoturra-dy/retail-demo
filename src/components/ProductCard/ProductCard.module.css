@@ -22,7 +22,7 @@
   aspect-ratio: 3 / 4;
   border-radius: 1rem;
   overflow: hidden;
-  background-color: #f4f4f5;
+  background-color: var(--color-zinc-100);
   position: relative;
 }
 
@@ -47,7 +47,7 @@
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }
 
 .productInfoContainer {
@@ -73,7 +73,7 @@
   line-height: 1.25rem;
   height: 2.5rem;
   font-weight: 500;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin: 0;
 
   display: -webkit-box;
@@ -84,7 +84,7 @@
 .productBrand {
   font-size: 0.875rem;
   margin: 5px 0;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .productRating {
@@ -97,14 +97,14 @@
 .ratingIcon {
   width: 0.875rem;
   height: 0.875rem;
-  fill: #facc15;
-  color: #facc15;
+  fill: var(--color-yellow-400);
+  color: var(--color-yellow-400);
 }
 
 .ratingText {
   font-size: 0.875rem;
   line-height: 1rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .productPrice {
@@ -112,20 +112,20 @@
   font-size: 1.25rem;
   line-height: 1.25rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }
 
 .addToCartBtn {
   padding: 0.375rem;
   border-radius: 9999px;
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   border: none;
   cursor: pointer;
   transition: background-color 0.2s;
 
   &:hover {
-    filter: invert() drop-shadow(3px 3px 5px #000000);
+    filter: invert() drop-shadow(3px 3px 5px var(--color-black));
     animation: var(--animate-wiggle);
   }
 }

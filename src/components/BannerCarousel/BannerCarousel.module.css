@@ -3,7 +3,7 @@
   width: 100%;
   height: 80vh;
   overflow: hidden;
-  background-color: #000;
+  background-color: var(--color-black);
 
   @media (min-width: 1024px) {
     height: 800px;
@@ -55,7 +55,7 @@
 }
 
 .indicatorLine.active {
-  background-color: #000; /* Blue color from image */
+  background-color: var(--color-black); /* Blue color from image */
   width: 60px;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .current {
-  color: #000;
+  color: var(--color-black);
 }
 
 .separator, .total {

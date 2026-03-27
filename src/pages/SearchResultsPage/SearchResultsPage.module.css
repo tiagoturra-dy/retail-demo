@@ -32,12 +32,12 @@
   font-size: 2.25rem;
   line-height: 2.5rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin: 0;
 }
 
 .searchSubtitle {
-  color: #71717a;
+  color: var(--color-zinc-500);
   margin-top: 0.5rem;
 }
 
@@ -63,7 +63,7 @@
 }
 
 .sidebarClearAll {
-  color: #000;
+  color: var(--color-black);
   border: none;
   font-size: 0.875rem;
   font-weight: 600;
@@ -81,7 +81,7 @@
   line-height: 1.25rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
   margin-bottom: 1rem;
 }
 
@@ -97,20 +97,20 @@
   gap: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: #52525b;
+  color: var(--color-zinc-600);
   cursor: pointer;
 }
 
 .filterCheckbox {
   border-radius: 0.25rem;
-  border-color: #d4d4d8;
+  border-color: var(--color-zinc-300);
   cursor: pointer;
-  color: #18181b;
+  color: var(--color-zinc-900);
 
   &:focus {
     outline: 2px solid transparent;
     outline-offset: 2px;
-    box-shadow: 0 0 0 2px #18181b;
+    box-shadow: 0 0 0 2px var(--color-zinc-900);
   }
 }
 
@@ -149,7 +149,7 @@
   gap: 0.5rem;
   padding-top: 2rem;
   padding-bottom: 2rem;
-  border-top: 1px solid #f4f4f5;
+  border-top: 1px solid var(--color-zinc-100);
 }
 
 .paginationArrow {
@@ -164,7 +164,7 @@
   justify-content: center;
 
   &:hover {
-    background-color: #f4f4f5;
+    background-color: var(--color-zinc-100);
   }
 
   &:disabled {
@@ -193,15 +193,15 @@
   cursor: pointer;
   background: none;
   border: none;
-  color: #52525b;
+  color: var(--color-zinc-600);
 
   &:hover {
-    background-color: #f4f4f5;
+    background-color: var(--color-zinc-100);
   }
 
   &.active {
-    background-color: #18181b;
-    color: #ffffff;
+    background-color: var(--color-zinc-900);
+    color: var(--color-white);
   }
 }
 
@@ -209,12 +209,12 @@
   text-align: center;
   padding-top: 5rem;
   padding-bottom: 5rem;
-  background-color: #fafafa;
+  background-color: var(--color-zinc-50);
   border-radius: 1.5rem;
 }
 
 .emptyStateText {
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .emptyStateBtn {
@@ -227,5 +227,5 @@
   cursor: pointer;
   background: none;
   border: none;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }

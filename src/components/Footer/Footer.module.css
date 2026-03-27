@@ -1,6 +1,6 @@
 .footer {
-  background-color: #ffffff;
-  border-top: 1px solid #f4f4f5;
+  background-color: var(--color-white);
+  border-top: 1px solid var(--color-zinc-100);
   padding-top: 5rem;
   padding-bottom: 2.5rem;
 }
@@ -48,13 +48,13 @@
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
   cursor: pointer;
   text-decoration: none;
 }
 
 .footerDescription {
-  color: #71717a;
+  color: var(--color-zinc-500);
   font-size: 0.875rem;
   line-height: 1.625;
 }
@@ -65,7 +65,7 @@
 }
 
 .socialIconWrapper {
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
 }
 
 .icon {
@@ -82,7 +82,7 @@
   line-height: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
   margin-bottom: 1.5rem;
 }
 
@@ -98,7 +98,7 @@
 .footerLink {
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: #52525b;
+  color: var(--color-zinc-600);
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
@@ -106,19 +106,19 @@
   text-decoration: none;
 
   &:hover {
-    color: #18181b;
+    color: var(--color-zinc-900);
   }
 }
 
 .footerText {
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: #52525b;
+  color: var(--color-zinc-600);
 }
 
 .footerBottom {
   padding-top: 2.5rem;
-  border-top: 1px solid #f4f4f5;
+  border-top: 1px solid var(--color-zinc-100);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -133,6 +133,6 @@
 .footerCopyright {
   font-size: 0.75rem;
   line-height: 1rem;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
 }
 

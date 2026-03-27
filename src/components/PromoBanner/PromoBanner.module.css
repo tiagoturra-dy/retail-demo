@@ -43,7 +43,7 @@
   padding-right: 1rem;
   position: relative;
   z-index: 10;
-  color: #ffffff;
+  color: var(--color-white);
   width: 100%;
 
   @media (min-width: 640px) {
@@ -97,8 +97,8 @@
 }
 
 .heroPrimaryBtn {
-  background-color: #ffffff;
-  color: #18181b;
+  background-color: var(--color-white);
+  color: var(--color-zinc-900);
   padding: 1rem 2rem;
   border-radius: 9999px;
   font-weight: 700;
@@ -121,8 +121,8 @@
 
 .heroSecondaryBtn {
   background-color: transparent;
-  border: 1px solid #ffffff;
-  color: #ffffff;
+  border: 1px solid var(--color-white);
+  color: var(--color-white);
   padding: 1rem 2rem;
   border-radius: 9999px;
   font-weight: 700;

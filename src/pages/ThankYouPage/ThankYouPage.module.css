@@ -16,7 +16,7 @@
 .successIconWrapper {
   width: 5rem;
   height: 5rem;
-  background-color: #ecfdf5;
+  background-color: var(--color-emerald-50);
   border-radius: 9999px;
   display: flex;
   align-items: center;
@@ -29,7 +29,7 @@
 .successIcon {
   width: 2.5rem;
   height: 2.5rem;
-  color: #10b981;
+  color: var(--color-emerald-500);
 }
 
 .thankYouTitle {
@@ -42,17 +42,17 @@
 .thankYouMessage {
   font-size: 1.125rem;
   line-height: 1.75rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
   margin: 0;
 }
 
 .orderId {
-  color: #18181b;
+  color: var(--color-zinc-900);
   font-weight: 700;
 }
 
 .thankYouDetails {
-  color: #71717a;
+  color: var(--color-zinc-500);
   max-width: 28rem;
   margin-left: auto;
   margin-right: auto;
@@ -67,8 +67,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   padding: 1rem 2rem;
   border-radius: 9999px;
   font-weight: 700;
@@ -76,7 +76,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #27272a;
+    background-color: var(--color-zinc-800);
   }
 }
 

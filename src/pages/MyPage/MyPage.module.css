@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #f9f9f9;
+  background-color: var(--color-background);
 }
 
 .loadingContainer {
@@ -10,14 +10,14 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f9f9f9;
+  background-color: var(--color-background);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #000;
+  border-left-color: var(--color-black);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -57,14 +57,14 @@
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .heroTitle {
   font-size: 4rem;
   line-height: 0.9;
   font-weight: 900;
-  color: #18181b;
+  color: var(--color-zinc-900);
   text-transform: uppercase;
 }
 
@@ -81,7 +81,7 @@
 .heroDescription {
   font-size: 1rem;
   line-height: 1.6;
-  color: #52525b;
+  color: var(--color-zinc-600);
   max-width: 24rem;
   margin-top: 1rem;
 }
@@ -111,8 +111,8 @@
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
-  background-color: #ffffff;
-  color: #18181b;
+  background-color: var(--color-white);
+  color: var(--color-zinc-900);
   font-size: 1rem;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
@@ -158,13 +158,13 @@
 .sectionTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin-bottom: 0.5rem;
 }
 
 .sectionSubtitle {
   font-size: 1rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .viewAllBtn {
@@ -173,7 +173,7 @@
   gap: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #18181b;
+  color: var(--color-zinc-900);
   background: none;
   border: none;
   cursor: pointer;
@@ -203,7 +203,7 @@
 }
 
 .dealCard {
-  background-color: #ffffff;
+  background-color: var(--color-white);
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -218,7 +218,7 @@
 .dealImageWrapper {
   position: relative;
   aspect-ratio: 1;
-  background-color: #f4f4f5;
+  background-color: var(--color-zinc-100);
   padding: 2rem;
 }
 
@@ -232,8 +232,8 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background-color: #ef4444;
-  color: #ffffff;
+  background-color: var(--color-red-500);
+  color: var(--color-white);
   font-size: 0.875rem;
   font-weight: 700;
   padding: 0.25rem 0.5rem;
@@ -247,7 +247,7 @@
 .dealName {
   font-size: 1rem;
   font-weight: 600;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin-bottom: 0.5rem;
 }
 
@@ -260,7 +260,7 @@
 .dealPrice {
   font-size: 1rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }
 
 /* GIFTS SECTION */
@@ -293,13 +293,13 @@
   font-size: 2.5rem;
   line-height: 1.1;
   font-weight: 800;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }
 
 .giftsDescription {
   font-size: 1rem;
   line-height: 1.6;
-  color: #52525b;
+  color: var(--color-zinc-600);
   margin-bottom: 2rem;
 }
 
@@ -347,25 +347,25 @@
 .giftName {
   font-size: 1rem;
   font-weight: 600;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin-bottom: 0.25rem;
 }
 
 .giftSubtitle {
   font-size: 0.875rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .giftPrice {
   font-size: 1rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }
 
 /* COMPLETE SET SECTION */
 .completeSetSection {
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   padding: 4rem 0;
   margin-top: 4rem;
 }
@@ -391,7 +391,7 @@
 
 .completeSetSubtitle {
   font-size: 1rem;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
 }
 
 .completeSetGrid {
@@ -422,7 +422,7 @@
   aspect-ratio: 1;
   border-radius: 0.5rem;
   overflow: hidden;
-  background-color: #27272a;
+  background-color: var(--color-zinc-800);
 }
 
 .setImage {
@@ -445,10 +445,10 @@
 .setName {
   font-size: 1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 .setPrice {
   font-size: 1rem;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
 }

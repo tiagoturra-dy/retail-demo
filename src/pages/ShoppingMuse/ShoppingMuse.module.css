@@ -6,7 +6,7 @@
 }
 
 .header {
-  background-color: #ffffff;
+  background-color: var(--color-white);
   border-bottom: 1px solid #e5e7eb;
   padding: 1.5rem 2rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -40,17 +40,17 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.875rem;
-  background-color: #f4f4f5;
-  border: 1px solid #e4e4e7;
+  background-color: var(--color-zinc-100);
+  border: 1px solid var(--color-zinc-200);
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #71717a;
+  color: var(--color-zinc-500);
   cursor: pointer;
   transition: all 0.2s;
   &:hover{
-    background-color: #e4e4e7;
-    color: #18181b;
+    background-color: var(--color-zinc-200);
+    color: var(--color-zinc-900);
     svg {
       animation: var(--animate-wiggle);
     }
@@ -58,7 +58,7 @@
 }
 
 .botIcon {
-  color: #18181b;
+  color: var(--color-zinc-900);
   width: 1.5rem;
   height: 1.5rem;
 }
@@ -66,13 +66,13 @@
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
   letter-spacing: -0.025em;
 }
 
 .subtitle {
   font-size: 0.875rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
   flex: 1;
   padding: 10px 20px 0;
   text-align: left;
@@ -89,7 +89,7 @@
   max-width: 48rem;
   width: 100%;
   margin: 0 auto 2rem;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
 }
@@ -127,14 +127,14 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background-color: #f4f4f5;
-  color: #18181b;
-  border: 1px solid #e4e4e7;
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-900);
+  border: 1px solid var(--color-zinc-200);
 }
 
 .userWrapper .avatar {
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   border: none;
 }
 
@@ -154,14 +154,14 @@
 }
 
 .userWrapper .messageBubble {
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   border-bottom-right-radius: 0.25rem;
 }
 
 .botWrapper .messageBubble {
-  background-color: #f4f4f5;
-  color: #18181b;
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-900);
   border-bottom-left-radius: 0.25rem;
 }
 
@@ -170,11 +170,11 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.25rem;
-  background-color: #f4f4f5;
+  background-color: var(--color-zinc-100);
   border-radius: 1.25rem;
   border-bottom-left-radius: 0.25rem;
   font-size: 0.875rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .spinner {
@@ -208,7 +208,7 @@
 .widgetTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #18181b;
+  color: var(--color-zinc-900);
   margin: 0;
   padding-left: 0.25rem;
 }
@@ -236,7 +236,7 @@
 
 .timestamp {
   font-size: 0.75rem;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
   margin-top: 0.25rem;
 }
 
@@ -249,7 +249,7 @@
   border-top: 1px solid #e5e7eb;
   display: flex;
   gap: 1rem;
-  background-color: #ffffff;
+  background-color: var(--color-white);
 }
 
 .inputWrapper {
@@ -262,7 +262,7 @@
 .input {
   width: 100%;
   padding: 0.75rem 4.5rem 0.75rem 1.25rem;
-  border: 1px solid #e4e4e7;
+  border: 1px solid var(--color-zinc-200);
   border-radius: 9999px;
   outline: none;
   font-size: 0.9375rem;
@@ -273,18 +273,18 @@
   position: absolute;
   right: 1.25rem;
   font-size: 0.7rem;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
   pointer-events: none;
   font-variant-numeric: tabular-nums;
 }
 
 .charCountWarning {
-  color: #ef4444;
+  color: var(--color-red-500);
   font-weight: 600;
 }
 
 .input:focus {
-  border-color: #18181b;
+  border-color: var(--color-zinc-900);
   box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.1);
 }
 
@@ -297,8 +297,8 @@
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,7 +309,7 @@
 }
 
 .sendButton:hover:not(:disabled) {
-  background-color: #000000;
+  background-color: var(--color-black);
   animation: var(--animate-wiggle);
 }
 
@@ -318,7 +318,7 @@
 }
 
 .sendButton:disabled {
-  background-color: #e4e4e7;
+  background-color: var(--color-zinc-200);
   cursor: not-allowed;
 }
 

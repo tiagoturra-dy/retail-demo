@@ -22,7 +22,7 @@
   max-width: 28rem;
   overflow: hidden;
   border-radius: 1.5rem;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   padding: 2rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
@@ -33,7 +33,7 @@
   right: 1rem;
   border-radius: 9999px;
   padding: 0.25rem;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
   transition: all 0.2s;
   cursor: pointer;
   display: flex;
@@ -42,8 +42,8 @@
 }
 
 .closeButton:hover {
-  background-color: #f4f4f5;
-  color: #52525b;
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-600);
 }
 
 .modalBody {
@@ -65,24 +65,24 @@
 
 .iconDanger {
   background-color: #fef2f2;
-  color: #ef4444;
+  color: var(--color-red-500);
 }
 
 .iconDefault {
-  background-color: #f4f4f5;
-  color: #52525b;
+  background-color: var(--color-zinc-100);
+  color: var(--color-zinc-600);
 }
 
 .title {
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #18181b;
+  color: var(--color-zinc-900);
 }
 
 .message {
   margin-bottom: 2rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
   line-height: 1.625;
 }
 
@@ -111,23 +111,23 @@
 }
 
 .btnCancel {
-  border: 1px solid #e4e4e7;
-  color: #52525b;
+  border: 1px solid var(--color-zinc-200);
+  color: var(--color-zinc-600);
   background-color: transparent;
 }
 
 .btnCancel:hover {
-  background-color: #fafafa;
+  background-color: var(--color-zinc-50);
 }
 
 .btnConfirm {
-  color: #ffffff;
+  color: var(--color-white);
   border: none;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .btnDanger {
-  background-color: #ef4444;
+  background-color: var(--color-red-500);
 }
 
 .btnDanger:hover {
@@ -135,9 +135,9 @@
 }
 
 .btnDefault {
-  background-color: #18181b;
+  background-color: var(--color-zinc-900);
 }
 
 .btnDefault:hover {
-  background-color: #27272a;
+  background-color: var(--color-zinc-800);
 }

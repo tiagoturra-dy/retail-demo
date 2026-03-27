@@ -25,7 +25,7 @@
 }
 
 .loginSubtitle {
-  color: #71717a;
+  color: var(--color-zinc-500);
   margin: 0;
 }
 
@@ -46,7 +46,7 @@
   line-height: 1rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #a1a1aa;
+  color: var(--color-zinc-400);
   margin-bottom: 0.5rem;
   margin-left: 0.25rem;
 }
@@ -55,7 +55,7 @@
   width: 100%;
   height: 3.5rem;
   border-radius: 1rem;
-  background-color: #fafafa;
+  background-color: var(--color-zinc-50);
   border: 1px solid transparent;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -63,16 +63,16 @@
   box-sizing: border-box;
 
   &:focus {
-    background-color: #ffffff;
-    border-color: #18181b;
+    background-color: var(--color-white);
+    border-color: var(--color-zinc-900);
     outline: none;
   }
 }
 
 .loginSubmitBtn {
   width: 100%;
-  background-color: #18181b;
-  color: #ffffff;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
   height: 3.5rem;
   border-radius: 1rem;
   font-weight: 700;
@@ -85,7 +85,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #27272a;
+    background-color: var(--color-zinc-800);
   }
 
   &:disabled {
@@ -104,11 +104,11 @@
   margin-top: 2rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: #71717a;
+  color: var(--color-zinc-500);
 }
 
 .loginLink {
-  color: #18181b;
+  color: var(--color-zinc-900);
   font-weight: 700;
   text-decoration: none;
   transition: text-decoration 0.2s;
