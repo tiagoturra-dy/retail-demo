@@ -177,6 +177,11 @@ export const Navbar = ({ logoText }) => {
                 </AnimatePresence>
               </div>
             ))}
+            <div className={s.navbarItemContainer}>
+              <Link to="/my-page" className={s.navbarLink}>
+                My Page
+              </Link>
+            </div>
           </div>
 
           {/* Icons & Search */}
@@ -294,6 +299,12 @@ export const Navbar = ({ logoText }) => {
                 </div>
               ))}
               
+              <div className={s.mobileCategory}>
+                <Link to="/my-page" className={s.mobileCategoryBtn} onClick={() => setIsMobileMenuOpen(false)}>
+                  My Page
+                </Link>
+              </div>
+
               <div className={s.mobileFooter}>
                 {user ? (
                   <button className={s.mobileAccountLink} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>

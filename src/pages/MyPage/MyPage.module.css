@@ -1,0 +1,454 @@
+.myPageContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* HERO SECTION */
+.heroSection {
+  padding: 4rem 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heroContent {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .heroContent {
+    grid-template-columns: 1fr 1.5fr;
+  }
+}
+
+.heroTextContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.heroTagline {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.heroTitle {
+  font-size: 4rem;
+  line-height: 0.9;
+  font-weight: 900;
+  color: #18181b;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .heroTitle {
+    font-size: 6rem;
+  }
+}
+
+.heroTitleLine {
+  display: block;
+}
+
+.heroDescription {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #52525b;
+  max-width: 24rem;
+  margin-top: 1rem;
+}
+
+.heroImagesContainer {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1rem;
+  height: 500px;
+}
+
+.heroImageMain {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  height: 100%;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shopTheLookBtn {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  background-color: #ffffff;
+  color: #18181b;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.shopTheLookBtn:hover {
+  transform: translateY(-2px);
+}
+
+.heroImageSecondary {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+  height: 100%;
+}
+
+.heroImageTopRight, .heroImageBottomRight {
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* DEALS SECTION */
+.dealsSection {
+  padding: 4rem 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #18181b;
+  margin-bottom: 0.5rem;
+}
+
+.sectionSubtitle {
+  font-size: 1rem;
+  color: #71717a;
+}
+
+.viewAllBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #18181b;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.viewAllIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.dealsGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .dealsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dealsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.dealCard {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.dealCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.dealImageWrapper {
+  position: relative;
+  aspect-ratio: 1;
+  background-color: #f4f4f5;
+  padding: 2rem;
+}
+
+.dealImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.discountBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.dealInfo {
+  padding: 1.5rem;
+}
+
+.dealName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #18181b;
+  margin-bottom: 0.5rem;
+}
+
+.dealPricing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dealPrice {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #18181b;
+}
+
+/* GIFTS SECTION */
+.giftsSection {
+  padding: 4rem 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.giftsContent {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4rem;
+}
+
+@media (min-width: 1024px) {
+  .giftsContent {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+.giftsTextContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.giftsTitle {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #18181b;
+}
+
+.giftsDescription {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #52525b;
+  margin-bottom: 2rem;
+}
+
+.giftsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 640px) {
+  .giftsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.giftCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.giftImageWrapper {
+  aspect-ratio: 3/4;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.giftImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.giftCard:hover .giftImage {
+  transform: scale(1.05);
+}
+
+.giftInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.giftName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #18181b;
+  margin-bottom: 0.25rem;
+}
+
+.giftSubtitle {
+  font-size: 0.875rem;
+  color: #71717a;
+}
+
+.giftPrice {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #18181b;
+}
+
+/* COMPLETE SET SECTION */
+.completeSetSection {
+  background-color: #18181b;
+  color: #ffffff;
+  padding: 4rem 0;
+  margin-top: 4rem;
+}
+
+.completeSetContainer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.completeSetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+}
+
+.completeSetTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.completeSetSubtitle {
+  font-size: 1rem;
+  color: #a1a1aa;
+}
+
+.completeSetGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .completeSetGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .completeSetGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.setCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.setImageWrapper {
+  aspect-ratio: 1;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #27272a;
+}
+
+.setImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.setCard:hover .setImage {
+  transform: scale(1.05);
+}
+
+.setInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.setName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.setPrice {
+  font-size: 1rem;
+  color: #a1a1aa;
+}

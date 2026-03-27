@@ -22,6 +22,7 @@ import { DYManager } from './components/DYManager/DYManager';
 import { ScrollToTop } from './components/ScrollToTop/ScrollToTop';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPage';
+import { MyPage } from './pages/MyPage/MyPage';
 import { ContentProvider } from './context/ContentContext';
 import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
 
@@ -51,6 +52,7 @@ export default function App() {
                       <Route path="/search" element={<SearchResultsPage />} />
                       <Route path="/muse" element={<ShoppingMuse />} />
                       <Route path="/thank-you" element={<ThankYouPage />} />
+                      <Route path="/my-page" element={<MyPage />} />
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
                   </AnimatePresence>
