@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { authService } from '../../services/authService';
@@ -9,6 +9,7 @@ import { LoginErrorModal } from '../../components/LoginErrorModal/LoginErrorModa
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,8 @@ export const LoginPage = () => {
           });
         }
 
-        navigate('/welcome');
+        const from = location.state?.from || '/welcome';
+        navigate(from);
       }
     } else {
       setErrorMessage('User not found. Please use a User ID.');

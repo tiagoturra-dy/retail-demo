@@ -47,7 +47,7 @@ export const MyPage = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/');
+      navigate('/login', { state: { from: '/my-page' } });
       return;
     }
     // Simulate API call to DY Personalization API

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut, LayoutDashboard, BotMessageSquare } from 'lucide-react';
+import { ShoppingBag, User, Search, Menu, X, ChevronDown, ArrowRight, LogOut, LayoutDashboard, BotMessageSquare, IdCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CATEGORIES } from '../../helpers/categoryConstants';
 import { useCart } from '../../context/CartContext';
@@ -198,6 +198,12 @@ export const Navbar = ({ logoText }) => {
             {user && user.role === 'admin' && (
               <Link to="/admin" className={s.actionBtn} title="Admin Dashboard" data-dy-nav-icon="admin">
                 <LayoutDashboard className={`dy-nav-icon ${s.actionIcon}`} />
+              </Link>
+            )}
+
+            {user && user.role !== 'admin' && (
+              <Link to="/welcome" className={s.actionBtn} title="Dashboard" data-dy-nav-icon="dashboard">
+                <IdCard className={`dy-nav-icon ${s.actionIcon}`} />
               </Link>
             )}
 
