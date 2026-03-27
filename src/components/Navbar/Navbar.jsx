@@ -36,7 +36,7 @@ export const Navbar = ({ logoText }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    window.location.href = '/';
   };
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { USERS } from '../helpers/users.js';
+import { Helper } from '../helpers/helper.js';
 
 const AuthContext = createContext();
 
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('authUser');
+    Helper.removeCookie('_dyjsession');
   };
 
   const isAdmin = user?.role === 'admin';
