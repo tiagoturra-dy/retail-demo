@@ -73,7 +73,7 @@ export const Navbar = ({ logoText }) => {
                 onMouseLeave={() => setHoveredCategory(null)}
                 data-dy-category-menu={category.name}
               >
-                <Link to={`/category/${category.name}`} className={s.navbarLink} >
+                <Link to={`/category/${category.name}`} className={s.navbarLink} onClick={() => setHoveredCategory(null)}>
                   {category.name}
                   <ChevronDown className={`${s.navbarChevron} ${hoveredCategory === category.name ? s.rotate180 : ''}`} />
                 </Link>
@@ -95,6 +95,7 @@ export const Navbar = ({ logoText }) => {
                             <div key={section.title} className={s.megaMenuSection}>
                               <Link to={`/category/${category.name}?sub=${section.title}`}
                                 className={s.megaMenuHeading}
+                                onClick={() => setHoveredCategory(null)}
                               >
                                 {section.title}
                               </Link>
@@ -103,6 +104,7 @@ export const Navbar = ({ logoText }) => {
                                   <li key={item}>
                                     <Link to={`/category/${category.name}?sub=${section.title}&item=${item}`}
                                       className={s.megaMenuLink}
+                                      onClick={() => setHoveredCategory(null)}
                                     >
                                       {item}
                                     </Link>
@@ -112,6 +114,7 @@ export const Navbar = ({ logoText }) => {
                                   <li>
                                     <Link to={`/category/${category.name}?sub=${section.title}`}
                                       className={s.megaMenuViewAll}
+                                      onClick={() => setHoveredCategory(null)}
                                     >
                                       View All
                                     </Link>
@@ -160,7 +163,7 @@ export const Navbar = ({ logoText }) => {
                                   <p className={s.offerText}>
                                     {`Join our loyalty program and get 15% off your first purchase in the ${category.name} collection.`}
                                   </p>
-                                  <Link to={"/login"} className={s.offerLink}>
+                                  <Link to={"/login"} className={s.offerLink} onClick={() => setHoveredCategory(null)}>
                                     {"Join Now"} <ArrowRight className={s.offerIcon} />
                                   </Link>
                                 </div>
