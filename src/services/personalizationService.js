@@ -40,9 +40,9 @@ const getBrowserData = async () => {
 }
 
 const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' }) => {
-  const dyid = Helper.getCookie('_dyid')
-  const dyid_server = Helper.getCookie('_dyid_server')
-  const dyjsession = Helper.getCookie('_dyjsession')
+  const dyid = Helper.getStoredValue('_dyid')
+  const dyid_server = Helper.getStoredValue('_dyid_server')
+  const dyjsession = Helper.getStoredValue('_dyjsession')
 
   const context = Helper.getDYContext(cart)
   const browserData = await getBrowserData()
@@ -133,7 +133,7 @@ export const personalizationService = {
 
     // set cookies
     recs?.cookes?.array.forEach(cookie => {
-      Helper.setCookie(cookie.name, cookie.value, cookie.maxAge);
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge);
     });
     
     return recs
@@ -188,7 +188,7 @@ export const personalizationService = {
     const response = await getPersonalizationData(body);
     // set cookies
     response?.cookes?.array.forEach(cookie => {
-      Helper.setCookie(cookie.name, cookie.value, cookie.maxAge);
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge);
     });
 
     return response
@@ -196,7 +196,7 @@ export const personalizationService = {
   getMuseResponse: async ({ query, cart = [], isImplicitPageview = false }) => {
     console.log('Fetching Muse response for:', query);
     const CHAT_ID_KEY = '_dyMuseChatId'
-    const chatId = Helper.getCookie(CHAT_ID_KEY);
+    const chatId = Helper.getStoredValue(CHAT_ID_KEY);
 
     let body = await buildBaseBody({ cart, isImplicitPageview, type: 'muse' });
     body.query = {
@@ -227,14 +227,14 @@ export const personalizationService = {
     // Store chatId if returned in the response
     // set cookies
     data?.cookes?.array.forEach(cookie => {
-      Helper.setCookie(cookie.name, cookie.value, cookie.maxAge);
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge);
     });
 
     const museData = data?.choices?.[0]?.variations?.[0]?.payload?.data;
 
     // handle muse chatId for session persistence
     if (museData && museData.chatId && museData.chatId !== chatId) {
-      Helper.setCookie(CHAT_ID_KEY, museData.chatId);
+      Helper.setStoredValue(CHAT_ID_KEY, museData.chatId);
     }
 
     return {

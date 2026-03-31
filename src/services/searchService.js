@@ -1,8 +1,8 @@
 import { Helper } from '../helpers/helper.js';
 
 const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent = true, contextType}) => {
-  const dyid = Helper.getCookie('_dyid');
-  const dyjsession = Helper.getCookie('_dyjsession');
+  const dyid = Helper.getStoredValue('_dyid');
+  const dyjsession = Helper.getStoredValue('_dyjsession');
 
   const context = Helper.getDYContext(cart);
 
@@ -103,8 +103,8 @@ export const searchService = {
     contextType = null
   }) => {
     if (!query && type === 'search') return;
-    const dyid = Helper.getCookie('_dyid');
-    const dyjsession = Helper.getCookie('_dyjsession');
+    const dyid = Helper.getStoredValue('_dyid');
+    const dyjsession = Helper.getStoredValue('_dyjsession');
 
     // Dynamic Yield Search API Call
     try {
@@ -162,14 +162,14 @@ export const searchService = {
         const dySessionFromResponse = data.cookies.filter(cookie => cookie.name === '_dyjsession')[0];
         
         if (dyidFromResponse && !dyid) {
-          Helper.setCookie(
+          Helper.setStoredValue(
             '_dyid', 
             dyidFromResponse.value, 
             dyidFromResponse.maxAge ? dyidFromResponse.maxAge / (60 * 60 * 24) : 365
           );
         }
         if (dySessionFromResponse && !dyjsession) {
-          Helper.setCookie(
+          Helper.setStoredValue(
             '_dyjsession', 
             dySessionFromResponse.value, 
             dySessionFromResponse.maxAge ? dySessionFromResponse.maxAge / (60 * 60 * 24) : 365

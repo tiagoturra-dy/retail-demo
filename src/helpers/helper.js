@@ -51,11 +51,19 @@ export const Helper = {
     }
     return context;
   },
-  getCookie: (name) => {
+  getStoredValue: (name) => {
+    // Check localStorage first
+    const localValue = window.localStorage.getItem(name);
+    if (localValue !== null) return localValue;
+
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     return match ? decodeURIComponent(match[2]) : null;
   },
-  setCookie: (name, value, days = 365) => {
+  setStoredValue: (name, value, days = 365, path = '/') => {
+    // Set in localStorage
+    window.localStorage.setItem(name, value);
+
+    // Set in cookies
     let expires = "";
     if (days) {
       const date = new Date();
@@ -63,7 +71,11 @@ export const Helper = {
       expires = `; expires=${date.toUTCString()}`;
     }
     document.cookie = `${name}=${encodeURIComponent(value || "")}${expires}; path=${path}; SameSite=Lax`;  },
-  removeCookie: (name) => {
+  removeStoredValue: (name) => {
+    // Remove from localStorage
+    window.localStorage.removeItem(name);
+
+    // Remove from cookies
     const host = window.location.hostname;
     const base = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
     

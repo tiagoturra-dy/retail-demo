@@ -145,7 +145,7 @@ export const ShoppingMuse = () => {
 
   const handleReset = () => {
     setMessages([]);
-    Helper.setCookie('_dyMuseChatId', '', -1); // Clear the cookie
+    Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
     handleSendMessage('');
   };
 

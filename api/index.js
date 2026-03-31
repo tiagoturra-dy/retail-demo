@@ -237,7 +237,7 @@ app.post('/api/muse', async (req, res) => {
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
     const response = await fetch(
-      `https://direct.dy-api.com/v2/serve/user/assistant`, 
+      `https://direct.dy-api.com/v2/serve/user/agent-assistant`, 
       {
         method: 'POST',
         headers: {

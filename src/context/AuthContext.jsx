@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('authUser');
-    Helper.removeCookie('_dyjsession');
+    Helper.removeStoredValue('_dyjsession');
   };
 
   const isAdmin = user?.role === 'admin';
