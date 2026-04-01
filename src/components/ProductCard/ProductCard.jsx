@@ -61,6 +61,7 @@ export const ProductCard = ({ product, compact = false }) => {
             product={product} 
             className={styles.addToCartBtn} 
             iconClass={styles.cartIcon} 
+            trackProductClick={handleTrackClick}
           />
         )}
       </div>

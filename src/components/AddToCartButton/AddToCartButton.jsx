@@ -2,12 +2,18 @@ import React from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
-export const AddToCartButton = ({ product, className, showText = false, iconClass }) => {
+export const AddToCartButton = ({ product, className, showText = false, iconClass, trackProductClick }) => {
   const { addToCart } = useCart();
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (trackProductClick
+        && typeof trackProductClick === 'function'
+    ) {
+      trackProductClick();
+    }
 
     // Handle both old and new structures
     const id = product.sku || product.id;
