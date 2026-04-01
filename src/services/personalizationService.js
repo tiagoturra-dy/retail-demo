@@ -13,30 +13,48 @@ const getPublicIpAddress = async () => {
   }
 }
 
-const getBrowserData = async () => {
-  const ua = navigator.userAgent;
-  
-  // 1. Get the UserAgent
-  const userAgent = ua;
+function getDeviceType(ua) {
+  switch (true) {
+    // ODMB (Smart TVs and Media Boxes)
+    case /SmartTV|AppleTV|HbbTV|Roku|DTV|OTT-Box|Large Screen/i.test(ua):
+      return 'ODMB'
+    // Kiosk
+    case /Kiosk|Provisio|SiteKiosk|Flashpoint/i.test(ua):
+      return 'kiosk'
+    // Tablet
+    case /iPad|PlayBook|Kindle|Silk/i.test(ua) || (/Android/i.test(ua) && !/Mobi/i.test(ua)):
+      return 'tablet'
+    // Smartphone
+    case /Mobi|iPhone|Android|Windows Phone/i.test(ua):
+      return 'smartphone'
+    default:
+      return 'desktop'
+  }
+}
 
-  // 2. Determine Type (Simplified)
-  // We check for "Mobi" which covers most phones and tablets
-  const type = /Mobi|Android|iPhone/i.test(ua) ? 'MOBILE' : 'DESKTOP';
+const getBrowserData = async () => {
+  const ua = navigator.userAgent
+
+  // 1. Get the UserAgent
+  const userAgent = ua
+
+  // 2. Determine Type (ODMB, Kiosk, Tablet, Smartphone, Desktop)
+  const type = getDeviceType(ua)
 
   // 3. Get Browser Name (Simple Logic)
-  let browser = "Unknown";
-  if (ua.includes("Firefox")) browser = "Firefox";
-  else if (ua.includes("SamsungBrowser")) browser = "Samsung Browser";
-  else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
-  else if (ua.includes("Edge") || ua.includes("Edg")) browser = "Edge";
-  else if (ua.includes("Chrome")) browser = "Chrome";
-  else if (ua.includes("Safari")) browser = "Safari";
+  let browser = 'Unknown'
+  if (ua.includes('Firefox')) browser = 'Firefox'
+  else if (ua.includes('SamsungBrowser')) browser = 'Samsung Browser'
+  else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera'
+  else if (ua.includes('Edge') || ua.includes('Edg')) browser = 'Edge'
+  else if (ua.includes('Chrome')) browser = 'Chrome'
+  else if (ua.includes('Safari')) browser = 'Safari'
 
   return {
     userAgent,
     type,
-    browser
-  };
+    browser,
+  }
 }
 
 const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' }) => {
@@ -75,10 +93,10 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' 
       body['options'] = {
         returnAnalyticsMetadata: false,
         isImplicitClientData: false,
-        isImplicitKeywordSearchEvent: false
+        isImplicitKeywordSearchEvent: false,
       }
-      break;
-  
+      break
+
     default:
       body['options'] = {
         isImplicitPageview,
@@ -86,7 +104,7 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' 
         isImplicitImpressionMode: true,
         isImplicitClientData: false,
       }
-      break;
+      break
   }
 
   if (dyid) {
@@ -106,11 +124,11 @@ const getPersonalizationData = async (body) => {
   const response = await fetch(`/api/choose`, {
     method: 'POST',
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Accept-Charset': 'utf-8',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({bodyData: JSON.stringify(body)}),
+    body: JSON.stringify({ bodyData: JSON.stringify(body) }),
   })
 
   const data = await response.json()
@@ -123,136 +141,133 @@ export const personalizationService = {
     console.log('Fetching recommendations for:', selectors, groups)
 
     let body = await buildBaseBody({ cart, isImplicitPageview })
-    if (selectors) 
-      body.selector = { names: selectors }
-    if (groups)
-      body.selector = { groups }
+    if (selectors) body.selector = { names: selectors }
+    if (groups) body.selector = { groups }
     console.debug('Personazliation Request Body:', body)
 
     const recs = await getPersonalizationData(body)
 
     // set cookies
-    recs?.cookes?.array.forEach(cookie => {
-      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge);
-    });
-    
+    recs?.cookes?.array.forEach((cookie) => {
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
+    })
+
     return recs
   },
   trackClick: async ({ decisionId, variationId, cart = [] }) => {
-    if (!decisionId || !variationId) return;
+    if (!decisionId || !variationId) return
 
-    console.log('Tracking click for decisionId:', decisionId, variationId);
+    console.log('Tracking click for decisionId:', decisionId, variationId)
 
-    let body = await buildBaseBody({ cart });
-    body.engagements = [{ 
-      type: 'CLICK',
-      decisionId,
-      variations: [variationId]
-    }];
+    let body = await buildBaseBody({ cart })
+    body.engagements = [
+      {
+        type: 'CLICK',
+        decisionId,
+        variations: [variationId],
+      },
+    ]
 
     try {
       const response = await fetch(`/api/engage`, {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Accept-Charset': 'utf-8',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({bodyData: JSON.stringify(body)}),
+        body: JSON.stringify({ bodyData: JSON.stringify(body) }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to track engagement');
+        throw new Error('Failed to track engagement')
       }
 
       if (response.status === 204) {
-        const data = await response.text();
-        console.debug('Engagement Tracked', data);
+        const data = await response.text()
+        console.debug('Engagement Tracked', data)
         return true
       }
-
     } catch (error) {
-      console.error('Error tracking engagement:', error);
+      console.error('Error tracking engagement:', error)
     }
   },
   getPersonalizedBanners: async ({ selectors = null, groups = null, cart = [], isImplicitPageview = false } = {}) => {
-    console.log('Fetching personalized banners');
+    console.log('Fetching personalized banners')
 
-    let body = await buildBaseBody({ cart });
-    if (selectors) 
-      body.selector = { names: selectors }
-    if (groups)
-      body.selector = { groups }
-    console.debug('Banner Request Body:', body);
+    let body = await buildBaseBody({ cart })
+    if (selectors) body.selector = { names: selectors }
+    if (groups) body.selector = { groups }
+    console.debug('Banner Request Body:', body)
 
-    const response = await getPersonalizationData(body);
+    const response = await getPersonalizationData(body)
     // set cookies
-    response?.cookes?.array.forEach(cookie => {
-      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge);
-    });
+    response?.cookes?.array.forEach((cookie) => {
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
+    })
 
     return response
   },
   getMuseResponse: async ({ query, cart = [], isImplicitPageview = false }) => {
-    console.log('Fetching Muse response for:', query);
+    console.log('Fetching Muse response for:', query)
     const CHAT_ID_KEY = '_dyMuseChatId'
-    const chatId = Helper.getStoredValue(CHAT_ID_KEY);
+    const chatId = Helper.getStoredValue(CHAT_ID_KEY)
 
-    let body = await buildBaseBody({ cart, isImplicitPageview, type: 'muse' });
+    let body = await buildBaseBody({ cart, isImplicitPageview, type: 'muse' })
     body.query = {
-      text: query
-    };
-    
-    if (chatId && chatId !== '')
-      body.query.chatId = chatId
+      text: query,
+    }
+
+    if (chatId && chatId !== '') body.query.chatId = chatId
 
     body.selector = {
-      "name": "Shopping Muse"
+      name: 'Shopping Muse',
     }
-    console.debug('Muse Request Body:', body);
+    console.debug('Muse Request Body:', body)
 
     const response = await fetch(`/api/muse`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Accept-Charset': 'utf-8',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({bodyData: JSON.stringify(body)}),
-    });
+      body: JSON.stringify({ bodyData: JSON.stringify(body) }),
+    })
 
-    const data = await response.json();
-    console.debug('DY Muse Results', data);
+    const data = await response.json()
+    console.debug('DY Muse Results', data)
 
     // Store chatId if returned in the response
     // set cookies
-    data?.cookes?.array.forEach(cookie => {
-      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge);
-    });
+    data?.cookes?.array.forEach((cookie) => {
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
+    })
 
-    const museData = data?.choices?.[0]?.variations?.[0]?.payload?.data;
+    const museData = data?.choices?.[0]?.variations?.[0]?.payload?.data
 
     // handle muse chatId for session persistence
     if (museData && museData.chatId && museData.chatId !== chatId) {
-      Helper.setStoredValue(CHAT_ID_KEY, museData.chatId);
+      Helper.setStoredValue(CHAT_ID_KEY, museData.chatId)
     }
 
     return {
       decisionId: data?.choices?.[0]?.decisionId,
       variationId: data?.choices?.[0]?.variations?.[0].id,
       answer: museData?.assistant,
-      widgets: museData?.widgets.map(widget => {
-        const slots = widget.slots.map(s => ({
-          ...s.productData,
-          sku: s.sku,
-          slotId: s.slotId
-        }))
+      widgets:
+        museData?.widgets.map((widget) => {
+          const slots = widget.slots.map((s) => ({
+            ...s.productData,
+            sku: s.sku,
+            slotId: s.slotId,
+          }))
 
-        return {
-          title: widget.title,
-          slots
-        }
-      }) || []
-    };
+          return {
+            title: widget.title,
+            slots,
+          }
+        }) || [],
+    }
   },
 }
