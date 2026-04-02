@@ -44,6 +44,7 @@ export default function App() {
                     <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/category/:categoryName" element={<CategoryPage />} />
+                      <Route path="/category/:categoryName/*" element={<NotFoundPage />} />
                       <Route path="/product/:productId" element={<ProductDetailPage />} />
                       <Route path="/cart" element={<CartPage />} />
                       <Route path="/login" element={<LoginPage />} />
