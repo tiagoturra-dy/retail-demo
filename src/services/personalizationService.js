@@ -213,4 +213,44 @@ export const personalizationService = {
         }) || [],
     }
   },
+  trackPurchase: async ({ orderId, total, cart = [] }) => {
+    console.log('[Dynamic Yield] Triggering PURCHASE event for order:', orderId)
+
+    let body = await buildBaseBody({cart: []})
+
+    body.events = [
+      {
+        "name": "Purchase",
+        "properties": {
+          "dyType": "purchase-v1",
+          "value": total,
+          "currency": "USD",
+          "uniqueTransactionId": orderId,
+          "cart": cart.map(item => ({
+            productId: String(item.id),
+            quantity: item.quantity,
+            itemPrice: Number(item.price)
+          }))
+        }
+      }
+    ]
+
+    console.debug('Purchase Event Body:', body)
+
+    const response = await fetch(`/api/event`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-Charset': 'utf-8',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bodyData: JSON.stringify(body) }),
+    })
+
+    if (response.ok && response.status === 204) {
+      return { success: true } 
+    }
+
+    return { success: false }
+  },
 }

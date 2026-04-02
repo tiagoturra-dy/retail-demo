@@ -33,32 +33,11 @@ export const CartPage = () => {
 
   const handleCheckout = async () => {
     setIsCheckingOut(true);
-    const result = await checkoutService.processCheckout(cart, totalPrice);
+    const result = await checkoutService.processCheckout({cart, total: totalPrice});
     setIsCheckingOut(false);
     if (result.success) {
-      const orderId = result.orderId;
-
-      // Trigger Dynamic Yield Purchase Event
-      if (window.DY && typeof window.DY.API === 'function') {
-        window.DY.API("event", {
-          name: "Purchase",
-          properties: {
-            uniqueTransactionId: String(orderId),
-            dyType: "purchase-v1",
-            value: Number(totalPrice),
-            currency: "USD",
-            cart: cart.map(item => ({
-              productId: String(item.id),
-              quantity: item.quantity,
-              itemPrice: Number(item.price)
-            }))
-          }
-        });
-        console.log('[Dynamic Yield] Purchase event triggered for order:', orderId);
-      }
-
       clearCart();
-      navigate('/thank-you', { state: { orderId } });
+      navigate('/thank-you', { state: { orderId: result.orderId } });
     }
   };
 
