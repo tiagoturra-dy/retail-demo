@@ -43,7 +43,7 @@ export const ProductCard = ({ product, compact = false }) => {
           {product.brand && !compact &&
             <p className={styles.productBrand}>{product.brand}</p>
           }
-          <Link to={`/product/${product.id}`} className={styles.productNameLink} onClick={handleTrackClick}>
+          <Link to={`/product/${product.sku}`} className={styles.productNameLink} onClick={handleTrackClick}>
             <h3 className={`${styles.productName} ${compact ? styles.compactName : ''}`}>
               {product.name}
             </h3>
