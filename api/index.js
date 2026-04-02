@@ -221,9 +221,9 @@ app.post('/api/engage', async (req, res) => {
       }
     );
 
-    if (response.status === 204) {
+    if (response.ok) {
       // Operation was successful, but there is no body.
-      res.status(response.status).send("Engagements reported successfully."); 
+      res.status(200).send("Engagements reported successfully."); 
     }
 
   } catch (error) {
@@ -285,9 +285,9 @@ app.post('/api/event', async (req, res) => {
       }
     );
 
-    if (response.status === 204) {
+    if (response.ok) {
       // Operation was successful, but there is no body.
-      res.status(response.status).send("Engagements reported successfully."); 
+      res.status(200).send("Engagements reported successfully."); 
     }
 
   } catch (error) {

@@ -126,7 +126,7 @@ export const personalizationService = {
         throw new Error('Failed to track engagement')
       }
 
-      if (response.status === 204) {
+      if (response.ok) {
         const data = await response.text()
         console.debug('Engagement Tracked', data)
         return true
@@ -247,7 +247,7 @@ export const personalizationService = {
       body: JSON.stringify({ bodyData: JSON.stringify(body) }),
     })
 
-    if (response.ok && response.status === 204) {
+    if (response.ok) {
       return { success: true } 
     }
 

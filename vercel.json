@@ -3,5 +3,10 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
     { "source": "/((?!static|.*\\..*).*)", "destination": "/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 90
+    }
+  }
 }
