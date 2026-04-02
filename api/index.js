@@ -224,6 +224,10 @@ app.post('/api/engage', async (req, res) => {
     if (response.ok) {
       // Operation was successful, but there is no body.
       res.status(200).send("Engagements reported successfully."); 
+    } else {
+      const text = await response.text();
+      console.error(`[/api/engage] Upstream error ${response.status}:`, text);
+      res.status(response.status).send(text || "Upstream error");
     }
 
   } catch (error) {
@@ -270,6 +274,8 @@ app.post('/api/event', async (req, res) => {
     const { bodyData } = req.body
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
+    console.log('[/api/event] Sending to DY:', dataToSend);
+
     const response = await fetch(
       `https://direct-collect.dy-api.com/v2/collect/user/event`, 
       {
@@ -285,12 +291,19 @@ app.post('/api/event', async (req, res) => {
       }
     );
 
+    console.log('[/api/event] Upstream response status:', response.status);
+
     if (response.ok) {
       // Operation was successful, but there is no body.
       res.status(200).send("Engagements reported successfully."); 
+    } else {
+      const text = await response.text();
+      console.error(`[/api/event] Upstream error ${response.status}:`, text);
+      res.status(response.status).send(text || "Upstream error");
     }
 
   } catch (error) {
+    console.error('[/api/event] Caught error:', error);
     res.status(500).json({ error: JSON.stringify(error) });
   }
 })
