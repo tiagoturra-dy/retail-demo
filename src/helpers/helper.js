@@ -61,7 +61,11 @@ export const Helper = {
   },
   setStoredValue: (name, value, days = 365, path = '/') => {
     // Set in localStorage
-    window.localStorage.setItem(name, value);
+    try {
+      window.localStorage.setItem(name, value);
+    } catch (e) {
+      console.warn(`[setStoredValue] localStorage unavailable for key "${name}":`, e);
+    }
 
     // Set in cookies
     let expires = "";
@@ -70,7 +74,8 @@ export const Helper = {
       date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
       expires = `; expires=${date.toUTCString()}`;
     }
-    document.cookie = `${name}=${encodeURIComponent(value || "")}${expires}; path=${path}; SameSite=Lax`;  },
+    document.cookie = `${name}=${encodeURIComponent(value ?? "")}${expires}; path=${path}; SameSite=Lax`;  
+  },
   removeStoredValue: (name) => {
     // Remove from localStorage
     window.localStorage.removeItem(name);

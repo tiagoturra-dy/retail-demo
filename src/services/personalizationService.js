@@ -89,9 +89,10 @@ export const personalizationService = {
     console.debug('Personazliation Request Body:', body)
 
     const recs = await getPersonalizationData(body)
+    console.log('[Dynamic Yield] getRecommendations response:', recs)
 
     // set cookies
-    recs?.cookes?.array.forEach((cookie) => {
+    recs?.cookies?.forEach((cookie) => {
       Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
     })
 
@@ -144,8 +145,9 @@ export const personalizationService = {
     console.debug('Banner Request Body:', body)
 
     const response = await getPersonalizationData(body)
+    console.log('[Dynamic Yield] getPersonalizedBanners response:', response)
     // set cookies
-    response?.cookes?.array.forEach((cookie) => {
+    response?.cookies?.forEach((cookie) => {
       Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
     })
 
@@ -183,7 +185,7 @@ export const personalizationService = {
 
     // Store chatId if returned in the response
     // set cookies
-    data?.cookes?.array.forEach((cookie) => {
+    data?.cookies?.forEach((cookie) => {
       Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
     })
 
