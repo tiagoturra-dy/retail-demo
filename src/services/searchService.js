@@ -1,6 +1,6 @@
 import { Helper } from '../helpers/helper.js';
 
-const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent = true, contextType}) => {
+const buildBaseBody = async ({type = 'search', cart = [], isImplicitKeywordSearchEvent = true, contextType}) => {
   const dyid = Helper.getStoredValue('_dyid');
   const dyjsession = Helper.getStoredValue('_dyjsession');
 
@@ -18,12 +18,23 @@ const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent
 
   switch (type) {
     case 'search':
+      const browserData = await Helper.getBrowserData()
+
       body.context.page = {
         locale: "en_US",
         type: contextType ?? context.type,
         data: contextType ? [""] : context.data || [""],
         location: window.location.href
       }
+      body.context.device = {
+        userAgent: browserData.userAgent,
+        type: browserData.type,
+        browser: browserData.browser,
+        ip: await Helper.getPublicIpAddress(),
+        dateTime: new Date().toISOString(),
+      },
+      body.context.channel = 'WEB'
+
       body.options = {
         returnAnalyticsMetadata: false,
         isImplicitClientData: true,
@@ -52,10 +63,12 @@ const buildBaseBody = ({type = 'search', cart = [], isImplicitKeywordSearchEvent
 export const searchService = {
   getTermsSuggestions: async ({text, numItems = 10}) => {
     // Dynamic Yield Suggestions API Call
+    const baseBody = await buildBaseBody({type: 'suggestion'})
+
     try {
       let results = []
       const body = {
-        ...buildBaseBody({type: 'suggestion'}),
+        ...baseBody,
         query: {
           text,
           suggestions: [
@@ -105,11 +118,13 @@ export const searchService = {
     if (!query && type === 'search') return;
     const dyid = Helper.getStoredValue('_dyid');
     const dyjsession = Helper.getStoredValue('_dyjsession');
+    
+    const baseBody = await buildBaseBody({cart, isImplicitKeywordSearchEvent, contextType})
 
     // Dynamic Yield Search API Call
     try {
       const requestBody = {
-        ...buildBaseBody({cart, isImplicitKeywordSearchEvent, contextType}),
+        ...baseBody,
         selector: {
           name: "Semantic Search"
         },
