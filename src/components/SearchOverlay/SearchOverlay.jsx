@@ -168,8 +168,8 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           <main className={styles.searchMain}>
             <div className={styles.searchContainer}>
               {/* Search Input Section */}
-              <form onSubmit={handleSearch} className={styles.searchForm}>
-                <div className={styles.searchInputWrapper}>
+              <div className={styles.searchInputWrapper}>
+                <form onSubmit={handleSearch} className={styles.searchForm}>
                   <input
                     ref={inputRef}
                     type="text"
@@ -178,13 +178,10 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                     placeholder="Search for products, categories..."
                     className={styles.searchInput}
                   />
-                  {/* <button type="button" className={styles.imageSearchBtn} aria-label="Search by image">
-                    <CameraIcon />
-                  </button> */}
-                  <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
-                </div>
-                <div className={styles.searchInputLine}></div>
-              </form>
+                </form>
+                <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
+              </div>
+              <div className={styles.searchInputLine}></div>
 
               {/* Content Grid */}
               <div className={styles.searchGrid}>

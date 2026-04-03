@@ -109,6 +109,7 @@
 
 .searchForm {
   position: relative;
+  flex: 1;
 
   &:focus-within .searchInputLine {
     height: 2px;
