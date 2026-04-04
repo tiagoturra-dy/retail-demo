@@ -42,7 +42,9 @@ export const Helper = {
         break
       case location.pathname.includes('/product/'):
         const productMatch = matchPath('/product/:productId', location.pathname)
-        context = { type: 'PRODUCT', data: [productMatch.params.productId] }
+        if (productMatch) {
+          context = { type: 'PRODUCT', data: [productMatch.params.productId] }
+        }
         break
       case location.pathname.includes('/cart'):
         const itemIds = cart.map(item => String(item.id))

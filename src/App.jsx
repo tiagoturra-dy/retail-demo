@@ -46,6 +46,7 @@ export default function App() {
                       <Route path="/category/:categoryName" element={<CategoryPage />} />
                       <Route path="/category/:categoryName/*" element={<NotFoundPage />} />
                       <Route path="/product/:productId" element={<ProductDetailPage />} />
+                      <Route path="/product/:productId/*" element={<NotFoundPage />} />
                       <Route path="/cart" element={<CartPage />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/welcome" element={<WelcomeBackPage />} />
