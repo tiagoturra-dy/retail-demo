@@ -93,6 +93,7 @@ export const personalizationService = {
 
     // set cookies
     recs?.cookies?.forEach((cookie) => {
+      if(cookie.name === '_dyid_server') cookie.name = '_dyid'
       Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
     })
 
@@ -148,6 +149,7 @@ export const personalizationService = {
     console.log('[Dynamic Yield] getPersonalizedBanners response:', response)
     // set cookies
     response?.cookies?.forEach((cookie) => {
+      if(cookie.name === '_dyid_server') cookie.name = '_dyid'
       Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
     })
 
@@ -186,6 +188,7 @@ export const personalizationService = {
     // Store chatId if returned in the response
     // set cookies
     data?.cookies?.forEach((cookie) => {
+      if(cookie.name === '_dyid_server') cookie.name = '_dyid'
       Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
     })
 

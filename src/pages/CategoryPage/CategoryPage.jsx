@@ -16,6 +16,7 @@ export const CategoryPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const subcategory = searchParams.get('sub');
+  const item = searchParams.get('item');
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const { cart } = useCart();
   const cartRef = useRef(cart);
@@ -53,15 +54,16 @@ export const CategoryPage = () => {
         values
       }));
 
-    // Add category filter if not "all"
-    if (categoryName && categoryName !== 'all') {
+    // Add category filter using the lowest level available: item > sub > categoryName
+    const effectiveCategory = item || subcategory || categoryName;
+    if (effectiveCategory && effectiveCategory !== 'all') {
       const catFilter = apiFilters.find(f => f.field === 'categories');
       if (catFilter) {
-        if (!catFilter.values.includes(categoryName)) {
-          catFilter.values.push(categoryName);
+        if (!catFilter.values.includes(effectiveCategory)) {
+          catFilter.values.push(effectiveCategory);
         }
       } else {
-        apiFilters.push({ field: 'categories', values: [categoryName] });
+        apiFilters.push({ field: 'categories', values: [effectiveCategory] });
       }
     }
 
@@ -108,7 +110,7 @@ export const CategoryPage = () => {
     
     setCategories(catData);
     setLoading(false);
-  }, [categoryName, selectedFilters, sortBy, currentPage]);
+  }, [categoryName, subcategory, item, selectedFilters, sortBy, currentPage]);
 
   useEffect(() => {
     fetchData();
@@ -183,7 +185,7 @@ export const CategoryPage = () => {
           </h1>
           {subcategory && (
             <p className={styles.categorySubtitle}>
-              Showing results for <span className={styles.categorySubtitleHighlight}>{subcategory}</span>
+              Showing results for <span className={styles.categorySubtitleHighlight}>{item || subcategory || categoryName}</span>
             </p>
           )}
         </div>

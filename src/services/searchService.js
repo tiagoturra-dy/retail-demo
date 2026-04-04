@@ -176,14 +176,14 @@ export const searchService = {
         const dyidFromResponse = data.cookies.filter(cookie => cookie.name === '_dyid_server')[0];
         const dySessionFromResponse = data.cookies.filter(cookie => cookie.name === '_dyjsession')[0];
         
-        if (dyidFromResponse && !dyid) {
+        if (dyidFromResponse) {
           Helper.setStoredValue(
             '_dyid', 
             dyidFromResponse.value, 
             dyidFromResponse.maxAge ? dyidFromResponse.maxAge / (60 * 60 * 24) : 365
           );
         }
-        if (dySessionFromResponse && !dyjsession) {
+        if (dySessionFromResponse) {
           Helper.setStoredValue(
             '_dyjsession', 
             dySessionFromResponse.value, 
