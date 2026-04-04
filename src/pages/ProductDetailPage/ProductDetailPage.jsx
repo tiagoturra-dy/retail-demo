@@ -21,6 +21,13 @@ export const ProductDetailPage = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(Helper.getStoredValue('dyRetailDemoWishlist') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +50,26 @@ export const ProductDetailPage = () => {
     };
     fetchProduct();
   }, [productId]);
+
+  const handleAddToWishlist = () => {
+    const sku = product.sku;
+    const updated = wishlist.includes(sku)
+      ? wishlist.filter(id => id !== sku)
+      : [...wishlist, sku];
+    setWishlist(updated);
+    Helper.setStoredValue('dyRetailDemoWishlist', JSON.stringify(updated));
+    console.log(`Wishlist updated: ${updated.join(', ')}`);
+    if (updated.includes(sku)) {
+      debugger
+      DY.API("event", {
+        name: "Add to Wishlist",
+        properties: {
+          dyType: "add-to-wishlist-v1",
+          productId: sku
+        }
+      });
+    }
+  };
 
   if (loading) {
     return <div className={styles.productDetailLoading}>Loading...</div>;
@@ -98,8 +125,8 @@ export const ProductDetailPage = () => {
                 iconClass={styles.btnIcon} 
                 showText={true} 
               />
-              <button className={styles.wishlistBtn}>
-                <Heart className={styles.wishlistIcon} />
+              <button className={styles.wishlistBtn} onClick={handleAddToWishlist}>
+                <Heart className={styles.wishlistIcon} style={wishlist.includes(product.sku) ? { color: 'red', fill: 'red' } : undefined} />
               </button>
             </div>
           </div>
