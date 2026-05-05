@@ -8,6 +8,9 @@ import { Helper } from '../../helpers/helper';
 import { PoweredBy } from '../PoweredBy/PoweredBy';
 import { CameraIcon } from '../../icons/CameraIcon/CameraIcon';
 import { personalizationService } from '../../services/personalizationService';
+import { MicButton } from '../MicButton/MicButton';
+import { useCurrency } from '../../context/CurrencyContext';
+import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -179,6 +182,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                     className={styles.searchInput}
                   />
                 </form>
+                <MicButton
+                  onTranscript={(t) => setQuery(prev => prev ? `${prev} ${t}` : t)}
+                  lang="en-US"
+                  tooltip={`Voice language: English (US)`}
+                />
                 <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
               </div>
               <div className={styles.searchInputLine}></div>
