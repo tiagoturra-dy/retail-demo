@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, User, Bot, RotateCcw } from 'lucide-react';
 import { MicButton } from '../../components/MicButton/MicButton';
+import { LiveMicButton } from '../../components/LiveMicButton/LiveMicButton';
 import useEmblaCarousel from 'embla-carousel-react';
 import { personalizationService } from '../../services/personalizationService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
@@ -51,6 +52,8 @@ export const ShoppingMuse = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLiveMic, setIsLiveMic] = useState(false);
+  const liveMicButtonRef = useRef(null);
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -96,7 +99,7 @@ export const ShoppingMuse = () => {
     handleSendMessage(initialQuery || '');
   }, []);
 
-  const handleSendMessage = async (text) => {
+  const handleSendMessage = async (text, displayText) => {
     if (!text.trim()) {
       const botMessage = {
         id: Date.now() + 1,
@@ -113,7 +116,7 @@ export const ShoppingMuse = () => {
     const userMessage = {
       id: Date.now(),
       type: 'user',
-      text: text,
+      text: displayText || text,
       timestamp: new Date()
     };
 
@@ -151,6 +154,7 @@ export const ShoppingMuse = () => {
   };
 
   const handleReset = () => {
+    liveMicButtonRef.current?.stop();
     setMessages([]);
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
     handleSendMessage('');
@@ -158,6 +162,7 @@ export const ShoppingMuse = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    liveMicButtonRef.current?.stop();
     handleSendMessage(input);
   };
 
@@ -262,10 +267,17 @@ export const ShoppingMuse = () => {
             </span>
           </div>
           <MicButton
-            isDisabled={isLoading}
+            isDisabled={isLoading || isLiveMic}
             onTranscript={(t) => setInput(prev => prev ? `${prev} ${t}` : t)}
             lang={lang}
             tooltip={`Voice language: ${langLabel}`}
+          />
+          <LiveMicButton
+            ref={liveMicButtonRef}
+            lang={lang}
+            isDisabled={isLoading}
+            onTranscript={(text, displayText) => handleSendMessage(text, displayText)}
+            onActiveChange={setIsLiveMic}
           />
           <button 
             type="submit" 
