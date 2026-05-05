@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, User, Bot, Loader2, RotateCcw } from 'lucide-react';
+import { Send, User, Bot, Loader2, RotateCcw, Mic, MicOff } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { personalizationService } from '../../services/personalizationService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { useCart } from '../../context/CartContext';
+import { useCurrency } from '../../context/CurrencyContext';
+import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { Helper } from '../../helpers/helper';
 import styles from './ShoppingMuse.module.css';
 
@@ -42,11 +44,16 @@ const MuseCarousel = ({ slots }) => {
 
 export const ShoppingMuse = () => {
   const { cart } = useCart();
+  const { lang } = useCurrency();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
 
   const MESSAGE_MAX_LEN = 150;
 
@@ -147,6 +154,32 @@ export const ShoppingMuse = () => {
     setMessages([]);
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
     handleSendMessage('');
+  };
+
+  const handleMicClick = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = lang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(prev => (prev ? `${prev} ${transcript}` : transcript));
+    };
+
+    recognition.start();
   };
 
   const handleSubmit = (e) => {
@@ -251,6 +284,20 @@ export const ShoppingMuse = () => {
             />
             <span className={`${styles.charCount} ${input.length >= 140 ? styles.charCountWarning : ''}`}>
               {input.length}/{MESSAGE_MAX_LEN}
+            </span>
+          </div>
+          <div className={styles.micWrapper}>
+            <button
+              type="button"
+              className={`${styles.micButton} ${isListening ? styles.micButtonActive : ''}`}
+              onClick={handleMicClick}
+              disabled={isLoading}
+              aria-label={isListening ? 'Stop listening' : 'Start voice input'}
+            >
+              {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+            </button>
+            <span className={styles.micTooltip}>
+              {isListening ? 'Listening...' : `Voice language: ${langLabel}`}
             </span>
           </div>
           <button 

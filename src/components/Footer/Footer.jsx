@@ -7,12 +7,12 @@ import { CustomSelect } from '../CustomSelect/CustomSelect';
 import styles from './Footer.module.css';
 
 export const Footer = ({ logoText }) => {
-  const { currency, setCurrency } = useCurrency();
+  const { lang, setCurrency } = useCurrency();
   const s = styles || {};
 
   const currencyOptions = CURRENCY_OPTIONS.map(opt => ({
-    value: opt.value,
-    label: `${opt.label} - ${opt.value}`
+    value: opt.lang,
+    label: <>{opt.flag} - {opt.label}</>
   }));
 
   return (
@@ -68,7 +68,7 @@ export const Footer = ({ logoText }) => {
 
           <CustomSelect 
             options={currencyOptions}
-            value={currency}
+            value={lang}
             onChange={setCurrency}
             icon={Globe}
             variant="pill"

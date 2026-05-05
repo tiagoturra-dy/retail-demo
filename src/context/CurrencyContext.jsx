@@ -1,18 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { CURRENCY_OPTIONS } from '../helpers/currencyConstants';
 
 const CurrencyContext = createContext(undefined);
 const LOCAL_STORAGE_KEY = 'dyRetailDemoCurrency'
+const DEFAULT_LANG = 'en-US';
 
 export const CurrencyProvider = ({ children }) => {
-  const [currency, setCurrency] = useState(() => {
-    const savedCurrency = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return savedCurrency || '$';
+  const [lang, setLang] = useState(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return CURRENCY_OPTIONS.some(o => o.lang === saved) ? saved : DEFAULT_LANG;
   });
 
+  const currencyOption = CURRENCY_OPTIONS.find(o => o.lang === lang) || CURRENCY_OPTIONS[0];
+  const currency = currencyOption.value; // ISO 4217 code e.g. "USD"
+
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, currency);
+    localStorage.setItem(LOCAL_STORAGE_KEY, lang);
     window.getCurrencySymbol = () => currency; // Expose a global function for testing purposes
-  }, [currency]);
+  }, [lang, currency]);
 
   const formatPrice = (price) => {
     if (price === undefined || price === null) return '';
@@ -25,11 +30,14 @@ export const CurrencyProvider = ({ children }) => {
     
     if (isNaN(numericPrice)) return String(price);
     
-    return `${currency}${numericPrice.toFixed(2)}`;
+    return new Intl.NumberFormat(lang, {
+      style: 'currency',
+      currency: currency,
+    }).format(numericPrice);
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+    <CurrencyContext.Provider value={{ currency, lang, setCurrency: setLang, formatPrice }}>
       {children}
     </CurrencyContext.Provider>
   );
