@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, User, Bot, Loader2, RotateCcw, Mic, MicOff } from 'lucide-react';
+import { Send, User, Bot, RotateCcw, Mic, MicOff } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { personalizationService } from '../../services/personalizationService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
@@ -262,8 +262,9 @@ export const ShoppingMuse = () => {
               </div>
               <div className={styles.messageContent}>
                 <div className={styles.loadingBubble}>
-                  <Loader2 className={styles.spinner} size={18} />
-                  <span>{CONSTANTS.THINKING}</span>
+                  <span className={styles.typingDot} />
+                  <span className={styles.typingDot} />
+                  <span className={styles.typingDot} />
                 </div>
               </div>
             </motion.div>
