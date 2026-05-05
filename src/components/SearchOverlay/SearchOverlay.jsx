@@ -11,6 +11,7 @@ import { personalizationService } from '../../services/personalizationService';
 import { MicButton } from '../MicButton/MicButton';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
+import { isMuseQuery } from '../../helpers/searchRouteConstants';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -122,7 +123,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
     e.preventDefault();
     if (query.trim()) {
       saveSearch(query.trim());
-      navigate(`/search?q=${encodeURIComponent(query)}`);
+      if (isMuseQuery(query)) {
+        navigate(`/muse?q=${encodeURIComponent(query)}`);
+      } else {
+        navigate(`/search?q=${encodeURIComponent(query)}`);
+      }
       onClose();
     }
   };
@@ -130,7 +135,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
   const handleSuggestionClick = (term) => {
     setQuery(term);
     saveSearch(term);
-    navigate(`/search?q=${encodeURIComponent(term)}`);
+    if (isMuseQuery(term)) {
+      navigate(`/muse?q=${encodeURIComponent(term)}`);
+    } else {
+      navigate(`/search?q=${encodeURIComponent(term)}`);
+    }
     onClose();
   };
 

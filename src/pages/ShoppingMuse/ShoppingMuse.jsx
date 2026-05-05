@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, User, Bot, RotateCcw } from 'lucide-react';
 import { MicButton } from '../../components/MicButton/MicButton';
@@ -46,6 +47,7 @@ const MuseCarousel = ({ slots }) => {
 export const ShoppingMuse = () => {
   const { cart } = useCart();
   const { lang } = useCurrency();
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -70,29 +72,28 @@ export const ShoppingMuse = () => {
   }, [messages, isLoading, scrollToBottom]);
 
   useEffect(() => {
-    const storedData = localStorage.getItem('retailDemo');
-    let initialQuery = null;
+    const urlQuery = searchParams.get('q');
+    let initialQuery = urlQuery || null;
 
-    if (storedData) {
-      try {
-        const retailDemo = JSON.parse(storedData);
-        initialQuery = retailDemo?.museQuery;
-        
-        if (initialQuery) {
-          handleSendMessage(initialQuery);
-          // Clear the variable after use in localStorage
-          retailDemo.museQuery = null;
-          localStorage.setItem('retailDemo', JSON.stringify(retailDemo));
+    if (!initialQuery) {
+      const storedData = localStorage.getItem('retailDemo');
+      if (storedData) {
+        try {
+          const retailDemo = JSON.parse(storedData);
+          initialQuery = retailDemo?.museQuery || null;
+
+          if (initialQuery) {
+            // Clear the variable after use in localStorage
+            retailDemo.museQuery = null;
+            localStorage.setItem('retailDemo', JSON.stringify(retailDemo));
+          }
+        } catch (e) {
+          console.error('Error parsing retailDemo from localStorage', e);
         }
-      } catch (e) {
-        console.error('Error parsing retailDemo from localStorage', e);
       }
     }
 
-    if (!initialQuery && messages.length === 0) {
-      // Default query if not set and no messages yet
-      handleSendMessage('');
-    }
+    handleSendMessage(initialQuery || '');
   }, []);
 
   const handleSendMessage = async (text) => {
