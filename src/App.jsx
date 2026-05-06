@@ -25,10 +25,19 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPag
 import { MyPage } from './pages/MyPage/MyPage';
 import { ContentProvider } from './context/ContentContext';
 import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
+import Clarity from '@microsoft/clarity';
+import { useEffect } from 'react';
 
 const LOGO_TEXT = 'BLUEBERRY';
 
 export default function App() {
+  useEffect(() => {
+    const id = process.env.CLARITY_PROJECT_ID;
+    if (id && process.env.NODE_ENV === 'production') {
+      Clarity.init(id);
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <ContentProvider>
