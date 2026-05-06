@@ -61,6 +61,7 @@ export const ShoppingMuse = () => {
   const hasAutoStarted = useRef(false);
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const lastProcessedQueryRef = useRef(null);
 
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
 
@@ -138,11 +139,15 @@ export const ShoppingMuse = () => {
       }
     }
 
+    const queryKey = initialQuery || '';
+    if (lastProcessedQueryRef.current === queryKey) return;
+    lastProcessedQueryRef.current = queryKey;
+
     const augmented = isLiveRedirect && initialQuery
       ? `${CONSTANTS.LIVE_PREFIX} ${initialQuery}`
       : (initialQuery || '');
     handleSendMessage(augmented, initialQuery || undefined);
-  }, []);
+  }, [searchParams]);
 
   // Auto-start live mic after first bot response when redirected with ?live=1
   useEffect(() => {
