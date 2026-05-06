@@ -264,6 +264,7 @@
   display: flex;
   gap: 1rem;
   background-color: var(--color-white);
+  align-items: center;
 }
 
 .inputWrapper {
@@ -412,6 +413,19 @@
 
 .micWrapper:hover .micTooltip {
   opacity: 1;
+}
+
+.mic, .liveMic, .sendButton {
+  &, button {
+    --_size: 2.3rem;
+    width: var(--_size);
+    height: var(--_size);
+    margin: 0;
+    svg {
+      width: 50%;
+      height: 50%;
+    }
+  }
 }
 
 /* Responsive adjustments */

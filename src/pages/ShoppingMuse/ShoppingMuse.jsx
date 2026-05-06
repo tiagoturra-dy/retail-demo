@@ -331,6 +331,7 @@ export const ShoppingMuse = () => {
             onTranscript={(t) => setInput(prev => prev ? `${prev} ${t}` : t)}
             lang={lang}
             tooltip={`Voice language: ${langLabel}`}
+            className={styles.mic}
           />
           <LiveMicButton
             ref={liveMicButtonRef}
@@ -338,7 +339,8 @@ export const ShoppingMuse = () => {
             isDisabled={isLoading}
             onTranscript={(text, displayText) => { if (!isSpeakingRef.current) handleSendMessage(text, displayText); }}
             onActiveChange={setIsLiveMic}
-            tooltip={`Voice language: ${langLabel}`}
+            tooltip={`Live language: ${langLabel}`}
+            className={styles.liveMic}
           />
           <button 
             type="submit" 
