@@ -2,11 +2,10 @@ import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { Radio } from 'lucide-react';
 import styles from './LiveMicButton.module.css';
 
-export const LiveMicButton = forwardRef(({ lang, isDisabled, onTranscript, onActiveChange }, ref) => {
+export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscript, onActiveChange }, ref) => {
   const [isLive, setIsLive] = useState(false);
   const recognitionRef = useRef(null);
   const isFirstRef = useRef(true);
-  const isEnglish = lang?.startsWith('en');
 
   const stop = () => {
     recognitionRef.current?.stop();
@@ -21,7 +20,7 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, onTranscript, onAct
 
   const handleClick = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition || !isEnglish) return;
+    if (!SpeechRecognition) return;
 
     if (isLive) {
       stop();
@@ -65,9 +64,7 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, onTranscript, onAct
 
   const tooltipText = isLive
     ? 'Live — click to stop'
-    : isEnglish
-      ? 'Live conversation'
-      : 'English only';
+    : tooltip
 
   return (
     <div className={styles.liveMicWrapper}>
@@ -75,7 +72,7 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, onTranscript, onAct
         type="button"
         className={`${styles.liveMicButton} ${isLive ? styles.liveMicButtonActive : ''}`}
         onClick={handleClick}
-        disabled={isDisabled || !isEnglish}
+        disabled={isDisabled}
         aria-label={isLive ? 'Stop live mic' : 'Start live conversation'}
       >
         <Radio size={20} />

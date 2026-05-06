@@ -278,6 +278,7 @@ export const ShoppingMuse = () => {
             isDisabled={isLoading}
             onTranscript={(text, displayText) => handleSendMessage(text, displayText)}
             onActiveChange={setIsLiveMic}
+            tooltip={`Voice language: ${langLabel}`}
           />
           <button 
             type="submit" 
