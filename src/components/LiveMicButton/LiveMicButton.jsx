@@ -35,7 +35,9 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
       setIsLive(true);
       onActiveChange?.(true);
     };
-    recognition.onerror = () => {
+    recognition.onerror = (e) => {
+      if (e.error === 'no-speech') return; // browser will fire onend and restart naturally
+      recognitionRef.current = null;
       setIsLive(false);
       isFirstRef.current = true;
       onActiveChange?.(false);
