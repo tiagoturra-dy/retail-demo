@@ -1,8 +1,12 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
-import { Radio } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AudioLines } from 'lucide-react';
 import styles from './LiveMicButton.module.css';
 
-export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscript, onActiveChange }, ref) => {
+export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscript, onActiveChange, onNavigate, className }, ref) => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isOnMuse = pathname === '/muse';
   const [isLive, setIsLive] = useState(false);
   const recognitionRef = useRef(null);
   const isFirstRef = useRef(true);
@@ -15,18 +19,11 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
     onActiveChange?.(false);
   };
 
-  // Expose stop() so parent can call it on reset/submit
-  useImperativeHandle(ref, () => ({ stop }));
-
-  const handleClick = () => {
+  const startRecognition = (skipFirst = false) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    if (!SpeechRecognition || recognitionRef.current) return;
 
-    if (isLive) {
-      stop();
-      return;
-    }
-
+    isFirstRef.current = !skipFirst;
     const recognition = new SpeechRecognition();
     recognition.lang = lang;
     recognition.continuous = true;
@@ -44,7 +41,6 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
       onActiveChange?.(false);
     };
     recognition.onend = () => {
-      // Restart if still in live mode (browser ends session after silence)
       if (recognitionRef.current) {
         recognition.start();
       }
@@ -52,6 +48,15 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
     recognition.onresult = (event) => {
       const transcript = event.results[event.results.length - 1][0].transcript.trim();
       if (!transcript) return;
+
+      if (isFirstRef.current && !isOnMuse) {
+        // Not on /muse yet — navigate there with the query and live flag
+        stop();
+        onNavigate?.();
+        navigate(`/muse?q=${encodeURIComponent(transcript)}&live=1`);
+        return;
+      }
+
       const text = isFirstRef.current
         ? `Ask any relevant follow up question before showing results. ${transcript}`
         : transcript;
@@ -62,12 +67,20 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
     recognition.start();
   };
 
+  // Expose stop() and start() to parent
+  useImperativeHandle(ref, () => ({ stop, start: startRecognition }));
+
+  const handleClick = () => {
+    if (isLive) { stop(); return; }
+    startRecognition();
+  };
+
   const tooltipText = isLive
     ? 'Live — click to stop'
-    : tooltip
+    : tooltip;
 
   return (
-    <div className={styles.liveMicWrapper}>
+    <div className={`${styles.liveMicWrapper}${className ? ` ${className}` : ''}`}>
       <button
         type="button"
         className={`${styles.liveMicButton} ${isLive ? styles.liveMicButtonActive : ''}`}
@@ -75,7 +88,7 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
         disabled={isDisabled}
         aria-label={isLive ? 'Stop live mic' : 'Start live conversation'}
       >
-        <Radio size={20} />
+        <AudioLines size={20} />
       </button>
       <span className={styles.liveMicTooltip}>{tooltipText}</span>
     </div>

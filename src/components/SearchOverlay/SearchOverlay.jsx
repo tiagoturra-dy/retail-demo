@@ -12,9 +12,12 @@ import { MicButton } from '../MicButton/MicButton';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { isMuseQuery } from '../../helpers/aiTriggerConstants';
+import { LiveMicButton } from '../LiveMicButton/LiveMicButton';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { lang } = useCurrency();
+  const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [initialSuggestions, setInitialSuggestions] = useState([]);
@@ -202,7 +205,14 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 <MicButton
                   onTranscript={(t) => setQuery(prev => prev ? `${prev} ${t}` : t)}
                   lang="en-US"
-                  tooltip={`Voice language: English (US)`}
+                  tooltip={`Voice language: English only`}
+                  className={styles.mic}
+                />
+                <LiveMicButton
+                  lang={lang}
+                  tooltip={`Live conversation (${langLabel})`}
+                  onNavigate={onClose}
+                  className={styles.liveMic}
                 />
                 <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
               </div>

@@ -54,6 +54,8 @@ export const ShoppingMuse = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLiveMic, setIsLiveMic] = useState(false);
   const liveMicButtonRef = useRef(null);
+  const autoStartLive = searchParams.get('live') === '1';
+  const hasAutoStarted = useRef(false);
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -76,6 +78,7 @@ export const ShoppingMuse = () => {
 
   useEffect(() => {
     const urlQuery = searchParams.get('q');
+    const isLiveRedirect = searchParams.get('live') === '1';
     let initialQuery = urlQuery || null;
 
     if (!initialQuery) {
@@ -96,8 +99,19 @@ export const ShoppingMuse = () => {
       }
     }
 
-    handleSendMessage(initialQuery || '');
+    const augmented = isLiveRedirect && initialQuery
+      ? `Ask any relevant follow up question before showing results. ${initialQuery}`
+      : (initialQuery || '');
+    handleSendMessage(augmented, initialQuery || undefined);
   }, []);
+
+  // Auto-start live mic after first bot response when redirected with ?live=1
+  useEffect(() => {
+    if (autoStartLive && !isLoading && messages.length >= 2 && !hasAutoStarted.current) {
+      hasAutoStarted.current = true;
+      liveMicButtonRef.current?.start(true);
+    }
+  }, [autoStartLive, isLoading, messages]);
 
   const handleSendMessage = async (text, displayText) => {
     if (!text.trim()) {

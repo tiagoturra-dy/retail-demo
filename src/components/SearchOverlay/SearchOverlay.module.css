@@ -451,3 +451,21 @@
   background-color: var(--color-zinc-50);
   font-family: var(--font-mono);
 }
+
+.mic, .liveMic {
+  button {
+    --_size: 2.3rem;
+    width: var(--_size);
+    height: var(--_size);
+    margin: 0 0 0 0.5rem;
+    border: none;
+    svg {
+      width: 50%;
+      height: 50%;
+    }
+
+    &, &:hover:not(:disabled) {
+      background-color: transparent;
+    }
+  }
+}

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import styles from './MicButton.module.css';
 
-export const MicButton = ({ isDisabled, onTranscript, tooltip, lang }) => {
+export const MicButton = ({ isDisabled, onTranscript, tooltip, lang, className }) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
@@ -33,7 +33,7 @@ export const MicButton = ({ isDisabled, onTranscript, tooltip, lang }) => {
   };
 
   return (
-    <div className={styles.micWrapper}>
+    <div className={`${styles.micWrapper}${className ? ` ${className}` : ''}`}>
       <button
         type="button"
         className={`${styles.micButton} ${isListening ? styles.micButtonActive : ''}`}
