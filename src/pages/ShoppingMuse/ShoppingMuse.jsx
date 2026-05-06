@@ -22,7 +22,8 @@ const CONSTANTS = {
   THINKING: "Thinking...",
   INITIAL_BOT_MESSAGE: "I'm here to help you find the perfect products. Just tell me what you need!",
   ERROR_BOT_MESSAGE: "I'm having a bit of trouble connecting right now. Please try again in a moment.",
-  FALLBACK_BOT_MESSAGE: "I'm sorry, I couldn't find a specific answer for that. How else can I help you?"
+  FALLBACK_BOT_MESSAGE: "I'm sorry, I couldn't find a specific answer for that. How else can I help you?",
+  LIVE_PREFIX: "Ask follow up questions before showing results. Confirm the gender. Keep the conversation going."
 };
 
 const MuseCarousel = ({ slots }) => {
@@ -138,7 +139,7 @@ export const ShoppingMuse = () => {
     }
 
     const augmented = isLiveRedirect && initialQuery
-      ? `Ask any relevant follow up question before showing results. ${initialQuery}`
+      ? `${CONSTANTS.LIVE_PREFIX} ${initialQuery}`
       : (initialQuery || '');
     handleSendMessage(augmented, initialQuery || undefined);
   }, []);
