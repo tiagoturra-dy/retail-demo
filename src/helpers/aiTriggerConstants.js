@@ -34,6 +34,6 @@ export const isMuseQuery = (query) => {
   const sorted = [...MUSE_KEYWORDS].sort((a, b) => b.length - a.length);
   return sorted.some((keyword) => {
     const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return new RegExp(`(?<![a-z])${escaped}(?![a-z])`, 'i').test(lower);
+    return new RegExp(`(?<![a-z])${escaped}`, 'i').test(lower);
   });
 };

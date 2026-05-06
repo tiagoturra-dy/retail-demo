@@ -11,7 +11,7 @@ import { personalizationService } from '../../services/personalizationService';
 import { MicButton } from '../MicButton/MicButton';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
-import { isMuseQuery } from '../../helpers/searchRouteConstants';
+import { isMuseQuery } from '../../helpers/aiTriggerConstants';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -63,6 +63,13 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
     const fetchData = async () => {
       if (query.length >= 3) {
         try {
+          const isMuse = isMuseQuery(query);
+          if (isMuse) {
+            setSuggestions(initialSuggestions);
+            setResults([]);
+            return;
+          }
+
           const [terms, products] = await Promise.all([
             searchService.getTermsSuggestions({text: query, numItems: 5}),
             searchService.searchProducts({query, numItems: 4})
@@ -155,6 +162,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
   };
 
   const displaySuggestions = query.length >= 3 ? suggestions : initialSuggestions;
+  const isMuse = query.length >= 3 && isMuseQuery(query);
 
   return (
     <AnimatePresence>
@@ -246,7 +254,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 {/* Suggestion / Results Preview Column */}
                 <div className={styles.searchResultsCol}>
                   <h3 className={styles.searchSectionTitle}>
-                    {query.length >= 3 ? 'Refining Search' : 'Featured Products'}
+                    {isMuse ? 'Ask our assistant' : query.length >= 3 ? 'Refining Search' : 'Featured Products'}
                   </h3>
                   <div className={styles.searchResultsList}>
                     {results.length > 0 ? (
@@ -284,7 +292,9 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                         </div>
                       )})
                     ) : query.length >= 3 ? (
-                      <div className={styles.searchEmpty}>No results found for "{query}"</div>
+                      isMuse
+                        ? <div className={styles.searchEmpty}>Our assistant will help you find &ldquo;{query}&rdquo;</div>
+                        : <div className={styles.searchEmpty}>No results found for &ldquo;{query}&rdquo;</div>
                     ) : (
                       <div className={styles.searchEmpty}>Start typing to see results...</div>
                     )}
