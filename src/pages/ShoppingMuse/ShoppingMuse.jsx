@@ -53,6 +53,8 @@ export const ShoppingMuse = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLiveMic, setIsLiveMic] = useState(false);
+  const isLiveMicRef = useRef(false);
+  const isSpeakingRef = useRef(false);
   const liveMicButtonRef = useRef(null);
   const autoStartLive = searchParams.get('live') === '1';
   const hasAutoStarted = useRef(false);
@@ -62,6 +64,42 @@ export const ShoppingMuse = () => {
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
 
   const MESSAGE_MAX_LEN = 150;
+
+  useEffect(() => {
+    isLiveMicRef.current = isLiveMic;
+  }, [isLiveMic]);
+
+  const speakBotMessage = useCallback((text) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    isSpeakingRef.current = true;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+
+    const assignVoiceAndSpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const langBase = lang.split('-')[0].toLowerCase();
+      const googleVoice = voices.find(v =>
+        v.name.toLowerCase().includes('google') && v.lang.toLowerCase().startsWith(langBase)
+      );
+      const fallbackVoice = voices.find(v => v.lang.toLowerCase().startsWith(langBase));
+      if (googleVoice) utterance.voice = googleVoice;
+      else if (fallbackVoice) utterance.voice = fallbackVoice;
+      utterance.onend = () => { isSpeakingRef.current = false; };
+      utterance.onerror = () => { isSpeakingRef.current = false; };
+      window.speechSynthesis.speak(utterance);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length) {
+      assignVoiceAndSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        assignVoiceAndSpeak();
+      };
+    }
+  }, [lang]);
 
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
@@ -153,6 +191,7 @@ export const ShoppingMuse = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
+      if (isLiveMicRef.current) speakBotMessage(botMessage.text);
     } catch (error) {
       console.error('Error getting Muse response:', error);
       const errorMessage = {
@@ -168,6 +207,7 @@ export const ShoppingMuse = () => {
   };
 
   const handleReset = () => {
+    window.speechSynthesis?.cancel();
     liveMicButtonRef.current?.stop();
     setMessages([]);
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
@@ -290,7 +330,7 @@ export const ShoppingMuse = () => {
             ref={liveMicButtonRef}
             lang={lang}
             isDisabled={isLoading}
-            onTranscript={(text, displayText) => handleSendMessage(text, displayText)}
+            onTranscript={(text, displayText) => { if (!isSpeakingRef.current) handleSendMessage(text, displayText); }}
             onActiveChange={setIsLiveMic}
             tooltip={`Voice language: ${langLabel}`}
           />
