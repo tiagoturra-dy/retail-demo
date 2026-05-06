@@ -177,11 +177,11 @@ export const Navbar = ({ logoText }) => {
                 </AnimatePresence>
               </div>
             ))}
-            <div className={s.navbarItemContainer}>
+            {/* <div className={s.navbarItemContainer}>
               <Link to="/my-page" className={s.navbarLink}>
                 My Page
               </Link>
-            </div>
+            </div> */}
           </div>
 
           {/* Icons & Search */}
