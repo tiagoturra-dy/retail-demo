@@ -12,6 +12,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { Helper } from '../../helpers/helper';
 import { resolveVoice } from '../../helpers/voiceConstants';
+import { useGroqConversation } from '../../hooks/useGroqConversation';
 import styles from './ShoppingMuse.module.css';
 
 const ENABLE_TYPEWRITER = false; // set to false to show full text immediately
@@ -56,6 +57,7 @@ export const ShoppingMuse = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [enableGroq, setEnableGroq] = useState(false);
   const [isLiveMic, setIsLiveMic] = useState(false);
   const isLiveMicRef = useRef(false);
   const isSpeakingRef = useRef(false);
@@ -162,6 +164,52 @@ export const ShoppingMuse = () => {
     isSpeakingRef.current = false;
   }, []);
 
+  const appendBotMessage = useCallback((text, widgets = []) => {
+    const botMessage = {
+      id: Date.now() + 1,
+      type: 'bot',
+      text,
+      widgets,
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, botMessage]);
+    if (isLiveMicRef.current) speakBotMessage(botMessage.text, botMessage.id);
+  }, [speakBotMessage]);
+
+  const { sendToGroq, resetGroq } = useGroqConversation({
+    cart,
+    lang,
+    onMessage: (text, isBot) => {
+      if (isBot) appendBotMessage(text, []);
+      setIsLoading(false);
+    },
+    onMuseResult: (response) => {
+      appendBotMessage(response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE, response.widgets || []);
+      setIsLoading(false);
+    },
+    onError: () => {
+      appendBotMessage(CONSTANTS.ERROR_BOT_MESSAGE, []);
+      setIsLoading(false);
+    },
+  });
+
+  const handleLiveTranscript = useCallback((text, displayText) => {
+    interruptSpeech();
+    if (enableGroq) {
+      const userMessage = {
+        id: Date.now(),
+        type: 'user',
+        text: displayText || text,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setIsLoading(true);
+      sendToGroq(text, displayText);
+    } else {
+      handleSendMessage(text, displayText);
+    }
+  }, [sendToGroq, interruptSpeech, enableGroq]);
+
   useEffect(() => {
     const urlQuery = searchParams.get('q');
     const isLiveRedirect = searchParams.get('live') === '1';
@@ -263,6 +311,7 @@ export const ShoppingMuse = () => {
     liveMicButtonRef.current?.stop();
     setTtsState(null);
     setMessages([]);
+    resetGroq();
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
     handleSendMessage('');
   };
@@ -285,15 +334,24 @@ export const ShoppingMuse = () => {
             </div>
 
             <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
-            
-            <button 
-              onClick={handleReset} 
-              className={styles.resetButton}
-              title={CONSTANTS.RESET_CHAT}
-            >
-              <RotateCcw size={18} />
-              <span>{CONSTANTS.RESET}</span>
-            </button>
+
+            <div className={styles.headerActions}>
+              {/* <button
+                onClick={() => setEnableGroq(v => !v)}
+                className={`${styles.groqToggle} ${enableGroq ? styles.groqToggleOn : ''}`}
+                title={enableGroq ? 'Groq mode — click to use legacy Muse' : 'Legacy mode — click to use Groq'}
+              >
+                {enableGroq ? 'G+M' : 'M'}
+              </button> */}
+              <button
+                onClick={handleReset}
+                className={styles.resetButton}
+                title={CONSTANTS.RESET_CHAT}
+              >
+                <RotateCcw size={18} />
+                <span>{CONSTANTS.RESET}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -390,7 +448,7 @@ export const ShoppingMuse = () => {
             ref={liveMicButtonRef}
             lang={lang}
             isDisabled={isLoading}
-            onTranscript={(text, displayText) => { interruptSpeech(); handleSendMessage(text, displayText); }}
+            onTranscript={(text, displayText) => handleLiveTranscript(text, displayText)}
             onActiveChange={setIsLiveMic}
             onSoundStart={() => { if (isSpeakingRef.current) interruptSpeech(); }}
             tooltip={`Live language: ${langLabel}`}

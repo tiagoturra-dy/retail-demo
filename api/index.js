@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Groq } from 'groq-sdk';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -304,6 +305,34 @@ app.post('/api/event', async (req, res) => {
 
   } catch (error) {
     console.error('[/api/event] Caught error:', error);
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+})
+
+app.post('/api/groq', async (req, res) => {
+  try {
+    const { messages, model = 'llama-3.3-70b-versatile' } = req.body;
+
+    let payload = {
+      messages,
+      model,
+      "temperature": 1,
+      "max_completion_tokens": 1024,
+      "top_p": 1,
+      "stream": true,
+      "stop": null
+    }
+
+    const groq = new Groq();
+    const chatCompletion = await groq.chat.completions.create(payload);
+
+    let content = '';
+    for await (const chunk of chatCompletion) {
+      content += chunk.choices[0]?.delta?.content || '';
+    }
+
+    res.json({ choices: [{ message: { content } }] });
+  } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
   }
 })
