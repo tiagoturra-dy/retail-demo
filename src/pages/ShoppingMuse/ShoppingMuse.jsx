@@ -14,6 +14,8 @@ import { Helper } from '../../helpers/helper';
 import { resolveVoice } from '../../helpers/voiceConstants';
 import styles from './ShoppingMuse.module.css';
 
+const ENABLE_TYPEWRITER = false; // set to false to show full text immediately
+
 const CONSTANTS = {
   TITLE: "Personal Shopper",
   SUBTITLE: "Your AI shopping assistant",
@@ -58,32 +60,82 @@ export const ShoppingMuse = () => {
   const isLiveMicRef = useRef(false);
   const isSpeakingRef = useRef(false);
   const liveMicButtonRef = useRef(null);
+  const [ttsState, setTtsState] = useState(null); // { msgId, visibleText }
+  const ttsCharRef = useRef(0);
+  const ttsMsgRef = useRef(null); // { id, fullText }
+  const ttsIntervalRef = useRef(null);
   const autoStartLive = searchParams.get('live') === '1';
   const hasAutoStarted = useRef(false);
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const lastBubbleRef = useRef(null);
   const lastProcessedQueryRef = useRef(null);
+  const inputRef = useRef(null);
 
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
 
   const MESSAGE_MAX_LEN = 150;
 
   useEffect(() => {
+    if (!lastBubbleRef.current || !messagesListRef.current) return;
+    const list = messagesListRef.current;
+    const isOverflowing = list.scrollHeight > list.clientHeight;
+    if (!isOverflowing) return;
+    const t = setTimeout(() => {
+      const bubble = lastBubbleRef.current;
+      if (!bubble) return;
+      const listTop = list.getBoundingClientRect().top;
+      const bubbleTop = bubble.getBoundingClientRect().top;
+      list.scrollBy({ top: bubbleTop - listTop, behavior: 'smooth' });
+    }, 150);
+    return () => clearTimeout(t);
+  }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading) inputRef.current?.focus();
+  }, [isLoading]);
+
+  useEffect(() => {
     isLiveMicRef.current = isLiveMic;
   }, [isLiveMic]);
 
-  const speakBotMessage = useCallback((text) => {
+  const speakBotMessage = useCallback((text, msgId) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
+    clearInterval(ttsIntervalRef.current);
     isSpeakingRef.current = true;
+    ttsMsgRef.current = { id: msgId, fullText: text };
+    ttsCharRef.current = 0;
+
+    if (ENABLE_TYPEWRITER) {
+      setTtsState({ msgId, visibleText: '' });
+      // Word-by-word typewriter at ~2.5 words/sec (400ms/word)
+      const tokens = text.split(' ');
+      let idx = 0;
+      ttsIntervalRef.current = setInterval(() => {
+        idx++;
+        const visible = tokens.slice(0, idx).join(' ');
+        ttsCharRef.current = visible.length;
+        setTtsState({ msgId, visibleText: visible });
+        if (idx >= tokens.length) clearInterval(ttsIntervalRef.current);
+      }, 400);
+    }
+
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
+
+    const cleanup = () => {
+      clearInterval(ttsIntervalRef.current);
+      setTtsState(null);
+      ttsMsgRef.current = null;
+      isSpeakingRef.current = false;
+    };
 
     const assignVoiceAndSpeak = () => {
       const voice = resolveVoice(lang);
       if (voice) utterance.voice = voice;
-      utterance.onend = () => { isSpeakingRef.current = false; };
-      utterance.onerror = () => { isSpeakingRef.current = false; };
+      utterance.onend = cleanup;
+      utterance.onerror = cleanup;
       window.speechSynthesis.speak(utterance);
     };
 
@@ -98,18 +150,17 @@ export const ShoppingMuse = () => {
     }
   }, [lang]);
 
-  const scrollToBottom = useCallback(() => {
-    if (messagesEndRef.current) {
-      // Small timeout to ensure DOM has updated and animations have started
-      setTimeout(() => {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }, 150);
-    }
+  const interruptSpeech = useCallback(() => {
+    if (!isSpeakingRef.current || !ttsMsgRef.current) return;
+    window.speechSynthesis.cancel();
+    clearInterval(ttsIntervalRef.current);
+    const { id, fullText } = ttsMsgRef.current;
+    const truncated = ttsCharRef.current > 0 ? fullText.slice(0, ttsCharRef.current) : fullText;
+    setMessages(prev => prev.map(m => m.id === id ? { ...m, text: truncated } : m));
+    setTtsState(null);
+    ttsMsgRef.current = null;
+    isSpeakingRef.current = false;
   }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isLoading, scrollToBottom]);
 
   useEffect(() => {
     const urlQuery = searchParams.get('q');
@@ -192,7 +243,7 @@ export const ShoppingMuse = () => {
       };
 
       setMessages(prev => [...prev, botMessage]);
-      if (isLiveMicRef.current) speakBotMessage(botMessage.text);
+      if (isLiveMicRef.current) speakBotMessage(botMessage.text, botMessage.id);
     } catch (error) {
       console.error('Error getting Muse response:', error);
       const errorMessage = {
@@ -208,8 +259,9 @@ export const ShoppingMuse = () => {
   };
 
   const handleReset = () => {
-    window.speechSynthesis?.cancel();
+    interruptSpeech();
     liveMicButtonRef.current?.stop();
+    setTtsState(null);
     setMessages([]);
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
     handleSendMessage('');
@@ -217,6 +269,7 @@ export const ShoppingMuse = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    interruptSpeech();
     liveMicButtonRef.current?.stop();
     handleSendMessage(input);
   };
@@ -251,7 +304,6 @@ export const ShoppingMuse = () => {
             {messages.map((msg) => (
               <motion.div
                 key={msg.id}
-                layout
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -261,11 +313,16 @@ export const ShoppingMuse = () => {
                   {msg.type === 'user' ? <User size={18} /> : <Bot size={18} />}
                 </div>
                 <div className={styles.messageContent}>
-                  <div className={styles.messageBubble}>
-                    <p className={styles.messageText}>{msg.text}</p>
+                  <div
+                    className={styles.messageBubble}
+                    ref={messages[messages.length - 1]?.id === msg.id ? lastBubbleRef : null}
+                  >
+                    <p className={styles.messageText}>
+                      {ttsState?.msgId === msg.id ? ttsState.visibleText : msg.text}
+                    </p>
                   </div>
                   
-                  {msg.widgets && msg.widgets.length > 0 && (
+                  {msg.widgets && msg.widgets.length > 0 && ttsState?.msgId !== msg.id && (
                     <div className={styles.widgetsContainer}>
                       {msg.widgets.map((widget, wIdx) => (
                         <div key={wIdx} className={styles.widgetBlock}>
@@ -309,6 +366,7 @@ export const ShoppingMuse = () => {
         <form onSubmit={handleSubmit} className={styles.inputArea}>
           <div className={styles.inputWrapper}>
             <input
+              ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -332,8 +390,9 @@ export const ShoppingMuse = () => {
             ref={liveMicButtonRef}
             lang={lang}
             isDisabled={isLoading}
-            onTranscript={(text, displayText) => { if (!isSpeakingRef.current) handleSendMessage(text, displayText); }}
+            onTranscript={(text, displayText) => { interruptSpeech(); handleSendMessage(text, displayText); }}
             onActiveChange={setIsLiveMic}
+            onSoundStart={() => { if (isSpeakingRef.current) interruptSpeech(); }}
             tooltip={`Live language: ${langLabel}`}
             className={styles.liveMic}
           />

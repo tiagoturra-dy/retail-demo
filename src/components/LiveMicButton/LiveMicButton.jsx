@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AudioLines } from 'lucide-react';
 import styles from './LiveMicButton.module.css';
 
-export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscript, onActiveChange, onNavigate, className }, ref) => {
+export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscript, onActiveChange, onNavigate, onSoundStart, className }, ref) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isOnMuse = pathname === '/muse';
@@ -46,6 +46,9 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
       if (recognitionRef.current) {
         recognition.start();
       }
+    };
+    recognition.onsoundstart = () => {
+      onSoundStart?.();
     };
     recognition.onresult = (event) => {
       const transcript = event.results[event.results.length - 1][0].transcript.trim();
