@@ -11,6 +11,7 @@ import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { Helper } from '../../helpers/helper';
+import { resolveVoice } from '../../helpers/voiceConstants';
 import styles from './ShoppingMuse.module.css';
 
 const CONSTANTS = {
@@ -79,14 +80,8 @@ export const ShoppingMuse = () => {
     utterance.lang = lang;
 
     const assignVoiceAndSpeak = () => {
-      const voices = window.speechSynthesis.getVoices();
-      const langBase = lang.split('-')[0].toLowerCase();
-      const googleVoice = voices.find(v =>
-        v.name.toLowerCase().includes('google') && v.lang.toLowerCase().startsWith(langBase)
-      );
-      const fallbackVoice = voices.find(v => v.lang.toLowerCase().startsWith(langBase));
-      if (googleVoice) utterance.voice = googleVoice;
-      else if (fallbackVoice) utterance.voice = fallbackVoice;
+      const voice = resolveVoice(lang);
+      if (voice) utterance.voice = voice;
       utterance.onend = () => { isSpeakingRef.current = false; };
       utterance.onerror = () => { isSpeakingRef.current = false; };
       window.speechSynthesis.speak(utterance);
