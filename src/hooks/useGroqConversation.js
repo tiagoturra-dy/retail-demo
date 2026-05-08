@@ -33,6 +33,12 @@ export function useGroqConversation({ cart = [], lang = 'en-US', onMessage, onMu
           query: musePrompt,
           cart,
         });
+        // Add Groq's MUSE PROMPT message and Muse answer to history as assistant turns
+        historyRef.current = [
+          ...historyRef.current,
+          { role: 'assistant', content },
+          { role: 'assistant', content: museResponse.answer || '' },
+        ];
         onMuseResult?.(museResponse);
       } else {
         // Normal qualifying question — show Groq reply
@@ -43,7 +49,7 @@ export function useGroqConversation({ cart = [], lang = 'en-US', onMessage, onMu
       console.error('[useGroqConversation]', err);
       onError?.(err.message);
     }
-  }, [cart, onMessage, onMuseResult, onError]);
+  }, [cart, lang, onMessage, onMuseResult, onError]);
 
   const resetGroq = useCallback(() => {
     historyRef.current = [];

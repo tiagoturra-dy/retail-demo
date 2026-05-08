@@ -180,8 +180,10 @@ export const ShoppingMuse = () => {
     cart,
     lang,
     onMessage: (text, isBot) => {
-      if (isBot) appendBotMessage(text, []);
-      setIsLoading(false);
+      if (isBot) {
+        appendBotMessage(text, []);
+        setIsLoading(false);
+      }
     },
     onMuseResult: (response) => {
       appendBotMessage(response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE, response.widgets || []);
@@ -336,13 +338,14 @@ export const ShoppingMuse = () => {
             <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
 
             <div className={styles.headerActions}>
-              {/* <button
+              <button
                 onClick={() => setEnableGroq(v => !v)}
                 className={`${styles.groqToggle} ${enableGroq ? styles.groqToggleOn : ''}`}
                 title={enableGroq ? 'Groq mode — click to use legacy Muse' : 'Legacy mode — click to use Groq'}
               >
                 {enableGroq ? 'G+M' : 'M'}
-              </button> */}
+              </button>
+
               <button
                 onClick={handleReset}
                 className={styles.resetButton}
