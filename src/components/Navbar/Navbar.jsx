@@ -7,6 +7,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
 import { useContent } from '../../context/ContentContext';
+import { useMuse } from '../../context/MuseContext';
 import styles from './Navbar.module.css';
 
 export const Navbar = ({ logoText }) => {
@@ -19,6 +20,7 @@ export const Navbar = ({ logoText }) => {
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
   const { banners, loading, fetchBanner } = useContent();
+  const { openMuse } = useMuse();
 
   // Safety check for styles
   const s = styles || {};
@@ -187,9 +189,9 @@ export const Navbar = ({ logoText }) => {
           {/* Icons & Search */}
           <div className={`dy-nav-icons ${s.navbarActions}`}>
 
-            <Link to="/muse" className={s.actionBtn} title="Shopper Assistant" data-dy-nav-icon="muse">
+            <button onClick={() => openMuse()} className={s.actionBtn} title="Shopper Assistant" data-dy-nav-icon="muse">
               <BotMessageSquare className={`dy-nav-icon ${s.actionIcon}`} />
-            </Link>
+            </button>
 
             <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
               <Search className={`dy-nav-icon ${s.actionIcon}`} />

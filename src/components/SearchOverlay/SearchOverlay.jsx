@@ -13,9 +13,11 @@ import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { isMuseQuery } from '../../helpers/aiTriggerConstants';
 import { LiveMicButton } from '../LiveMicButton/LiveMicButton';
+import { useMuse } from '../../context/MuseContext';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { openMuse } = useMuse();
   const { lang } = useCurrency();
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
   const [query, setQuery] = useState('');
@@ -134,11 +136,12 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
     if (query.trim()) {
       saveSearch(query.trim());
       if (isMuseQuery(query)) {
-        navigate(`/muse?q=${encodeURIComponent(query)}`);
+        openMuse({ query: query.trim() });
+        onClose();
       } else {
         navigate(`/search?q=${encodeURIComponent(query)}`);
+        onClose();
       }
-      onClose();
     }
   };
 
@@ -146,11 +149,12 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
     setQuery(term);
     saveSearch(term);
     if (isMuseQuery(term)) {
-      navigate(`/muse?q=${encodeURIComponent(term)}`);
+      openMuse({ query: term });
+      onClose();
     } else {
       navigate(`/search?q=${encodeURIComponent(term)}`);
+      onClose();
     }
-    onClose();
   };
 
   const handleTrackClick = (product) => {

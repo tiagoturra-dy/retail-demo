@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, User, Bot, RotateCcw } from 'lucide-react';
+import { Send, User, Bot, RotateCcw, X } from 'lucide-react';
+import { useMuse } from '../../context/MuseContext';
 import { MicButton } from '../../components/MicButton/MicButton';
 import { LiveMicButton } from '../../components/LiveMicButton/LiveMicButton';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -27,7 +27,7 @@ const CONSTANTS = {
   INITIAL_BOT_MESSAGE: "I'm here to help you find the perfect products. Just tell me what you need!",
   ERROR_BOT_MESSAGE: "I'm having a bit of trouble connecting right now. Please try again in a moment.",
   FALLBACK_BOT_MESSAGE: "I'm sorry, I couldn't find a specific answer for that. How else can I help you?",
-  LIVE_PREFIX: "Ask follow up questions before showing results. Confirm the gender. Keep the conversation going."
+  LIVE_PREFIX: "Ask follow-ups before results. Confirm gender. Keep chat moving. Be brief."
 };
 
 const MuseCarousel = ({ slots }) => {
@@ -53,7 +53,7 @@ const MuseCarousel = ({ slots }) => {
 export const ShoppingMuse = () => {
   const { cart } = useCart();
   const { lang } = useCurrency();
-  const [searchParams] = useSearchParams();
+  const { isMuseOpen, closeMuse, pendingQuery, clearPendingQuery } = useMuse();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +66,7 @@ export const ShoppingMuse = () => {
   const ttsCharRef = useRef(0);
   const ttsMsgRef = useRef(null); // { id, fullText }
   const ttsIntervalRef = useRef(null);
-  const autoStartLive = searchParams.get('live') === '1';
+  const [autoStartLive, setAutoStartLive] = useState(false);
   const hasAutoStarted = useRef(false);
   const messagesListRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -212,38 +212,38 @@ export const ShoppingMuse = () => {
     }
   }, [sendToGroq, interruptSpeech, enableGroq]);
 
+  // Lock body scroll when panel is open
   useEffect(() => {
-    const urlQuery = searchParams.get('q');
-    const isLiveRedirect = searchParams.get('live') === '1';
-    let initialQuery = urlQuery || null;
+    document.body.style.overflow = isMuseOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isMuseOpen]);
 
-    if (!initialQuery) {
-      const storedData = localStorage.getItem('retailDemo');
-      if (storedData) {
-        try {
-          const retailDemo = JSON.parse(storedData);
-          initialQuery = retailDemo?.museQuery || null;
+  // Process pending query when panel opens or a new query arrives
+  useEffect(() => {
+    if (!isMuseOpen) return;
 
-          if (initialQuery) {
-            // Clear the variable after use in localStorage
-            retailDemo.museQuery = null;
-            localStorage.setItem('retailDemo', JSON.stringify(retailDemo));
-          }
-        } catch (e) {
-          console.error('Error parsing retailDemo from localStorage', e);
-        }
-      }
+    if (pendingQuery !== null) {
+      const { query: q, live: isLiveRedirect } = pendingQuery;
+      clearPendingQuery();
+
+      const queryKey = q || '';
+      if (lastProcessedQueryRef.current === queryKey) return;
+      lastProcessedQueryRef.current = queryKey;
+
+      if (isLiveRedirect && q) setAutoStartLive(true);
+      const augmented = isLiveRedirect && q
+        ? `${CONSTANTS.LIVE_PREFIX} ${q}`
+        : (q || '');
+      handleSendMessage(augmented, q || undefined);
+      return;
     }
 
-    const queryKey = initialQuery || '';
-    if (lastProcessedQueryRef.current === queryKey) return;
-    lastProcessedQueryRef.current = queryKey;
-
-    const augmented = isLiveRedirect && initialQuery
-      ? `${CONSTANTS.LIVE_PREFIX} ${initialQuery}`
-      : (initialQuery || '');
-    handleSendMessage(augmented, initialQuery || undefined);
-  }, [searchParams]);
+    // Panel opened without a pending query — show initial greeting if no messages yet
+    if (messages.length === 0 && lastProcessedQueryRef.current === null) {
+      lastProcessedQueryRef.current = '';
+      handleSendMessage('');
+    }
+  }, [isMuseOpen, pendingQuery]);
 
   // Auto-start live mic after first bot response when redirected with ?live=1
   useEffect(() => {
@@ -313,6 +313,9 @@ export const ShoppingMuse = () => {
     liveMicButtonRef.current?.stop();
     setTtsState(null);
     setMessages([]);
+    setAutoStartLive(false);
+    hasAutoStarted.current = false;
+    lastProcessedQueryRef.current = '';
     resetGroq();
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
     handleSendMessage('');
@@ -326,35 +329,52 @@ export const ShoppingMuse = () => {
   };
 
   return (
-    <div className={styles.musePage}>
+    <AnimatePresence>
+      {isMuseOpen && (
+        <>
+          <motion.div
+            className={styles.backdrop}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeMuse}
+          />
+          <motion.div
+            className={styles.panel}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          >
       <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.headerTop}>
-            <div className={styles.logoContainer}>
-              <Bot className={styles.botIcon} />
-              <h1 className={styles.title}>{CONSTANTS.TITLE}</h1>
-            </div>
-
-            <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
-
-            <div className={styles.headerActions}>
-              <button
-                onClick={() => setEnableGroq(v => !v)}
-                className={`${styles.groqToggle} ${enableGroq ? styles.groqToggleOn : ''}`}
-                title={enableGroq ? 'Groq mode — click to use legacy Muse' : 'Legacy mode — click to use Groq'}
-              >
-                {enableGroq ? 'G+M' : 'M'}
-              </button>
-
-              <button
-                onClick={handleReset}
-                className={styles.resetButton}
-                title={CONSTANTS.RESET_CHAT}
-              >
-                <RotateCcw size={18} />
-                <span>{CONSTANTS.RESET}</span>
-              </button>
-            </div>
+        <div className={styles.headerTop}>
+          <div className={styles.logoContainer}>
+            <Bot className={styles.botIcon} />
+            <h1 className={styles.title}>{CONSTANTS.TITLE}</h1>
+          </div>
+          <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
+          <div className={styles.headerActions}>
+            <button
+              onClick={() => setEnableGroq(v => !v)}
+              className={`${styles.groqToggle} ${enableGroq ? styles.groqToggleOn : ''}`}
+              title={enableGroq ? 'Groq mode — click to use legacy Muse' : 'Legacy mode — click to use Groq'}
+            >
+              {enableGroq ? 'G+M' : 'M'}
+            </button>
+            <button
+              onClick={handleReset}
+              className={styles.resetButton}
+              title={CONSTANTS.RESET_CHAT}
+            >
+              <RotateCcw size={18} />
+            </button>
+            <button
+              onClick={closeMuse}
+              className={styles.closeButton}
+              title="Close"
+            >
+              <X size={18} />
+            </button>
           </div>
         </div>
       </div>
@@ -466,6 +486,9 @@ export const ShoppingMuse = () => {
           </button>
         </form>
       </div>
-    </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };

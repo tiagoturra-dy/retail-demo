@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from './components/Navbar/Navbar';
 import { Footer } from './components/Footer/Footer';
 import { Home } from './pages/Home/Home';
@@ -25,8 +25,25 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPag
 import { MyPage } from './pages/MyPage/MyPage';
 import { ContentProvider } from './context/ContentContext';
 import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
+import { MuseProvider, useMuse } from './context/MuseContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect } from 'react';
+
+// Handles direct navigation to /muse (e.g. external links, bookmarks)
+const MuseRoute = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { openMuse } = useMuse();
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    const live = searchParams.get('live') === '1';
+    openMuse({ query: q || undefined, live });
+    navigate('/', { replace: true });
+  }, []);
+
+  return null;
+};
 
 const LOGO_TEXT = 'BLUEBERRY';
 
@@ -43,11 +60,13 @@ export default function App() {
       <ContentProvider>
         <CurrencyProvider>
           <CartProvider>
-            <Router>
+            <MuseProvider>
+              <Router>
               <ScrollToTop />
               <DYManager />
               <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
                 <Navbar logoText={LOGO_TEXT} />
+                <ShoppingMuse />
                 <main>
                   <AnimatePresence mode="wait">
                     <Routes>
@@ -61,7 +80,7 @@ export default function App() {
                       <Route path="/welcome" element={<WelcomeBackPage />} />
                       <Route path="/admin" element={<AdminDashboardPage />} />
                       <Route path="/search" element={<SearchResultsPage />} />
-                      <Route path="/muse" element={<ShoppingMuse />} />
+                      <Route path="/muse" element={<MuseRoute />} />
                       <Route path="/thank-you" element={<ThankYouPage />} />
                       <Route path="/my-page" element={<MyPage />} />
                       <Route path="*" element={<NotFoundPage />} />
@@ -71,6 +90,7 @@ export default function App() {
                 <Footer logoText={LOGO_TEXT} />
               </div>
             </Router>
+            </MuseProvider>
           </CartProvider>
         </CurrencyProvider>
       </ContentProvider>

@@ -1,12 +1,10 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { AudioLines } from 'lucide-react';
 import styles from './LiveMicButton.module.css';
+import { useMuse } from '../../context/MuseContext';
 
 export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscript, onActiveChange, onNavigate, onSoundStart, className }, ref) => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const isOnMuse = pathname === '/muse';
+  const { isMuseOpen, openMuse } = useMuse();
   const [isLive, setIsLive] = useState(false);
   const recognitionRef = useRef(null);
   const isFirstRef = useRef(true);
@@ -54,11 +52,11 @@ export const LiveMicButton = forwardRef(({ lang, isDisabled, tooltip, onTranscri
       const transcript = event.results[event.results.length - 1][0].transcript.trim();
       if (!transcript) return;
 
-      if (isFirstRef.current && !isOnMuse) {
-        // Not on /muse yet — navigate there with the query and live flag
+      if (isFirstRef.current && !isMuseOpen) {
+        // Muse panel not open yet — open it with the query and live flag
         stop();
         onNavigate?.();
-        navigate(`/muse?q=${encodeURIComponent(transcript)}&live=1`);
+        openMuse({ query: transcript, live: true });
         return;
       }
 
