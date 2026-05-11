@@ -54,15 +54,22 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.5rem 0.5rem;
   background-color: var(--color-zinc-100);
   border: 1px solid var(--color-zinc-200);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-zinc-500);
   cursor: pointer;
   transition: all 0.2s;
+
+  svg {
+    --_size: .75rem;
+    width: var(--_size);
+    height: var(--_size);
+  }
+  
   &:hover{
     background-color: var(--color-zinc-200);
     color: var(--color-zinc-900);
@@ -82,11 +89,11 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.5rem 0.875rem;
+  padding: 0.3rem 0.5rem;
   background-color: var(--color-zinc-100);
   border: 1px solid var(--color-zinc-200);
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-zinc-500);
   cursor: pointer;
