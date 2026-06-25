@@ -89,7 +89,13 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
-        { from: "public", to: "" }, // Copies everything from public/ into the root of dist/
+        { 
+          from: "public", 
+          to: "",
+          globOptions: {
+            ignore: ["**/index.html"], 
+          }
+        }, // Copies everything from public/ into the root of dist/
       ],
     }),
   ],
