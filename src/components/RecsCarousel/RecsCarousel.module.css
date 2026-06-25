@@ -1,115 +1,120 @@
 .recommendationsSection {
-  padding: 1.5rem 0;
   background-color: var(--color-white);
   overflow: hidden;
-}
 
-.recommendationsHeader {
-  max-width: 80rem;
-  margin: 0 auto 3rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 2rem;
-}
-
-.recommendationsTitle {
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: var(--color-zinc-900);
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.carouselContainer {
-  position: relative;
-  width: 100%;
-  max-width: 80rem;
-  margin: 0 auto;
-  padding: 0 1rem; /* Reduced to match item padding logic */
-}
-
-.carouselViewport {
-  overflow: hidden;
-}
-
-.carouselTrack {
-  display: flex;
-  backface-visibility: hidden;
-  touch-action: pan-y;
-  margin-left: -1rem; /* Offset the item padding */
-}
-
-.carouselItem {
-  flex: 0 0 25%;
-  min-width: 0;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  transition: opacity 0.3s ease;
-}
-
-.navButtons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.navButton {
-  --_size: 2rem;
-  width: var(--_size);
-  height: var(--_size);
-  border-radius: 50%;
-  border: 1px solid var(--color-zinc-200);
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  color: var(--color-zinc-900);
-}
-
-.navButton:hover:not(:disabled) {
-  background: var(--color-zinc-900);
-  color: white;
-  border-color: var(--color-zinc-900);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.navButton:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.navButton:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-@media (max-width: 1280px) {
-  .carouselItem {
-    flex: 0 0 33.333333%;
-  }
-}
-
-@media (max-width: 1024px) {
-  .recommendationsTitle {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .carouselItem {
-    flex: 0 0 50%;
-  }
   .recommendationsHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
-  }
-}
+    margin: 0 auto 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
 
-@media (max-width: 480px) {
-  .carouselItem {
-    flex: 0 0 100%;
+    .recommendationsHeaderLeft {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .recommendationsTitle {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: var(--font-headline);
+      color: var(--color-black);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin: 0;
+
+      @media (max-width: 1024px) {
+        font-size: 2rem;
+      }
+    }
+
+    .recommendationsSubtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      font-family: var(--font-body);
+      color: var(--color-grey-800);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .navButtons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .navButton {
+      --_size: 2.5rem;
+      width: var(--_size);
+      height: var(--_size);
+      border-radius: 50%;
+      background: var(--color-grey-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--color-zinc-900);
+
+      &:hover:not(:disabled) {
+        background: var(--color-zinc-900);
+        color: white;
+        border-color: var(--color-zinc-900);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+  }
+
+  .carouselContainer {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+
+    .carouselViewport {
+      overflow: hidden;
+    }
+
+    .carouselTrack {
+      display: flex;
+      backface-visibility: hidden;
+      touch-action: pan-y;
+      gap: 10px;
+    }
+
+    .carouselItem {
+      flex: 0 0 15%;
+      min-width: 0;
+      padding-left: 0;
+      padding-right: 0;
+      transition: opacity 0.3s ease;
+
+      @media (max-width: 1280px) {
+        flex: 0 0 33.333333%;
+      }
+
+      @media (max-width: 768px) {
+        flex: 0 0 50%;
+      }
+
+      @media (max-width: 480px) {
+        flex: 0 0 100%;
+      }
+    }
+
   }
 }

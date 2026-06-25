@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { searchService } from '../../services/searchService';
-import { ProductCard } from '../../components/ProductCard/ProductCard';
-import { Pagination } from '../../components/Pagination/Pagination';
-import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
 import { CategoryBanner } from '../../components/CategoryBanner/CategoryBanner';
-import { CustomSelect } from '../../components/CustomSelect/CustomSelect';
+import { ListingPage } from '../../components/ListingPage/ListingPage';
 import { useCart } from '../../context/CartContext';
 import { CATEGORIES } from '../../helpers/categoryConstants';
 import styles from './CategoryPage.module.css';
@@ -27,6 +24,7 @@ export const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
+  const [imageFilters, setImageFilters] = useState([]);
   const itemsPerPage = 48;
 
   const sortOptions = [
@@ -102,6 +100,7 @@ export const CategoryPage = () => {
       setProducts(processedProducts);
       setFacets(data.facets || []);
       setTotalResults(data.totalNumResults || 0);
+      setImageFilters((data.custom?.imageFilters || []).filter(f => f.image && f.name));
     } else {
       setProducts([]);
       setFacets([]);
@@ -136,35 +135,6 @@ export const CategoryPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleFilterChange = (column, value, isReplace = false) => {
-    setSelectedFilters(prev => {
-      if (isReplace) {
-        return {
-          ...prev,
-          [column]: [value]
-        };
-      }
-
-      const currentValues = prev[column] || [];
-      const newValues = currentValues.includes(value)
-        ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
-      
-      return {
-        ...prev,
-        [column]: newValues
-      };
-    });
-  };
-
-  const handleClearFacet = (column) => {
-    setSelectedFilters(prev => {
-      const newState = { ...prev };
-      delete newState[column];
-      return newState;
-    });
-  };
-
   const clearFilters = () => {
     setSelectedFilters({});
     setSortBy('');
@@ -172,88 +142,44 @@ export const CategoryPage = () => {
   };
 
   const totalPages = Math.ceil(totalResults / itemsPerPage);
+  const categoryFacets = facets.filter((facet) => facet.column !== 'categories');
+  const activeCategoryLabel = item || subcategory || categoryName;
 
   return (
     <div className={styles.categoryPageContainer}>
       {categoryConfig?.banner && (
         <CategoryBanner bannerConfig={categoryConfig.banner} />
       )}
-      <div className={styles.categoryHeader}>
-        <div>
-          <h1 className={styles.categoryTitle}>
-            {categoryName === 'all' ? 'All Collections' : categoryName}
-          </h1>
-          {subcategory && (
-            <p className={styles.categorySubtitle}>
-              Showing results for <span className={styles.categorySubtitleHighlight}>{item || subcategory || categoryName}</span>
-            </p>
-          )}
-        </div>
-        
-        <div className={styles.searchControls}>
-          <CustomSelect 
-            label="Sort by:"
-            options={sortOptions}
-            value={sortBy}
-            onChange={setSortBy}
-            variant="ghost"
-          />
-        </div>
-      </div>
-
-      <div className={styles.categoryLayout}>
-        {/* Sidebar Filters */}
-        <aside className={styles.categorySidebar}>
-          {Object.values(selectedFilters).some(v => v.length > 0) && (
-            <button 
-              onClick={clearFilters}
-              className={styles.sidebarClearAll}
-            >
-              Clear all filters
-            </button>
-          )}
-          {facets.filter(f => f.column !== 'categories').map((facet) => (
-            <FacetFilter
-              key={facet.column}
-              facet={facet}
-              selectedValues={selectedFilters[facet.column] || []}
-              onFilterChange={handleFilterChange}
-              onClearFacet={handleClearFacet}
-            />
-          ))}
-        </aside>
-
-        {/* Product Grid */}
-        <div className={styles.categoryProductArea}>
-          {loading ? (
-            <div className={styles.loadingState}>Loading products...</div>
-          ) : products.length > 0 ? (
-            <>
-              <div className={styles.productGrid}>
-                {products.map((product) => (
-                  <ProductCard key={product.sku || product.id} product={product} />
-                ))}
-              </div>
-              
-              <Pagination 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </>
-          ) : (
-            <div className={styles.emptyState}>
-              <p className={styles.emptyStateText}>No products found in this category.</p>
-              <button 
-                onClick={clearFilters}
-                className={styles.emptyStateBtn}
-              >
-                Reset all filters
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <ListingPage
+        title={categoryName === 'all' ? 'All Collections' : subcategory || categoryName}
+        subtitle={subcategory ? `Showing results for ${activeCategoryLabel}` : ''}
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          ...(categoryName === 'all'
+            ? [{ label: 'All Collections' }]
+            : [
+                { label: categoryName, href: subcategory ? `/category/${categoryName}` : undefined },
+                ...(subcategory ? [{ label: subcategory }] : []),
+              ]
+          ),
+        ]}
+        loading={loading}
+        loadingText="Loading products..."
+        products={products}
+        facets={categoryFacets}
+        selectedFilters={selectedFilters}
+        onApplyFilters={setSelectedFilters}
+        onClearAllFilters={clearFilters}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortOptions={sortOptions}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        emptyStateText="No products found in this category."
+        resetButtonLabel="Reset all filters"
+        imageFilters={imageFilters}
+      />
     </div>
   );
 };

@@ -3,17 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { searchService } from '../../services/searchService';
 import styles from './SearchOverlay.module.css';
-import { ArrowUpRight, History } from 'lucide-react'
+import { ArrowUpRight, History, Search, X } from 'lucide-react'
 import { Helper } from '../../helpers/helper';
 import { PoweredBy } from '../PoweredBy/PoweredBy';
 import { CameraIcon } from '../../icons/CameraIcon/CameraIcon';
 import { personalizationService } from '../../services/personalizationService';
+import { ProductCard } from '../ProductCard/ProductCard';
 import { MicButton } from '../MicButton/MicButton';
 import { useCurrency } from '../../context/CurrencyContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { isMuseQuery } from '../../helpers/aiTriggerConstants';
 import { LiveMicButton } from '../LiveMicButton/LiveMicButton';
 import { useMuse } from '../../context/MuseContext';
+import { MuseStripBanner } from '../MuseStripBanner/MuseStripBanner';
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [initialSuggestions, setInitialSuggestions] = useState([]);
   const [results, setResults] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
   const inputRef = useRef(null);
 
@@ -43,6 +46,37 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
       }
     };
     fetchInitialSuggestions();
+
+    // Fetch recommendations for empty state
+    const fetchRecommendations = async () => {
+      try {
+        const recs = await personalizationService.getRecommendations({
+          selectors: ['SearchOverlayRecs']
+        });
+        console.log('Recommendations response:', recs);
+        
+        if (recs?.choices) {
+          const recProducts = recs.choices.flatMap(choice =>
+            choice.variations.flatMap(variation =>
+              (variation.payload.data.slots || []).map(slot => ({
+                ...slot,
+                ...slot.productData,
+                decisionId: choice.decisionId,
+                variationId: variation.id
+              }))
+            )
+          ).filter(product => product.sku);
+          console.log('Processed recommendations:', recProducts);
+          setRecommendations(recProducts);
+        } else {
+          console.warn('No recommendations found');
+        }
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        setRecommendations([]);
+      }
+    };
+    fetchRecommendations();
   }, []);
 
   useEffect(() => {
@@ -180,32 +214,23 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           exit={{ opacity: 0 }}
           className={styles.searchOverlay}
         >
-          {/* Header */}
-          <header className={styles.searchHeader}>
-            <div className={styles.searchHeaderInner}>
-              <div className={styles.searchLogo}>BLUEBERRY</div>
-              <button onClick={onClose} className={styles.searchCloseBtn}>
-                <span className={styles.searchCloseText}>Close</span>
-                <span className={`material-symbols-outlined ${styles.searchCloseIcon}`}>x</span>
-              </button>
-            </div>
-          </header>
-
           {/* Main Search Canvas */}
           <main className={styles.searchMain}>
             <div className={styles.searchContainer}>
               {/* Search Input Section */}
               <div className={styles.searchInputWrapper}>
+                <Search className={styles.searchInputIcon} />
                 <form onSubmit={handleSearch} className={styles.searchForm}>
                   <input
                     ref={inputRef}
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search for products, categories..."
+                    placeholder="Type to search..."
                     className={styles.searchInput}
                   />
                 </form>
+                <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
                 <MicButton
                   onTranscript={(t) => setQuery(prev => prev ? `${prev} ${t}` : t)}
                   lang="en-US"
@@ -218,16 +243,17 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                   onNavigate={onClose}
                   className={styles.liveMic}
                 />
-                <div id="dy_Image_Search" className={styles.imageSearchBtn} aria-label="Search by image"></div>
+                <button onClick={onClose} className={styles.searchCloseBtn} aria-label="Close search">
+                  <X className={styles.searchCloseIcon} />
+                </button>
               </div>
-              <div className={styles.searchInputLine}></div>
 
               {/* Content Grid */}
               <div className={styles.searchGrid}>
                 {/* Suggestions Column */}
                 <div className={styles.searchSuggestionsCol}>
                   <section>
-                    <h3 className={styles.searchSectionTitle}>Our Suggestions</h3>
+                    <h3 className={styles.searchSectionTitle}>Top Searches</h3>
                     <div className={styles.searchTags}>
                       {displaySuggestions.length > 0 ? displaySuggestions.map((suggestion) => (
                         <button
@@ -263,12 +289,16 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                       </div>
                     </section>
                   )}
+
+                  <section className={styles.searchImageSearchSection}>
+                    <MuseStripBanner query={query} />
+                  </section>
                 </div>
 
                 {/* Suggestion / Results Preview Column */}
                 <div className={styles.searchResultsCol}>
                   <h3 className={styles.searchSectionTitle}>
-                    {isMuse ? 'Ask our assistant' : query.length >= 3 ? 'Refining Search' : 'Featured Products'}
+                    {isMuse ? 'Ask Our Assistant' : query.length >= 3 ? 'Search Results' : 'Recommended For You'}
                   </h3>
                   <div className={styles.searchResultsList}>
                     {results.length > 0 ? (
@@ -276,45 +306,27 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                         product = {...product, ...product.productData}
                         delete product.productData;
                         return (
-                        <div
-                          key={product.sku}
-                          onClick={() => {
-                            handleTrackClick(product)
-                          }}
-                          className={styles.searchResultItem}
-                        >
-                          <div className={styles.searchResultInfo}>
-                            <div className={styles.searchResultImageContainer}>
-                              <img src={Helper.getProductImage(product.image_url)} alt={product.name} className={styles.searchResultImage} />
-                            </div>
-                            <div>
-                              <div className={styles.searchResultNameContainer}>
-                                <span className={styles.searchResultName}>
-                                  {product.name.split(new RegExp(`(${query})`, 'gi')).map((part, i) => 
-                                    part.toLowerCase() === query.toLowerCase() ? 
-                                    <span key={i} className={styles.searchHighlight}>{part}</span> : 
-                                    part
-                                  )}
-                                </span>
-                              </div>
-                              <span className={styles.searchResultCategory}>{Helper.getProducCategoriesDisplay(product.categories)}</span>
-                            </div>
-                          </div>
-                          <span className={`material-symbols-outlined ${styles.searchResultArrow}`}>
-                            <ArrowUpRight />
-                          </span>
-                        </div>
-                      )})
+                          <ProductCard key={product.sku} product={product} compact className={styles.searchResultItem} onClick={() => handleTrackClick(product)} />
+                        );
+                      })
                     ) : query.length >= 3 ? (
                       isMuse
                         ? <div className={styles.searchEmpty}>Our assistant will help you find &ldquo;{query}&rdquo;</div>
                         : <div className={styles.searchEmpty}>No results found for &ldquo;{query}&rdquo;</div>
+                    ) : recommendations.length > 0 ? (
+                      recommendations.map((product) => {
+                        product = {...product, ...product.productData}
+                        delete product.productData;
+                        return (
+                          <ProductCard key={product.sku} product={product} compact className={styles.searchResultItem} onClick={() => handleTrackClick(product)} />
+                        );
+                      })
                     ) : (
-                      <div className={styles.searchEmpty}>Start typing to see results...</div>
+                      <div className={styles.searchEmpty}>Loading recommendations...</div>
                     )}
                   </div>
 
-                  {results.length > 0 && (
+                  {(results.length > 0 || (query.length < 3 && recommendations.length > 0)) && (
                     <div className={styles.searchViewAllContainer}>
                       <PoweredBy />
                       <button onClick={handleSearch} className={styles.searchViewAllBtn}>
@@ -329,13 +341,6 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
               </div>
             </div>
           </main>
-
-          {/* Footer */}
-          <footer className={styles.searchFooter}>
-            <div className={styles.searchFooterInner}>
-              <span>Press <kbd className={styles.searchKbd}>ESC</kbd> to exit search</span>
-            </div>
-          </footer>
         </motion.div>
       )}
     </AnimatePresence>

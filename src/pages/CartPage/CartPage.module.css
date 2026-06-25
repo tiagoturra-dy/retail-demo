@@ -1,8 +1,7 @@
 .cartEmptyContainer {
-  max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 8rem 1rem;
+  padding: 8rem 0;
   text-align: center;
 }
 
@@ -53,7 +52,6 @@
 }
 
 .cartPageContainer {
-  max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
   padding: 3rem 1rem;

@@ -3,7 +3,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { PromoBanner } from '../PromoBanner/PromoBanner';
 import styles from './BannerCarousel.module.css';
 
-export const BannerCarousel = ({ choice = {}, additionalClass = '', autoPlay = true, interval = 10000, transitionSpeed = 25, type = 'hero' }) => {
+export const BannerCarousel = ({ choice = {}, additionalClass = '', autoPlay = false, interval = 10000, transitionSpeed = 25, type = 'hero' }) => {
   if (!choice || !choice.variations || choice.variations.length === 0) return null;
   const variations = choice.variations;
 

@@ -1,18 +1,7 @@
 .searchResultsContainer {
-  max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 3rem 1rem;
-
-  @media (min-width: 640px) {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+  padding: 0;
 }
 
 .searchHeader {
@@ -137,7 +126,7 @@
   }
 
   @media (min-width: 1280px) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

@@ -40,7 +40,10 @@ export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
   }, [recommendations]);
 
   const title = useMemo(() => {
-    return recommendations?.choices?.[0]?.variations?.[0]?.payload.data.custom?.title || 'Recommended for you';
+    return recommendations?.choices?.[0]?.variations?.[0]?.payload.data.custom?.title || 'Products To Explore';
+  }, [recommendations]);
+  const subtitle = useMemo(() => {
+    return recommendations?.choices?.[0]?.variations?.[0]?.payload.data.custom?.subtitle || 'Based on what customers are shopping';
   }, [recommendations]);
 
   if (allProducts.length === 0) return null;
@@ -48,7 +51,10 @@ export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
   return (
     <section className={`${additionalClass} ${styles.recommendationsSection}`}>
       <div className={styles.recommendationsHeader}>
-        <h2 className={styles.recommendationsTitle}>{title}</h2>
+        <div className={styles.recommendationsHeaderLeft}>
+          <h2 className={styles.recommendationsTitle}>{title}</h2>
+          <p className={styles.recommendationsSubtitle}>{subtitle || ''}</p>
+        </div>
         <div className={styles.navButtons}>
           <button 
             className={styles.navButton} 

@@ -1,18 +1,7 @@
 .categoryPageContainer {
-  max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 3rem 1rem;
-
-  @media (min-width: 640px) {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  @media (min-width: 1024px) {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+  padding: 3rem 0;
 }
 
 .categoryHeader {

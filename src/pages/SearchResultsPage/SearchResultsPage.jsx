@@ -1,13 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchService } from '../../services/searchService';
-import { ProductCard } from '../../components/ProductCard/ProductCard';
-import { Pagination } from '../../components/Pagination/Pagination';
-import { PoweredBy } from '../../components/PoweredBy/PoweredBy';
-import { FacetFilter } from '../../components/FacetFilter/FacetFilter';
-import { CustomSelect } from '../../components/CustomSelect/CustomSelect';
+import { ListingPage } from '../../components/ListingPage/ListingPage';
 import { useCart } from '../../context/CartContext';
-import { motion } from 'motion/react';
 import styles from './SearchResultsPage.module.css';
 
 export const SearchResultsPage = () => {
@@ -18,6 +13,7 @@ export const SearchResultsPage = () => {
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [results, setResults] = useState([]);
   const [facets, setFacets] = useState([]);
+  const [imageFilters, setImageFilters] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -75,10 +71,12 @@ export const SearchResultsPage = () => {
 
       setResults(processedResults);
       setFacets(data.facets || []);
+      setImageFilters((data.imageFilters || []).filter(f => f.image && f.name));
       setTotalResults(data.totalNumResults || 0);
     } else {
       setResults([]);
       setFacets([]);
+      setImageFilters([]);
       setTotalResults(0);
     }
     
@@ -109,35 +107,6 @@ export const SearchResultsPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleFilterChange = (column, value, isReplace = false) => {
-    setSelectedFilters(prev => {
-      if (isReplace) {
-        return {
-          ...prev,
-          [column]: [value]
-        };
-      }
-
-      const currentValues = prev[column] || [];
-      const newValues = currentValues.includes(value)
-        ? currentValues.filter(v => v !== value)
-        : [...currentValues, value];
-      
-      return {
-        ...prev,
-        [column]: newValues
-      };
-    });
-  };
-
-  const handleClearFacet = (column) => {
-    setSelectedFilters(prev => {
-      const newState = { ...prev };
-      delete newState[column];
-      return newState;
-    });
-  };
-
   const clearFilters = () => {
     setSelectedFilters({});
     setSortBy('');
@@ -147,81 +116,32 @@ export const SearchResultsPage = () => {
 
   return (
     <div className={styles.searchResultsContainer}>
-      <div className={styles.searchHeader}>
-        <div>
-          <h1 className={styles.searchTitle}>
-            Search Results
-          </h1>
-          <p className={styles.searchSubtitle}>
-            {loading ? 'Searching...' : `Found ${totalResults} results for "${query}"`}
-          </p>
-        </div>
-        
-        <div className={styles.searchControls}>
-          <CustomSelect 
-            label="Sort by:"
-            options={sortOptions}
-            value={sortBy}
-            onChange={setSortBy}
-            variant="ghost"
-          />
-        </div>
-      </div>
-
-      <div className={styles.searchLayout}>
-        {/* Sidebar Facets */}
-        <aside className={styles.searchSidebar}>
-          {Object.values(selectedFilters).some(v => v.length > 0) && (
-            <button 
-              onClick={clearFilters}
-              className={styles.sidebarClearAll}
-            >
-              Clear all filters
-            </button>
-          )}
-          {facets.map((facet) => (
-            <FacetFilter
-              key={facet.column}
-              facet={facet}
-              selectedValues={selectedFilters[facet.column] || []}
-              onFilterChange={handleFilterChange}
-              onClearFacet={handleClearFacet}
-            />
-          ))}
-        </aside>
-
-        {/* Results Grid */}
-        <div className={styles.searchResultsArea}>
-          {loading ? (
-            <div className={styles.loadingState}>Searching...</div>
-          ) : results.length > 0 ? (
-            <>
-              <div className={styles.productGrid}>
-                {results.map((product) => (
-                  <ProductCard key={product.sku || product.id} product={product} />
-                ))}
-              </div>
-
-              <Pagination 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-              <PoweredBy />
-            </>
-          ) : (
-            <div className={styles.emptyState}>
-              <p className={styles.emptyStateText}>No products found matching your search.</p>
-              <button 
-                onClick={clearFilters}
-                className={styles.emptyStateBtn}
-              >
-                Reset all filters
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <ListingPage
+        title="Search Results"
+        subtitle={loading ? 'Searching...' : `Showing results for <q>${query}</q>`}
+        breadcrumbs={[
+          { label: 'Home', href: '/' },
+          { label: query ? `${query}` : 'Search' },
+        ]}
+        totalResults={totalResults}
+        imageFilters={imageFilters}
+        loading={loading}
+        loadingText="Searching..."
+        products={results}
+        facets={facets}
+        selectedFilters={selectedFilters}
+        onApplyFilters={setSelectedFilters}
+        onClearAllFilters={clearFilters}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortOptions={sortOptions}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        emptyStateText="No products found matching your search."
+        resetButtonLabel="Reset all filters"
+        showPoweredBy
+      />
     </div>
   );
 };

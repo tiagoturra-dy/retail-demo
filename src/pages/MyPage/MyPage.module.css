@@ -28,8 +28,6 @@
 
 /* HERO SECTION */
 .heroSection {
-  padding: 4rem 2rem;
-  max-width: 80rem;
   margin: 0 auto;
   width: 100%;
 }
@@ -142,8 +140,6 @@
 
 /* DEALS SECTION */
 .dealsSection {
-  padding: 4rem 2rem;
-  max-width: 80rem;
   margin: 0 auto;
   width: 100%;
 }
@@ -265,8 +261,6 @@
 
 /* GIFTS SECTION */
 .giftsSection {
-  padding: 4rem 2rem;
-  max-width: 80rem;
   margin: 0 auto;
   width: 100%;
 }
@@ -371,7 +365,6 @@
 }
 
 .completeSetContainer {
-  max-width: 80rem;
   margin: 0 auto;
   padding: 0 2rem;
 }

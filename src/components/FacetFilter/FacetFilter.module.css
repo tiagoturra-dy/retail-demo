@@ -27,10 +27,10 @@
   cursor: pointer;
   padding: 0;
   transition: color 0.2s;
-}
 
-.clearFacetBtn:hover {
-  color: var(--color-black);
+  &:hover {
+    color: var(--color-black);
+  }
 }
 
 .searchWrapper {
@@ -53,10 +53,10 @@
   border-radius: 4px;
   font-size: 0.875rem;
   outline: none;
-}
 
-.searchInput:focus {
-  border-color: var(--color-black);
+  &:focus {
+    border-color: var(--color-black);
+  }
 }
 
 .valuesList {
@@ -73,10 +73,10 @@
   font-size: 0.875rem;
   color: #444;
   transition: color 0.2s;
-}
 
-.valueLabel:hover {
-  color: var(--color-black);
+  &:hover {
+    color: var(--color-black);
+  }
 }
 
 .checkbox {
@@ -108,8 +108,8 @@
   font-weight: 500;
   cursor: pointer;
   padding: 0;
-}
 
-.showMoreBtn:hover {
-  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
 }

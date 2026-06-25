@@ -1,78 +1,109 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Facebook, Youtube, Globe } from 'lucide-react';
-import { useCurrency } from '../../context/CurrencyContext';
-import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
-import { CustomSelect } from '../CustomSelect/CustomSelect';
+import { Instagram, Facebook } from 'lucide-react';
+import PayPal from './logos/PayPal.png';
+import ApplePay from './logos/ApplePay.png';
+import GooglePay from './logos/GooglePay.png';
+import Klarna from './logos/Klarna.png';
+import { BlueberryLogo } from '../BlueberryLogo/BlueberryLogo';
 import styles from './Footer.module.css';
 
 export const Footer = ({ logoText }) => {
-  const { lang, setCurrency } = useCurrency();
   const s = styles || {};
+  const [email, setEmail] = useState('');
 
-  const currencyOptions = CURRENCY_OPTIONS.map(opt => ({
-    value: opt.lang,
-    label: <>{opt.flag} - {opt.label}</>
-  }));
+  const handleSubscribe = () => {
+    if (email) {
+      console.log('Subscribed with email:', email);
+      setEmail('');
+    }
+  };
 
   return (
     <footer className={s.footer}>
       <div className={s.footerContainer}>
-        <div className={s.footerGrid}>
-          <div className={s.footerBrand}>
-            <Link to="/" className={s.footerLogo}>{logoText}</Link>
-            <p className={s.footerDescription}>
-              Curating the world's finest fashion and lifestyle essentials. Elevate your everyday with our premium collections.
-            </p>
-            <div className={s.footerSocial}>
-              <span className={s.socialIconWrapper}><Instagram className={s.icon} /></span>
-              <span className={s.socialIconWrapper}><Twitter className={s.icon} /></span>
-              <span className={s.socialIconWrapper}><Facebook className={s.icon} /></span>
-              <span className={s.socialIconWrapper}><Youtube className={s.icon} /></span>
-            </div>
-          </div>
-
-          <div className={s.footerColumn}>
-            <h4 className={s.footerHeading}>Shop</h4>
-            <ul className={s.footerLinks}>
-              <li><Link to="/category/men" className={s.footerLink}>Men's Collection</Link></li>
-              <li><Link to="/category/women" className={s.footerLink}>Women's Collection</Link></li>
-              <li><Link to="/category/kids" className={s.footerLink}>Kids' Wear</Link></li>
-              <li><Link to="/category/beauty" className={s.footerLink}>Beauty & Grooming</Link></li>
-            </ul>
-          </div>
-
-          <div className={s.footerColumn}>
-            <h4 className={s.footerHeading}>Support</h4>
-            <ul className={s.footerLinks}>
-              <li><span className={s.footerText}>Shipping Policy</span></li>
-              <li><span className={s.footerText}>Returns & Exchanges</span></li>
-              <li><span className={s.footerText}>Order Tracking</span></li>
-              <li><span className={s.footerText}>Contact Us</span></li>
-            </ul>
-          </div>
-
-          <div className={s.footerColumn}>
-            <h4 className={s.footerHeading}>Company</h4>
-            <ul className={s.footerLinks}>
-              <li><span className={s.footerText}>Our Story</span></li>
-              <li><span className={s.footerText}>Careers</span></li>
-              <li><span className={s.footerText}>Sustainability</span></li>
-              <li><span className={s.footerText}>Privacy Policy</span></li>
-            </ul>
+        {/* Logo and Payment Methods */}
+        <div className={s.headerSection}>
+          <Link to="/" className={s.footerLogo}>
+            <BlueberryLogo size={128} />
+          </Link>
+          <div className={s.paymentMethods}>
+            <span className={s.paymentBadge}>
+              <img src={PayPal} alt="PayPal" className={s.paymentIcon} />
+            </span>
+            <span className={s.paymentBadge}>
+              <img src={ApplePay} alt="Apple Pay" className={s.paymentIcon} />
+            </span>
+            <span className={s.paymentBadge}>
+              <img src={GooglePay} alt="Google Pay" className={s.paymentIcon} />
+            </span>
+            <span className={s.paymentBadge}>
+              <img src={Klarna} alt="Klarna" className={s.paymentIcon} />
+            </span>
           </div>
         </div>
 
-        <div className={s.footerBottom}>
-          <p className={s.footerCopyright}>© 2024 {logoText} Commerce Inc. All rights reserved.</p>
+        {/* Main Content */}
+        <div className={s.mainContent}>
+          {/* Links Section */}
+          <div className={s.linksGrid}>
+            <div className={s.column}>
+              <h4 className={s.columnHeading}>Shop</h4>
+              <ul className={s.footerLinks}>
+                <li><Link to="/category/women" className={s.footerLink}>Women</Link></li>
+                <li><Link to="/category/men" className={s.footerLink}>Men</Link></li>
+                <li><Link to="/category/home" className={s.footerLink}>Home</Link></li>
+                {/* <li><Link to="/category/electronics" className={s.footerLink}>Electronics</Link></li> */}
+              </ul>
+            </div>
 
-          <CustomSelect 
-            options={currencyOptions}
-            value={lang}
-            onChange={setCurrency}
-            icon={Globe}
-            variant="pill"
-          />
+            <div className={s.column}>
+              <h4 className={s.columnHeading}>Help</h4>
+              <ul className={s.footerLinks}>
+                <li><span className={s.footerText}>Customer Service</span></li>
+                <li><span className={s.footerText}>Delivery Information</span></li>
+                <li><span className={s.footerText}>Return an Order</span></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Newsletter Section */}
+          <div className={s.newsletter}>
+            <h4 className={s.newsletterHeading}>Subscribe</h4>
+            <p className={s.newsletterDesc}>Join our newsletter to stay up to date on features and releases.</p>
+            
+            <div className={s.subscriberForm}>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={s.emailInput}
+              />
+              <button onClick={handleSubscribe} className={s.subscribeBtn}>Subscribe</button>
+            </div>
+
+            <p className={s.privacyText}>
+              By subscribing you agree to with our <Link to="#" className={s.privacyLink}>Privacy Policy</Link> and provide consent to receive updates from our company.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer Bottom */}
+        <div className={s.footerBottom}>
+          <div className={s.bottomContent}>
+            <p className={s.copyright}>© 2026. All rights reserved.</p>
+            <div className={s.bottomLinks}>
+              <Link to="#" className={s.bottomLink}>Privacy Policy</Link>
+              <Link to="#" className={s.bottomLink}>Terms of Service</Link>
+              <Link to="#" className={s.bottomLink}>Cookies Settings</Link>
+            </div>
+          </div>
+
+          <div className={s.socialLinks}>
+            <a href="#" className={s.socialIcon} aria-label="Facebook"><Facebook size={20} /></a>
+            <a href="#" className={s.socialIcon} aria-label="Instagram"><Instagram size={20} /></a>
+          </div>
         </div>
       </div>
     </footer>

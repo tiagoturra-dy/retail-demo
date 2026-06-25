@@ -4,133 +4,128 @@
   display: flex;
   align-items: center;
   overflow: hidden;
+  border-radius: 16px;
 
   @media (min-width: 1024px) {
     height: 800px;
   }
-  
+
   &:hover {
     .heroTexts {
-      background-color: rgba(0, 0, 0, 0.1);
       border-radius: 5px;
     }
   }
-}
 
-.heroBg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
+  .heroBg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
 
-.heroImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    .heroImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-.heroOverlay {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.heroContentContainer {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  position: relative;
-  z-index: 10;
-  color: var(--color-white);
-  width: 100%;
-
-  @media (min-width: 640px) {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    .heroOverlay {
+      position: absolute;
+      inset: 0;
+    }
   }
 
-  @media (min-width: 1024px) {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
+  .heroContentContainer {
+    padding: 1rem;
+    position: relative;
+    z-index: 10;
+    color: var(--hero-content-color, var(--color-white));
+    width: 100%;
+    display: flex;
+    height: 100%;
+    align-items: center;
 
-.heroContent {
-  max-width: 42rem;
-}
+    &.left {
+      justify-content: flex-start;
+    }
 
-.heroTexts {
-  /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); */
-  text-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
-  font-weight: 700;
-  margin-bottom: 2rem;
-  padding: 2rem;
-}
+    &.center {
+      justify-content: center;
+    }
 
-.heroTitle {
-  font-size: 3.75rem;
-  margin-bottom: 1.5rem;
+    &.right {
+      justify-content: flex-end;
+    }
 
-  @media (min-width: 768px) {
-    font-size: 6rem;
-  }
-}
+    &.top {
+      align-items: flex-start;
+    }
 
-.heroSubtitle {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  max-width: 50rem;
-  letter-spacing: 0.1rem;
+    &.middle {
+      align-items: center;
+    }
 
-  @media (min-width: 768px) {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-  }
-}
+    &.bottom {
+      align-items: flex-end;
+    }
 
-.heroActions {
-  display: flex;
-  gap: 1rem;
-  margin-left: 2rem;
-}
+    .heroContent,
+    .promoContent {
+      max-width: 42rem;
+    }
 
-.heroPrimaryBtn {
-  background-color: var(--color-white);
-  color: var(--color-zinc-900);
-  padding: 1rem 2rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.2s;
+    .heroTexts {
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
 
-  &:hover {
-    filter: invert();
-  }
-}
+    .heroTitle {
+      font-size: 48px;
+      margin-bottom: 1.5rem;
+      font-family: var(--font-display);
+    }
 
-.heroBtnIcon {
-  width: 1rem;
-  height: 1rem;
-}
+    .heroSubtitle {
+      font-size: 18px;
+      line-height: 1.75rem;
+      max-width: 50rem;
+      letter-spacing: 0.1rem;
 
-.heroSecondaryBtn {
-  background-color: transparent;
-  border: 1px solid var(--color-white);
-  color: var(--color-white);
-  padding: 1rem 2rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.2s;
+      @media (min-width: 768px) {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+      }
+    }
 
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    .heroActions {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      
+      .heroCta {
+        color: var(--hero-content-color, var(--color-white));
+        padding: 1rem 0;
+        font-size: 18px;
+        text-transform: uppercase;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+
+        &:hover {
+          scale: 1.05;
+          .heroCtaIcon {
+            transform: translateX(4px);
+          }
+        }
+        
+        .heroCtaIcon {
+          width: 1rem;
+          height: 1rem;
+          transition: all 0.2s;
+        }
+      }
+    }
   }
 }

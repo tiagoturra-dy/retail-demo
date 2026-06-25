@@ -19,18 +19,18 @@
   color: #374151;
   transition: all 0.2s ease;
   cursor: pointer;
-}
 
-.paginationArrow:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #d1d5db;
-  color: #111827;
-}
+  &:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+  }
 
-.paginationArrow:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #f3f4f6;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f3f4f6;
+  }
 }
 
 .paginationNumbers {
@@ -46,24 +46,24 @@
   min-width: 2.5rem;
   height: 2.5rem;
   padding: 0 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: 50%;
   border: 1px solid transparent;
   background: transparent;
-  color: #4b5563;
+  color: var(--color-black);
   font-weight: 500;
   transition: all 0.2s ease;
   cursor: pointer;
-}
 
-.paginationNumber:hover:not(.active) {
-  background: #f3f4f6;
-  color: #111827;
-}
+  &:hover:not(.active) {
+    background: #f3f4f6;
+    color: var(--color-black);
+  }
 
-.paginationNumber.active {
-  background: #111827;
-  color: white;
-  border-color: #111827;
+  &.active {
+    background: var(--color-black);
+    color: white;
+    border-color: var(--color-black);
+  }
 }
 
 .paginationEllipsis {
@@ -72,16 +72,18 @@
   font-weight: 500;
 }
 
-@media (max-width: 640px) {
-  .paginationArrow {
-    width: 2rem;
-    height: 2rem;
-  }
-  
-  .paginationNumber {
-    min-width: 2rem;
-    height: 2rem;
-    padding: 0 0.5rem;
-    font-size: 0.875rem;
+.paginationContainer {
+  @media (max-width: 640px) {
+    .paginationArrow {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .paginationNumber {
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 0.5rem;
+      font-size: 0.875rem;
+    }
   }
 }

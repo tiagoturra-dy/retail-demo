@@ -1,0 +1,210 @@
+.listingContainer {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 0 3rem;
+
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0.75rem 0;
+    text-transform: uppercase;
+
+    .breadcrumbItem {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .breadcrumbSep {
+      margin: 0 0.4rem;
+      color: var(--color-grey-500);
+      font-size: 0.75rem;
+    }
+
+    .breadcrumbLink {
+      font-size: 0.75rem;
+      color: var(--color-grey-500);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--color-black);
+        text-decoration: underline;
+      }
+    }
+
+    .breadcrumbCurrent {
+      font-size: 0.75rem;
+      color: var(--color-black);
+    }
+  }
+
+  .listingHeader {
+    margin-bottom: 1rem;
+
+    &.listingHeaderWithImages {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+
+      @media (max-width: 767px) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .listingTitle {
+      font-size: 2.25rem;
+      line-height: 2.5rem;
+      font-weight: 700;
+      color: var(--color-black);
+      margin: 0;
+      text-transform: capitalize;
+      font-family: var(--font-display)
+    }
+
+    .listingSubtitle {
+      margin-top: 0.5rem;
+      font-size: 1.3rem;
+
+      q {
+        font-weight: 700;
+      }
+    }
+  }
+
+  .imageFilters {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    flex-shrink: 0;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .imageFilterItem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      flex-shrink: 0;
+
+      @media (min-width: 768px) {
+        align-items: flex-start;
+      }
+
+      .imageFilterImg {
+        width: 5rem;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+
+        @media (min-width: 768px) {
+          width: 10rem;
+        }
+      }
+
+      .imageFilterName {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #333;
+        text-align: center;
+      }
+
+      &:hover .imageFilterImg {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .listingToolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    flex-flow: row wrap;
+
+    .totalResults {
+      text-transform: uppercase;
+      flex: 1;
+      text-align: right;
+
+      @media (max-width: 768px) {
+        text-align: left;
+        margin-top: 1rem;
+      }
+    }
+
+    .sortBox, .facetsBox {
+      @media (max-width: 768px) {
+        flex: 50%;
+      }
+    }
+
+    .facetsBox {
+      justify-content: center;
+      border-color: var(--color-grey-400);
+    }
+
+    .sortBox {
+      .sortSelect {
+        button {
+          width: 100% !important;
+          justify-content: center;
+          border-color: var(--color-grey-400);
+        }
+      }
+    }
+  }
+
+  .resultsArea {
+    display: flex;
+    flex-direction: column;
+
+    .loadingState {
+      text-align: center;
+      padding: 5rem 0;
+    }
+
+    .productGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+
+      @media (min-width: 1280px) {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    .emptyState {
+      text-align: center;
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+      background-color: #f7f7f7;
+
+      .emptyStateText {
+        color: #5f5f5f;
+      }
+
+      .emptyStateBtn {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        color: #1d1d1d;
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
 
 import { BrowserRouter as Router, Routes, Route, useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from './components/Navbar/Navbar';
+import { CategoriesSection } from './components/CategoriesSection/CategoriesSection';
 import { Footer } from './components/Footer/Footer';
 import { Home } from './pages/Home/Home';
 import { CategoryPage } from './pages/CategoryPage/CategoryPage';
@@ -66,6 +67,7 @@ export default function App() {
               <DYManager />
               <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
                 <Navbar logoText={LOGO_TEXT} />
+                <CategoriesSection />
                 <ShoppingMuse />
                 <main>
                   <AnimatePresence mode="wait">

@@ -50,10 +50,10 @@
   font-weight: 600;
   border-radius: 4px;
   transition: background-color 0.2s;
-}
 
-.bannerCta:hover {
-  background-color: #f0f0f0;
+  &:hover {
+    background-color: #f0f0f0;
+  }
 }
 
 .bannerPlaceholder {
@@ -71,23 +71,23 @@
   100% { opacity: 1; }
 }
 
-@media (max-width: 768px) {
-  .bannerContainer {
+.bannerContainer {
+  @media (max-width: 768px) {
     height: 300px;
-  }
-  
-  .bannerOverlay {
-    padding: 0 24px;
-    background: rgba(0, 0, 0, 0.4);
-    justify-content: center;
-    text-align: center;
-  }
 
-  .bannerTitle {
-    font-size: 2rem;
-  }
+    .bannerOverlay {
+      padding: 0 24px;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      text-align: center;
+    }
 
-  .bannerSubtitle {
-    font-size: 1rem;
+    .bannerTitle {
+      font-size: 2rem;
+    }
+
+    .bannerSubtitle {
+      font-size: 1rem;
+    }
   }
 }

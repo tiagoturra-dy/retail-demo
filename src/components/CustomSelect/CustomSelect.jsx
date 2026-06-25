@@ -28,7 +28,7 @@ export const CustomSelect = ({
 
   return (
     <div className={`${styles.selectContainer} ${className}`} ref={dropdownRef}>
-      {label && <span className={styles.label}>{label}</span>}
+      {label && variant !== 'bordered' && <span className={styles.label}>{label}</span>}
       
       <button 
         type="button"
@@ -38,8 +38,8 @@ export const CustomSelect = ({
         aria-haspopup="listbox"
       >
         {Icon && <Icon className={styles.icon} size={16} />}
-        <span className={styles.valueText}>{selectedOption.label}</span>
-        <ChevronDown size={14} className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`} />
+        <span className={styles.valueText}>{label || selectedOption.label}</span>
+        {variant !== 'bordered' && <ChevronDown size={14} className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`} />}
       </button>
       
       {isOpen && (

@@ -54,12 +54,22 @@ export const Home = () => {
 
   const transformCSBanner = (data) => {
     if (!data) return null
+
+    const buttons = Array.isArray(data.buttons) && data.buttons.length > 0
+      ? data.buttons
+      : data.cta_text && data.link_url
+        ? [{ cta: data.cta_text, link: data.link_url }]
+        : data.cta && data.link
+          ? [{ cta: data.cta, link: data.link }]
+          : []
+
     return {
-      image: data.background_image.url,
-      title: data.display_title,
+      image: data.image || data.background_image?.url,
+      title: data.title || data.display_title,
       subtitle: data.subtitle,
-      link: data.link_url,
-      cta: data.cta_text
+      buttons,
+      layout: data.layout,
+      v_position: data.v_position || data.layout?.v_position
     }
   }
 
