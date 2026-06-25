@@ -8,6 +8,10 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  devtool: isProduction ? 'source-map' : 'eval-cheap-module-source-map',
+  cache: {
+    type: 'filesystem',
+  },
   entry: './src/main.jsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -87,7 +91,7 @@ module.exports = {
         : 'http://localhost:5000' // dev - local Express server
       )
     }),
-    new CopyPlugin({
+    ...(isProduction ? [new CopyPlugin({
       patterns: [
         { 
           from: "public", 
@@ -97,16 +101,13 @@ module.exports = {
           }
         }, // Copies everything from public/ into the root of dist/
       ],
-    }),
+    })] : []),
   ],
   devServer: {
     host: '0.0.0.0',
     port: 3000,
     historyApiFallback: true,
     hot: false, // HMR is disabled in AI Studio
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
     proxy: [
       {
         context: ['/api'],

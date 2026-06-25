@@ -1,0 +1,19 @@
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.85); }
+}
+
+.starLarge {
+  transform-origin: 7.5px 10px;
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+.starMedium {
+  transform-origin: 15px 5px;
+  animation: twinkle 2.4s ease-in-out infinite 0.8s;
+}
+
+.starSmall {
+  transform-origin: 13.75px 15.625px;
+  animation: twinkle 2.4s ease-in-out infinite 1.6s;
+}

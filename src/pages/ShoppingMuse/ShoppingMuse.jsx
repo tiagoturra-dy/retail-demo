@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, User, Bot, RotateCcw, X } from 'lucide-react';
+import { User, RotateCcw, X, SendHorizontal } from 'lucide-react';
 import { useMuse } from '../../context/MuseContext';
 import { MicButton } from '../../components/MicButton/MicButton';
 import { LiveMicButton } from '../../components/LiveMicButton/LiveMicButton';
@@ -14,12 +14,13 @@ import { Helper } from '../../helpers/helper';
 import { resolveVoice } from '../../helpers/voiceConstants';
 import { useGroqConversation } from '../../hooks/useGroqConversation';
 import styles from './ShoppingMuse.module.css';
+import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
 
 const ENABLE_TYPEWRITER = false; // set to false to show full text immediately
 
 const CONSTANTS = {
   TITLE: "Personal Shopper",
-  SUBTITLE: "Your AI shopping assistant",
+  SUBTITLE: "",
   RESET_CHAT: "Reset Chat",
   RESET: "Reset",
   PLACEHOLDER: "Ask me anything...",
@@ -349,7 +350,9 @@ export const ShoppingMuse = () => {
       <div className={styles.header}>
         <div className={styles.headerTop}>
           <div className={styles.logoContainer}>
-            <Bot className={styles.botIcon} />
+            <div className={styles.museIcon}>
+              <MuseIcon className={`dy-nav-icon ${styles.botIcon}`} color="currentColor" size={16} />
+            </div>
             <h1 className={styles.title}>{CONSTANTS.TITLE}</h1>
           </div>
           <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
@@ -390,9 +393,9 @@ export const ShoppingMuse = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className={`${styles.messageWrapper} ${msg.type === 'user' ? styles.userWrapper : styles.botWrapper}`}
               >
-                <div className={styles.avatar}>
-                  {msg.type === 'user' ? <User size={18} /> : <Bot size={18} />}
-                </div>
+                {/* <div className={styles.avatar}>
+                  {msg.type === 'user' ? <User size={18} /> : <MuseIcon className={`dy-nav-icon ${styles.botIcon}`} color="currentColor" />}
+                </div> */}
                 <div className={styles.messageContent}>
                   <div
                     className={styles.messageBubble}
@@ -429,9 +432,6 @@ export const ShoppingMuse = () => {
               animate={{ opacity: 1, y: 0 }}
               className={`${styles.messageWrapper} ${styles.botWrapper}`}
             >
-              <div className={styles.avatar}>
-                <Bot size={18} />
-              </div>
               <div className={styles.messageContent}>
                 <div className={styles.loadingBubble}>
                   <span className={styles.typingDot} />
@@ -482,7 +482,7 @@ export const ShoppingMuse = () => {
             className={styles.sendButton}
             disabled={!input.trim() || isLoading}
           >
-            <Send size={20} />
+            <SendHorizontal size={20} />
           </button>
         </form>
       </div>

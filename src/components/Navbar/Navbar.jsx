@@ -6,8 +6,9 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
 import { useMuse } from '../../context/MuseContext';
-import { BlueberryLogo } from '../BlueberryLogo/BlueberryLogo';
+import { BlueberryLogo } from '../../icons/BlueberryLogo/BlueberryLogo';
 import styles from './Navbar.module.css';
+import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
 
 export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
@@ -44,7 +45,8 @@ export const Navbar = ({ logoText }) => {
           <div className={`dy-nav-icons ${s.navbarActions}`}>
 
             <button onClick={() => openMuse()} className={s.actionBtn} title="Shopper Assistant" data-dy-nav-icon="muse">
-              <BotMessageSquare className={`dy-nav-icon ${s.actionIcon}`} />
+              {/* <BotMessageSquare className={`dy-nav-icon ${s.actionIcon}`} /> */}
+              <MuseIcon className={`dy-nav-icon ${s.actionIcon}`} color="currentColor" />
             </button>
 
             <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">

@@ -5,7 +5,7 @@ import PayPal from './logos/PayPal.png';
 import ApplePay from './logos/ApplePay.png';
 import GooglePay from './logos/GooglePay.png';
 import Klarna from './logos/Klarna.png';
-import { BlueberryLogo } from '../BlueberryLogo/BlueberryLogo';
+import { BlueberryLogo } from '../../icons/BlueberryLogo/BlueberryLogo';
 import styles from './Footer.module.css';
 
 export const Footer = ({ logoText }) => {
