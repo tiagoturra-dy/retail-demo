@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -86,6 +87,11 @@ module.exports = {
         : 'http://localhost:5000' // dev - local Express server
       )
     }),
+    new CopyPlugin({
+      patterns: [
+        { from: "public", to: "" }, // Copies everything from public/ into the root of dist/
+      ],
+    }),
   ],
   devServer: {
     host: '0.0.0.0',
@@ -101,6 +107,9 @@ module.exports = {
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
-    ]
+    ],
+    static: {
+      directory: path.join(__dirname, 'public'),
+    }
   },
 };
