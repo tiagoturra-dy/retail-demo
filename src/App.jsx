@@ -30,6 +30,22 @@ import { MuseProvider, useMuse } from './context/MuseContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect } from 'react';
 
+// Exposes openMuse globally so external scripts/banners can trigger it:
+// window.__openMuse({ query: 'summer dresses' })
+// window.__openMuse({ live: true })
+const MuseGlobalBridge = () => {
+  const { openMuse } = useMuse();
+
+  useEffect(() => {
+    window.__openMuse = (options) => openMuse(options);
+    return () => {
+      delete window.__openMuse;
+    };
+  }, [openMuse]);
+
+  return null;
+};
+
 // Handles direct navigation to /muse (e.g. external links, bookmarks)
 const MuseRoute = () => {
   const [searchParams] = useSearchParams();
@@ -62,6 +78,7 @@ export default function App() {
         <CurrencyProvider>
           <CartProvider>
             <MuseProvider>
+              <MuseGlobalBridge />
               <Router>
               <ScrollToTop />
               <DYManager />
