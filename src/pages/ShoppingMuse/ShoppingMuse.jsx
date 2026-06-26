@@ -426,9 +426,6 @@ export const ShoppingMuse = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className={`${styles.messageWrapper} ${msg.type === 'user' ? styles.userWrapper : styles.botWrapper}`}
               >
-                {/* <div className={styles.avatar}>
-                  {msg.type === 'user' ? <User size={18} /> : <MuseIcon className={`dy-nav-icon ${styles.botIcon}`} color="currentColor" />}
-                </div> */}
                 <div className={styles.messageContent}>
                   <div
                     className={styles.messageBubble}
