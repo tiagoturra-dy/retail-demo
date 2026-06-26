@@ -77,7 +77,7 @@ export const ProductCard = ({ product, compact = false, className = '' }) => {
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           onClick={handleWishlistClick}
         >
-          <Heart className={styles.wishlistIcon} style={isWishlisted ? { fill: 'currentColor' } : undefined} />
+          <Heart className={styles.wishlistIcon} style={isWishlisted ? { color: 'var(--color-crimson)', fill: 'var(--color-crimson)' } : undefined} />
         </button>
       </div>
       <div className={styles.productInfoContainer}>

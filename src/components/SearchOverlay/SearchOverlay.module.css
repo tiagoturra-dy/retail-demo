@@ -6,13 +6,13 @@
   bottom: 0;
   z-index: 51;
   /* transparent over navbar height, gray below */
-  background: linear-gradient(to bottom, transparent 5rem, rgba(100, 100, 100, 0.55) 5rem);
+  background: linear-gradient(to bottom, transparent var(--nav-bottom, 5rem), rgba(100, 100, 100, 0.55) var(--nav-bottom, 5rem));
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   font-family: var(--font-body);
   color: var(--color-black);
-  padding-top: 5rem;
+  padding-top: var(--nav-bottom, 5rem);
 
   .searchCloseBtn {
     display: flex;

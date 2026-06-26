@@ -29,6 +29,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
   const inputRef = useRef(null);
+  const [navBottom, setNavBottom] = useState('5rem');
 
   useEffect(() => {
     const saved = localStorage.getItem('recentSearches');
@@ -81,6 +82,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
+      const nav = document.querySelector('.dy-nav');
+      if (nav) {
+        const rect = nav.getBoundingClientRect();
+        setNavBottom(`${rect.bottom}px`);
+      }
       setTimeout(() => inputRef.current?.focus(), 100);
       document.body.style.overflow = 'hidden';
     } else {
@@ -213,6 +219,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={styles.searchOverlay}
+          style={{ '--nav-bottom': navBottom }}
         >
           {/* Main Search Canvas */}
           <main className={styles.searchMain}>

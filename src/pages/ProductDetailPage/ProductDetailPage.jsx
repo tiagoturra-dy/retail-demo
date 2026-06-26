@@ -3,24 +3,25 @@ import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
-import { Star, ShoppingBag, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 import { personalizationService } from '../../services/personalizationService';
-import { motion } from 'motion/react';
 import { AddToCartButton } from '../../components/AddToCartButton/AddToCartButton';
 import styles from './ProductDetailPage.module.css';
 import { Helper } from '../../helpers/helper';
-import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const ProductDetailPage = () => {
   const productRating = Helper.getRandomRating();
+  const reviewCount = Helper.getRandomReviewCount(200);
 
   const { productId } = useParams();
-  const { cart, addToCart } = useCart();
+  const { cart } = useCart();
   const { formatPrice } = useCurrency();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
+  const [openAccordion, setOpenAccordion] = useState('details');
+  const [altImageError, setAltImageError] = useState(false);
   const [wishlist, setWishlist] = useState(() => {
     try {
       return JSON.parse(Helper.getStoredValue('dyRetailDemoWishlist') || '[]');
@@ -32,13 +33,12 @@ export const ProductDetailPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [recData] = await Promise.all([
-        personalizationService.getRecommendations({groups: ['pdp_recs'], isImplicitPageview: false, cart}),
+        personalizationService.getRecommendations({ groups: ['pdp_recs'], isImplicitPageview: false, cart }),
       ]);
       setRecommendations(recData);
     };
     fetchData();
   }, [cart]);
-
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -58,115 +58,172 @@ export const ProductDetailPage = () => {
       : [...wishlist, sku];
     setWishlist(updated);
     Helper.setStoredValue('dyRetailDemoWishlist', JSON.stringify(updated));
-    console.log(`Wishlist updated: ${updated.join(', ')}`);
     if (updated.includes(sku)) {
-      debugger
-      DY.API("event", {
-        name: "Add to Wishlist",
-        properties: {
-          dyType: "add-to-wishlist-v1",
-          productId: sku
-        }
+      DY.API('event', {
+        name: 'Add to Wishlist',
+        properties: { dyType: 'add-to-wishlist-v1', productId: sku },
       });
     }
   };
 
+  const toggleAccordion = (key) => setOpenAccordion(prev => prev === key ? null : key);
+
   if (loading) {
-    return <div className={styles.productDetailLoading}>Loading...</div>;
+    return <div className={styles.pdpLoading}>Loading...</div>;
   }
 
   if (!product) {
     return (
-      <div className={styles.productDetailNotFound}>
-        <h2 className={styles.notFoundTitle}>Product not found</h2>
-        <Link to="/" className={styles.notFoundLink}>Return Home</Link>
+      <div className={styles.pdpNotFound}>
+        <h2 className={styles.pdpNotFoundTitle}>Product not found</h2>
+        <Link to="/" className={styles.pdpNotFoundLink}>Return Home</Link>
       </div>
     );
   }
 
+  const markdownPct = product['type:number:markdown_percent'] || 0;
+  const salePrice = product.price;
+  const originalPrice = markdownPct > 0 ? salePrice / (1 - markdownPct / 100) : null;
+  const rating = product.rating || productRating;
+  const reviews = product.reviews || reviewCount;
+  const categories = Array.isArray(product.categories)
+    ? product.categories
+    : (product.categories || '').split('|').filter(Boolean);
+
+  const accordions = [
+    {
+      key: 'details',
+      label: 'DETAILS:',
+      content: product.description,
+    },
+    {
+      key: 'sizeFit',
+      label: 'SIZE & FIT:',
+      content: 'This product fits true to size. We recommend sizing up if you prefer a relaxed fit. Model is 5\'9" and wears a Small.',
+    },
+    {
+      key: 'delivery',
+      label: 'DELIVERY AND RETURN',
+      content: `Free standard shipping on orders over ${formatPrice(Helper.getFreeShippingThreshold())}. Easy 30-day returns for a full refund or exchange.`,
+    },
+  ];
+
+  const Stars = ({ size = 'sm' }) => (
+    <div className={styles.pdpStars}>
+      {[1, 2, 3, 4, 5].map(i => (
+        <Star
+          key={i}
+          className={`${styles.pdpStar} ${size === 'sm' ? styles.pdpStarSm : ''} ${i <= Math.floor(rating) ? styles.pdpStarFilled : styles.pdpStarEmpty}`}
+        />
+      ))}
+    </div>
+  );
+
   return (
-    <div className={styles.productDetailContainer}>
-      <div className={styles.productDetailGrid}>
-        {/* Image Gallery */}
-        <div className={styles.productGallery}>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={styles.mainImageContainer}
-          >
-            <img src={Helper.getProductImage(product.image_url)} alt={product.name} className={styles.mainImage} />
-          </motion.div>
+    <div className={styles.pdpWrapper}>
+      <div className={styles.pdpGrid}>
+
+        {/* Left: Gallery */}
+        <div className={styles.pdpGallery}>
+          <img
+            src={Helper.getProductImage(product.image_url)}
+            alt={product.name}
+            className={styles.pdpMainImage}
+          />
+          {product.alt_image && !altImageError && (
+            <div className={styles.pdpThumbnails}>
+              <div className={styles.pdpThumbItem}>
+                <img src={Helper.getProductImage(product.alt_image)} alt={product.name} className={styles.pdpThumbImg} onError={() => setAltImageError(true)} />
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Product Info */}
-        <div className={styles.productInfoCol}>
-          <div className={styles.productHeader}>
-            <div className={styles.breadcrumbs}>
-              <span className={styles.breadcrumbLink}>{Helper.getProducCategoriesDisplay(product.categories)}</span>
-            </div>
-            <h1 className={styles.productTitle}>{product.name}</h1>
-            <div className={styles.productRating}>
-              <div className={styles.starsContainer}>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className={`${styles.starIcon} ${i <= Math.floor(product.rating || productRating) ? styles.filled : styles.empty}`} />
-                ))}
-              </div>
-              <span className={styles.reviewsText}>{product.rating || productRating} ({product.reviews || Helper.getRandomReviewCount()} reviews)</span>
-            </div>
-          </div>
+        {/* Right: Info */}
+        <div className={styles.pdpInfo}>
 
-          <p id="pricep" className={styles.productPrice}>{formatPrice(product.price)}</p>
+          {/* Breadcrumb */}
+          <nav className={styles.pdpBreadcrumb}>
+            <Link to="/" className={styles.pdpBreadcrumbLink}>HOME</Link>
+            {categories.slice(0, 3).map((cat, i) => (
+              <React.Fragment key={i}>
+                <span className={styles.pdpBreadcrumbSep}>›</span>
+                <span className={styles.pdpBreadcrumbLink}>{cat.toUpperCase()}</span>
+              </React.Fragment>
+            ))}
+          </nav>
 
-          <div className={styles.productActions}>
-            <div id="dy-action-buttons" className={styles.actionButtonsRow}>
-              <AddToCartButton 
-                product={product} 
-                className={styles.addToCartBtn} 
-                iconClass={styles.btnIcon} 
-                showText={true} 
+          {/* Title + Wishlist */}
+          <div className={styles.pdpTitleRow}>
+            <h1 className={styles.pdpTitle}>{product.name}</h1>
+            <button className={styles.pdpWishlistBtn} onClick={handleAddToWishlist} aria-label="Add to wishlist">
+              <Heart
+                className={styles.pdpWishlistIcon}
+                style={wishlist.includes(product.sku) ? { color: 'var(--color-crimson)', fill: 'var(--color-crimson)' } : undefined}
               />
-              <button className={styles.wishlistBtn} onClick={handleAddToWishlist}>
-                <Heart className={styles.wishlistIcon} style={wishlist.includes(product.sku) ? { color: 'red', fill: 'red' } : undefined} />
-              </button>
-            </div>
+            </button>
           </div>
 
-          <div className={styles.productFeatures}>
-            <div className={styles.featureItem}>
-              <div className={styles.featureIconWrapper}>
-                <Truck className={styles.featureIcon} />
-              </div>
-              <div>
-                <h4 className={styles.featureTitle}>Free Shipping</h4>
-                <p className={styles.featureDesc}>Free standard shipping on orders over {formatPrice(Helper.getFreeShippingThreshold())}.</p>
-              </div>
+          {/* Price */}
+          <div className={styles.pdpPriceRow}>
+            <span id="pricep" className={styles.pdpSalePrice}>{formatPrice(salePrice)}</span>
+            {originalPrice && (
+              <span className={styles.pdpOriginalPrice}>{formatPrice(originalPrice)}</span>
+            )}
+          </div>
+
+          {/* Rating */}
+          <div className={styles.pdpRatingRow}>
+            <Stars />
+            <span className={styles.pdpRatingText}>{rating} ({reviews})</span>
+          </div>
+
+          {/* CTA */}
+          <div id="dy-action-buttons" className={styles.pdpCtaRow}>
+            <AddToCartButton
+              product={product}
+              className={styles.pdpAddToCartBtn}
+              iconClass={styles.pdpAddToCartIcon}
+              showText={true}
+            />
+          </div>
+
+          {/* Promo Banner */}
+          <div className={styles.pdpPromoBanner}>
+            <span className={styles.pdpPromoText}>10% OFF FOR NEW CUSTOMERS</span>
+            <button className={styles.pdpPromoSignUp}>SIGN UP NOW</button>
+          </div>
+
+          {/* Accordions */}
+          {accordions.map(({ key, label, content }) => (
+            <div key={key} className={styles.pdpAccordion}>
+              <button className={styles.pdpAccordionHeader} onClick={() => toggleAccordion(key)}>
+                <span className={styles.pdpAccordionLabel}>{label}</span>
+                <span className={styles.pdpAccordionIcon}>{openAccordion === key ? '−' : '+'}</span>
+              </button>
+              {openAccordion === key && (
+                <div className={styles.pdpAccordionContent}>{content}</div>
+              )}
             </div>
-            <div className={styles.featureItem}>
-              <div className={styles.featureIconWrapper}>
-                <RotateCcw className={styles.featureIcon} />
-              </div>
-              <div>
-                <h4 className={styles.featureTitle}>Easy Returns</h4>
-                <p className={styles.featureDesc}>30-day return policy for a full refund.</p>
-              </div>
-            </div>
-            <div className={styles.featureItem}>
-              <div className={styles.featureIconWrapper}>
-                <Shield className={styles.featureIcon} />
-              </div>
-              <div>
-                <h4 className={styles.featureTitle}>Secure Payment</h4>
-                <p className={styles.featureDesc}>Your information is protected by 256-bit SSL encryption.</p>
+          ))}
+
+          {/* Reviews accordion */}
+          <div className={`${styles.pdpAccordion} ${styles.pdpAccordionLast}`}>
+            <div className={styles.pdpAccordionHeader}>
+              <span className={styles.pdpAccordionLabel}>REVIEWS [{reviews}]</span>
+              <div className={styles.pdpAccordionRatingSummary}>
+                <Stars size="sm" />
+                <span className={styles.pdpAccordionRatingValue}>{rating}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recommendations */}
+      {/* Style It With */}
       {recommendations?.choices?.some(choice => choice.name === 'pdp_recs1') &&
-        recommendations?.choices?.filter(choice => choice.name === 'pdp_recs1').map(choice => (
-          <RecsCarousel id="dy-recs-1" key={choice.name} recommendations={{choices: [choice]}} additionalClass='dy-pdp-recs' />
+        recommendations.choices.filter(choice => choice.name === 'pdp_recs1').map(choice => (
+          <RecsCarousel id="dy-recs-1" key={choice.name} recommendations={{ choices: [choice] }} additionalClass='dy-pdp-recs' />
         ))
       }
     </div>
