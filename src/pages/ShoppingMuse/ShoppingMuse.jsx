@@ -15,6 +15,7 @@ import { resolveVoice } from '../../helpers/voiceConstants';
 import { useGroqConversation } from '../../hooks/useGroqConversation';
 import styles from './ShoppingMuse.module.css';
 import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ENABLE_TYPEWRITER = false; // set to false to show full text immediately
 
@@ -31,12 +32,16 @@ const CONSTANTS = {
   LIVE_PREFIX: "Ask follow-ups before results. Confirm gender. Keep chat moving. Be brief."
 };
 
-const MuseCarousel = ({ slots }) => {
-  const [emblaRef] = useEmblaCarousel({ 
+const MuseCarousel = ({ slots, onApiReady }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
     align: 'start',
     containScroll: 'trimSnaps',
     dragFree: true
   });
+
+  useEffect(() => {
+    if (emblaApi && onApiReady) onApiReady(emblaApi);
+  }, [emblaApi, onApiReady]);
 
   return (
     <div className={styles.embla} ref={emblaRef}>
@@ -47,6 +52,34 @@ const MuseCarousel = ({ slots }) => {
           </div>
         ))}
       </div>
+    </div>
+  );
+};
+
+const MuseWidgetBlock = ({ widget }) => {
+  const emblaApiRef = useRef(null);
+
+  const scrollPrev = useCallback(() => emblaApiRef.current?.scrollPrev(), []);
+  const scrollNext = useCallback(() => emblaApiRef.current?.scrollNext(), []);
+
+  const handleApiReady = useCallback((api) => {
+    emblaApiRef.current = api;
+  }, []);
+
+  return (
+    <div className={styles.widgetBlock}>
+      <div className={styles.widgetHeader}>
+        {widget.title && <h4 className={styles.widgetTitle}>{widget.title}</h4>}
+        <div className={styles.widgetNavButtons}>
+          <button className={styles.widgetNavButton} onClick={scrollPrev} aria-label="Previous">
+            <ChevronLeft size={16} />
+          </button>
+          <button className={styles.widgetNavButton} onClick={scrollNext} aria-label="Next">
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+      <MuseCarousel slots={widget.slots} onApiReady={handleApiReady} />
     </div>
   );
 };
@@ -409,10 +442,7 @@ export const ShoppingMuse = () => {
                   {msg.widgets && msg.widgets.length > 0 && ttsState?.msgId !== msg.id && (
                     <div className={styles.widgetsContainer}>
                       {msg.widgets.map((widget, wIdx) => (
-                        <div key={wIdx} className={styles.widgetBlock}>
-                          {widget.title && <h4 className={styles.widgetTitle}>{widget.title}</h4>}
-                          <MuseCarousel slots={widget.slots} />
-                        </div>
+                        <MuseWidgetBlock key={wIdx} widget={widget} />
                       ))}
                     </div>
                   )}

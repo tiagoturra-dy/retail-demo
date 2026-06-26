@@ -6,11 +6,14 @@ import ApplePay from './logos/ApplePay.png';
 import GooglePay from './logos/GooglePay.png';
 import Klarna from './logos/Klarna.png';
 import { BlueberryLogo } from '../../icons/BlueberryLogo/BlueberryLogo';
+import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
+import { useCurrency } from '../../context/CurrencyContext';
 import styles from './Footer.module.css';
 
 export const Footer = ({ logoText }) => {
   const s = styles || {};
   const [email, setEmail] = useState('');
+  const { lang, setCurrency } = useCurrency();
 
   const handleSubscribe = () => {
     if (email) {
@@ -53,16 +56,15 @@ export const Footer = ({ logoText }) => {
                 <li><Link to="/category/women" className={s.footerLink}>Women</Link></li>
                 <li><Link to="/category/men" className={s.footerLink}>Men</Link></li>
                 <li><Link to="/category/home" className={s.footerLink}>Home</Link></li>
-                {/* <li><Link to="/category/electronics" className={s.footerLink}>Electronics</Link></li> */}
               </ul>
             </div>
 
             <div className={s.column}>
               <h4 className={s.columnHeading}>Help</h4>
               <ul className={s.footerLinks}>
-                <li><span className={s.footerText}>Customer Service</span></li>
-                <li><span className={s.footerText}>Delivery Information</span></li>
-                <li><span className={s.footerText}>Return an Order</span></li>
+                <li><span className={s.footerLink}>Customer Service</span></li>
+                <li><span className={s.footerLink}>Delivery Information</span></li>
+                <li><span className={s.footerLink}>Return an Order</span></li>
               </ul>
             </div>
           </div>
@@ -84,7 +86,7 @@ export const Footer = ({ logoText }) => {
             </div>
 
             <p className={s.privacyText}>
-              By subscribing you agree to with our <Link to="#" className={s.privacyLink}>Privacy Policy</Link> and provide consent to receive updates from our company.
+              By subscribing you agree to with our <span className={s.privacyLink}>Privacy Policy</span> and provide consent to receive updates from our company.
             </p>
           </div>
         </div>
@@ -92,17 +94,32 @@ export const Footer = ({ logoText }) => {
         {/* Footer Bottom */}
         <div className={s.footerBottom}>
           <div className={s.bottomContent}>
-            <p className={s.copyright}>© 2026. All rights reserved.</p>
+            <p className={s.copyright}>© 2026 Mastercard Dynamic Yield. All rights reserved.</p>
             <div className={s.bottomLinks}>
-              <Link to="#" className={s.bottomLink}>Privacy Policy</Link>
-              <Link to="#" className={s.bottomLink}>Terms of Service</Link>
-              <Link to="#" className={s.bottomLink}>Cookies Settings</Link>
+              <span className={s.bottomLink}>Privacy Policy</span>
+              <span className={s.bottomLink}>Terms of Service</span>
+              <span className={s.bottomLink}>Cookies Settings</span>
             </div>
           </div>
 
           <div className={s.socialLinks}>
-            <a href="#" className={s.socialIcon} aria-label="Facebook"><Facebook size={20} /></a>
-            <a href="#" className={s.socialIcon} aria-label="Instagram"><Instagram size={20} /></a>
+            <span className={s.socialIcon} aria-label="Facebook"><Facebook size={20} /></span>
+            <span className={s.socialIcon} aria-label="Instagram"><Instagram size={20} /></span>
+          </div>
+
+          <div className={s.currencySelector}>
+            {CURRENCY_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                className={`${s.currencyOption} ${lang === option.lang ? s.currencyOptionActive : ''}`}
+                onClick={() => setCurrency(option.lang)}
+                title={option.langLabel}
+                aria-label={option.langLabel}
+              >
+                {option.flag}
+                <span className={s.currencyLabel}>{option.value}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>

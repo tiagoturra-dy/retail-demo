@@ -82,7 +82,7 @@ export default function App() {
               <Router>
               <ScrollToTop />
               <DYManager />
-              <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
+              <div className="min-h-screen bg-white font-sans text-zinc-900">
                 <Navbar logoText={LOGO_TEXT} />
                 <CategoriesSection />
                 <ShoppingMuse />

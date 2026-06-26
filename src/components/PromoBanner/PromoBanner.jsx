@@ -8,13 +8,6 @@ import styles from './PromoBanner.module.css';
 export const PromoBanner = ({ additionalClass = '', content, type = "main" }) => {
   const position = (content?.layout?.position || 'center').toLowerCase();
   const verticalPositionValue = (content?.v_position || content?.layout?.v_position || 'middle').toLowerCase();
-  const verticalPosition =
-    verticalPositionValue === 'top'
-      ? 'top'
-      : verticalPositionValue === 'bottom'
-        ? 'bottom'
-        : 'middle';
-
   const containerPositionClass = 
     position === 'left'
       ? styles.left
@@ -22,9 +15,9 @@ export const PromoBanner = ({ additionalClass = '', content, type = "main" }) =>
         ? styles.right
         : styles.center;
   const containerVerticalClass =
-    verticalPosition === 'top'
+    verticalPositionValue === 'top'
       ? styles.top
-      : verticalPosition === 'bottom'
+      : verticalPositionValue === 'bottom'
         ? styles.bottom
         : styles.middle;
 
@@ -33,7 +26,7 @@ export const PromoBanner = ({ additionalClass = '', content, type = "main" }) =>
   const heroButtons = Array.isArray(content?.buttons) && content.buttons.length > 0
     ? content.buttons
     : content?.cta && content?.link
-      ? [{ cta: content.cta, link: content.link }]
+      ? [{ cta: content.cta, link: content.link, style: content.style }]
       : [];
 
   const handleTrackClick = () => {
@@ -78,7 +71,7 @@ export const PromoBanner = ({ additionalClass = '', content, type = "main" }) =>
                 <Link
                   key={`${button.link || 'action'}-${index}`}
                   to={button.link}
-                  className={styles.heroCta}
+                  className={`${styles.heroCta} ${styles[button.style]}`}
                 >
                 {button.cta}
                 <ArrowRight className={styles.heroCtaIcon} />

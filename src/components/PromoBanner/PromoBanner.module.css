@@ -113,6 +113,23 @@
         text-decoration: none;
         transition: all 0.2s;
 
+        &.primary, &.secondary {
+          text-decoration: none;
+          margin: auto;
+          padding: .5rem 1rem;
+          border-radius: 8px;
+        }
+        
+        &.primary {
+          color: var(--color-white);
+          background-color: var(--color-black);
+        }
+
+        &.secondary {
+          color: var(--color-white);
+          background-color: var(--color-crimson);
+        }
+
         &:hover {
           scale: 1.05;
           .heroCtaIcon {

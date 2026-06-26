@@ -3,6 +3,11 @@
   color: var(--color-white);
   padding: 3.125rem 80px;
   margin: 0 calc(var(--app-page-padding-x) * -1);
+  
+  & *::selection {
+    background-color: var(--color-white);
+    color: var(--color-black);
+  }
 
   .footerContainer {
     margin-left: auto;
@@ -113,7 +118,7 @@
         max-width: 242px;
 
         .columnHeading {
-          font-size: 1rem;
+          font-size: 1.2rem;
           font-weight: 600;
           text-transform: capitalize;
           color: white;
@@ -136,9 +141,11 @@
             text-decoration: none;
             transition: opacity 150ms ease;
             font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
 
             &:hover {
               opacity: 0.7;
+              text-decoration: underline;
             }
           }
 
@@ -242,6 +249,7 @@
         .privacyLink {
           text-decoration: underline;
           color: white;
+          cursor: pointer;
 
           &:hover {
             opacity: 0.7;
@@ -303,10 +311,58 @@
           text-decoration: underline;
           transition: opacity 150ms ease;
           font-family: 'Roboto', sans-serif;
+          cursor: pointer;
 
           &:hover {
             opacity: 0.7;
           }
+        }
+      }
+    }
+
+    .currencySelector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      align-items: center;
+
+      .currencyOption {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.5rem;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.375rem;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.75rem;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+
+        svg, img {
+          width: 1.125rem;
+          height: 0.75rem;
+          flex-shrink: 0;
+        }
+
+        &:hover {
+          border-color: rgba(255, 255, 255, 0.6);
+          color: white;
+        }
+      }
+
+      .currencyOptionActive {
+        border-color: white;
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .currencyLabel {
+        @media (max-width: 479px) {
+          display: none;
         }
       }
     }
@@ -329,6 +385,7 @@
         justify-content: center;
         transition: opacity 150ms ease;
         text-decoration: none;
+        cursor: pointer;
 
         &:hover {
           opacity: 0.7;

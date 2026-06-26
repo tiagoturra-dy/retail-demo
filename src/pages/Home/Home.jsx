@@ -7,12 +7,14 @@ import { useCart } from '../../context/CartContext';
 import styles from './Home.module.css';
 import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
 import { BannerCarousel } from '../../components/BannerCarousel/BannerCarousel';
+import { CategoryTiles } from '../../components/CategoryTiles/CategoryTiles';
 
 export const Home = () => {
   const { cart } = useCart();
   const [recommendations, setRecommendations] = useState([]);
   const [heroBanner, setHeroBanner] = useState(null);
   const [dyBanner, setDyBanner] = useState(null);
+  const [categoryTilesData, setCategoryTilesData] = useState(null);
   const [blogData, setBlogData] = useState(null);
   const [categoryData, setCategoryData] = useState(null);
   const [featureBoxData, setFeatureBoxData] = useState(null);
@@ -26,12 +28,14 @@ export const Home = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [recData, heroData, dyBanner, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
+      const [recData, heroData, dyBanner, categoryTiles, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
         personalizationService.getRecommendations({groups: ['home_page_recs'], isImplicitPageview: false, cart}),
         // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
         // dy banners
         personalizationService.getPersonalizedBanners({selectors: ['hp_hero'], isImplicitPageview: false, cart}),
+        // dy category tiles
+        personalizationService.getPersonalizedBanners({groups: ['hp_category_tiles'], isImplicitPageview: false, cart}),
         // blog posts
         contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
         // featured categories
@@ -44,6 +48,7 @@ export const Home = () => {
       setRecommendations(recData);
       setHeroBanner(heroData);
       setDyBanner(dyBanner);
+      setCategoryTilesData(categoryTiles?.choices?.[0] ?? null);
       setBlogData(blogData);
       setCategoryData(categoryData);
       setFeatureBoxData(featureBoxData);
@@ -86,6 +91,12 @@ export const Home = () => {
       ) : promoBannerData ? (
         <PromoBanner id="dy-banner-1" additionalClass='dy-home-banner' content={transformCSBanner(heroBanner)} type="hero" />
       ) : null}
+
+      {/* Category Tiles */}
+      {console.log('categoryTilesData:', categoryTilesData)}
+      {categoryTilesData && (
+        <CategoryTiles choice={categoryTilesData} />
+      )}
       
 
       {/* Recommendations */}

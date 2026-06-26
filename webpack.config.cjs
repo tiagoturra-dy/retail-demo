@@ -33,8 +33,9 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
+            cacheDirectory: true,
             presets: [
-              ['@babel/preset-env', { targets: "defaults" }],
+              ['@babel/preset-env', { targets: isProduction ? "defaults" : { esmodules: true } }],
               ['@babel/preset-react', { runtime: 'automatic' }]
             ]
           }
@@ -115,8 +116,12 @@ module.exports = {
         changeOrigin: true,
       },
     ],
+    watchFiles: {
+      paths: ['public/**', '!public/img/**'],
+    },
     static: {
       directory: path.join(__dirname, 'public'),
-    }
+      watch: false,
+    },
   },
 };
