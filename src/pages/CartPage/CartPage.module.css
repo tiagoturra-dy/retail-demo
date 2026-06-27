@@ -52,7 +52,16 @@
 .cartPageContainer {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 3rem 2rem;
+  padding: 1.5rem 1rem;
+  overflow-x: hidden;
+
+  @media (min-width: 640px) {
+    padding: 2rem 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 3rem 2rem;
+  }
 
   & .cartPageTitle {
     font-size: 1.75rem;

@@ -40,6 +40,10 @@
     .navButtons {
       display: flex;
       gap: 0.5rem;
+
+      @media (max-width: 768px) {
+        align-self: flex-end;
+      }
     }
 
     .navButton {

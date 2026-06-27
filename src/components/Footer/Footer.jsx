@@ -28,7 +28,7 @@ export const Footer = ({ logoText }) => {
         {/* Logo and Payment Methods */}
         <div className={s.headerSection}>
           <Link to="/" className={s.footerLogo}>
-            <BlueberryLogo size={128} />
+            <BlueberryLogo className={s.footerLogoSvg} />
           </Link>
           <div className={s.paymentMethods}>
             <span className={s.paymentBadge}>

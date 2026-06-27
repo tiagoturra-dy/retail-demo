@@ -9,6 +9,10 @@
     color: var(--color-black);
   }
 
+  @media (max-width: 768px) {
+    padding: 3.125rem 1rem;
+  }
+
   .footerContainer {
     margin-left: auto;
     margin-right: auto;
@@ -48,6 +52,22 @@
       text-decoration: none;
       letter-spacing: 0.15em;
       font-family: 'Montserrat', sans-serif;
+
+      & .footerLogoSvg {
+        height: 60px;
+        width: auto;
+        margin-bottom: 32px;
+
+        @media (min-width: 640px) {
+          height: 32px;
+          margin-bottom: 16px;
+        }
+
+        @media (min-width: 1024px) {
+          height: 40px;
+          margin-bottom: 0;
+        }
+      }
 
       svg {
         path {
