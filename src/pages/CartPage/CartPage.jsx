@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
-import { Plus, Minus, ShoppingBag, X, ChevronDown } from 'lucide-react';
+import { Plus, Minus, ShoppingBag, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { checkoutService } from '../../services/checkoutService';
 import { Helper } from '../../helpers/helper';
@@ -13,9 +13,9 @@ import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const CartPage = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, updateQuantity, totalPrice, subtotal, shippingFee, totalItems, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, subtotal, shippingFee, totalItems } = useCart();
   const { formatPrice } = useCurrency();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isCheckingOut] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [promoOpen, setPromoOpen] = useState(false);
@@ -39,14 +39,8 @@ export const CartPage = () => {
 
   const taxes = parseFloat((subtotal * 0.02).toFixed(2));
 
-  const handleCheckout = async () => {
-    setIsCheckingOut(true);
-    const result = await checkoutService.processCheckout({ cart, total: totalPrice });
-    setIsCheckingOut(false);
-    if (result.success) {
-      clearCart();
-      navigate('/thank-you', { state: { orderId: result.orderId } });
-    }
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   const handleRemoveClick = (item) => setItemToRemove(item);

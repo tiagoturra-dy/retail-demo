@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, Search, Menu, X, LogOut, LayoutDashboard, BotMessageSquare, IdCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -14,9 +14,16 @@ export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { totalItems } = useCart();
+  const { totalItems, lastAdded, clearLastAdded } = useCart();
   const { user, logout } = useAuth();
   const { openMuse } = useMuse();
+
+  // Auto-dismiss popup after 4 seconds
+  useEffect(() => {
+    if (!lastAdded) return;
+    const t = setTimeout(clearLastAdded, 4000);
+    return () => clearTimeout(t);
+  }, [lastAdded]);
 
   // Safety check for styles
   const s = styles || {};
@@ -81,6 +88,43 @@ export const Navbar = ({ logoText }) => {
                 <span className={s.cartBadge}>{totalItems}</span>
               )}
             </Link>
+
+            {/* Added to Bag popup */}
+            <AnimatePresence>
+              {lastAdded && (
+                <motion.div
+                  className={s.addedToBagPopup}
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <div className={s.popupHeader}>
+                    <span className={s.popupTitle}>Added To Bag</span>
+                  </div>
+                  <div className={s.popupItem}>
+                    <img
+                      src={lastAdded.image_url || lastAdded.image}
+                      alt={lastAdded.name}
+                      className={s.popupItemImage}
+                    />
+                    <div className={s.popupItemInfo}>
+                      <div className={s.popupItemTopRow}>
+                        <span className={s.popupItemName}>{lastAdded.name}</span>
+                        <button className={s.popupClose} onClick={clearLastAdded} aria-label="Close">✕</button>
+                      </div>
+                      {lastAdded.color && <p className={s.popupItemAttr}>Color: {lastAdded.color}</p>}
+                      {lastAdded.size && <p className={s.popupItemAttr}>Size: {lastAdded.size}</p>}
+                      <p className={s.popupItemPrice}>${lastAdded.price?.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <div className={s.popupActions}>
+                    <Link to="/cart" className={s.popupGoToBag} onClick={clearLastAdded}>GO TO BAG</Link>
+                    <Link to="/checkout" className={s.popupCheckout} onClick={clearLastAdded}>CHECKOUT</Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <button className={s.mobileToggleBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? <X className={s.actionIcon} /> : <Menu className={s.actionIcon} />}

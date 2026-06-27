@@ -11,6 +11,7 @@ import { Home } from './pages/Home/Home';
 import { CategoryPage } from './pages/CategoryPage/CategoryPage';
 import { ProductDetailPage } from './pages/ProductDetailPage/ProductDetailPage';
 import { CartPage } from './pages/CartPage/CartPage';
+import { CheckoutPage } from './pages/CheckoutPage/CheckoutPage';
 import { LoginPage } from './pages/LoginPage/LoginPage';
 import { WelcomeBackPage } from './pages/WelcomeBackPage/WelcomeBackPage';
 import { SearchResultsPage } from './pages/SearchResultsPage/SearchResultsPage';
@@ -95,6 +96,7 @@ export default function App() {
                       <Route path="/product/:productId" element={<ProductDetailPage />} />
                       <Route path="/product/:productId/*" element={<NotFoundPage />} />
                       <Route path="/cart" element={<CartPage />} />
+                      <Route path="/checkout" element={<CheckoutPage />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/welcome" element={<WelcomeBackPage />} />
                       <Route path="/admin" element={<AdminDashboardPage />} />

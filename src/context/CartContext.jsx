@@ -12,6 +12,7 @@ export const CartProvider = ({ children }) => {
     const savedCart = localStorage.getItem('retail_cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
+  const [lastAdded, setLastAdded] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('retail_cart', JSON.stringify(cart));
@@ -28,6 +29,8 @@ export const CartProvider = ({ children }) => {
       } else {
         newCart = [...prev, { ...product, quantity: 1 }];
       }
+
+      setLastAdded(product);
 
       // Trigger Dynamic Yield Event
       if (window.DY && typeof window.DY.API === 'function') {
@@ -68,6 +71,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = () => setCart([]);
+  const clearLastAdded = () => setLastAdded(null);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   let subtotal = Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
@@ -84,6 +88,8 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
+        lastAdded,
+        clearLastAdded,
         totalItems,
         subtotal,
         totalPrice,
