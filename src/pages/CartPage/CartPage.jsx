@@ -69,9 +69,6 @@ export const CartPage = () => {
   if (cart.length === 0) {
     return (
       <div className={`cart__emptyContainer ${styles.cartEmptyContainer}`}>
-        <div className={styles.cartEmptyIconWrapper}>
-          <ShoppingBag className={styles.cartEmptyIcon} />
-        </div>
         <h2 className={styles.cartEmptyTitle}>Your bag is empty</h2>
         <p className={styles.cartEmptySubtitle}>Looks like you haven't added anything to your bag yet.</p>
         <Link to="/category/all" className={styles.cartEmptyBtn}>

@@ -42,11 +42,7 @@ export const ConfirmationModal = ({
               <X className="h-5 w-5" />
             </button>
 
-            <div className={styles.modalBody}>
-              <div className={`${styles.iconWrapper} ${type === 'danger' ? styles.iconDanger : styles.iconDefault}`}>
-                <AlertTriangle className="h-7 w-7" />
-              </div>
-              
+            <div className={styles.modalBody}>              
               <h3 className={styles.title}>{title}</h3>
               <p className={styles.message}>{
                 messageParts.map((part, index) => {

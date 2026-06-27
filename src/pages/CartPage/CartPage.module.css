@@ -1,25 +1,8 @@
 /* ── Empty state ─────────────────────────────── */
 .cartEmptyContainer {
   margin: 0 auto;
-  padding: 8rem 0;
+  padding: 6rem 0;
   text-align: center;
-
-  & .cartEmptyIconWrapper {
-    width: 5rem;
-    height: 5rem;
-    background-color: var(--color-zinc-50);
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-
-    & .cartEmptyIcon {
-      width: 2.5rem;
-      height: 2.5rem;
-      color: var(--color-zinc-300);
-    }
-  }
 
   & .cartEmptyTitle {
     font-size: 1.875rem;
@@ -36,8 +19,8 @@
     display: inline-flex;
     background-color: var(--color-zinc-900);
     color: var(--color-white);
-    padding: 1rem 2rem;
-    border-radius: 9999px;
+    padding: .5rem 1rem;
+    border-radius: 8px;
     font-weight: 700;
     text-decoration: none;
     transition: background-color 0.2s;
