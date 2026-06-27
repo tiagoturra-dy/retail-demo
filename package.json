@@ -20,6 +20,7 @@
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-react": "^7.28.5",
     "@google/genai": "^1.29.0",
+    "@lucide/lab": "^0.1.2",
     "@microsoft/clarity": "^1.0.2",
     "babel-loader": "^10.1.1",
     "clsx": "^2.1.1",

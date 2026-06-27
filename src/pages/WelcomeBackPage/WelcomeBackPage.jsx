@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Award, Star, Package, User, ArrowRight } from 'lucide-react';
+import { Award, Star, Package, User, ArrowRight, MapPinned } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './WelcomeBackPage.module.css';
 
@@ -61,7 +61,7 @@ export const WelcomeBackPage = () => {
           
           <div className={styles.accountChip}>
             <div className={styles.chipIconWrapper}>
-              <User className={styles.chipIcon} />
+              <MapPinned className={styles.chipIcon} />
             </div>
             <div className={styles.chipContent}>
               <h3 className={styles.chipTitle}>Location</h3>
