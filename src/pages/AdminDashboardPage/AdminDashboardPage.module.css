@@ -14,11 +14,12 @@
   font-weight: 700;
   color: var(--color-zinc-900);
   margin-bottom: 8px;
+  font-family: var(--font-display);
 }
 
 .dashboardSubtitle {
   font-size: 1.1rem;
-  color: var(--color-zinc-500);
+  color: var(--color-zinc-900);
 }
 
 .dashboardGrid {
@@ -26,7 +27,7 @@
   grid-template-columns: 350px 1fr;
   gap: 32px;
   background: var(--color-white);
-  border-radius: 24px;
+  border-radius: 8px;
   border: 1px solid var(--color-zinc-100);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -37,7 +38,6 @@
   border-right: 1px solid var(--color-zinc-100);
   display: flex;
   flex-direction: column;
-  background: var(--color-zinc-50);
   height: 100%;
   max-height: 700px;
 }
@@ -61,7 +61,7 @@
 .searchInput {
   width: 100%;
   padding: 12px 12px 12px 40px;
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid var(--color-zinc-200);
   font-size: 0.95rem;
   outline: none;
@@ -77,7 +77,6 @@
   flex: 1;
   padding: 12px 12px 40px 12px;
   min-height: 0;
-  /* max-height: 600px; */
   height: 100%;
   overflow-y: scroll;
 }
@@ -88,7 +87,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -97,7 +96,10 @@
 }
 
 .userListItem:hover {
-  background: var(--color-zinc-100);
+  background: var(--color-zinc-50);
+  .userAvatar {
+    background: var(--color-zinc-300);
+  }
 }
 
 .userListItem.active {
@@ -108,7 +110,7 @@
 .userAvatar {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--color-zinc-200);
   display: flex;
   align-items: center;
@@ -181,7 +183,7 @@
 .largeAvatar {
   width: 80px;
   height: 80px;
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--color-zinc-900);
   color: var(--color-white);
   display: flex;
@@ -201,6 +203,7 @@
   font-size: 2rem;
   font-weight: 700;
   color: var(--color-zinc-900);
+  font-family: var(--font-display);
 }
 
 .detailEmail {
@@ -212,7 +215,7 @@
   display: inline-block;
   padding: 4px 12px;
   background: var(--color-zinc-100);
-  border-radius: 100px;
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-zinc-900);
@@ -229,10 +232,11 @@
 .statCard {
   padding: 20px;
   background: var(--color-zinc-50);
-  border-radius: 16px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 16px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
 .statIcon {
@@ -270,6 +274,7 @@
   font-weight: 700;
   color: var(--color-zinc-900);
   margin-bottom: 20px;
+  font-family: var(--font-display);
 }
 
 .interestsTags {
@@ -294,7 +299,7 @@
   padding: 16px;
   background: var(--color-white);
   border: 1px solid var(--color-zinc-200);
-  border-radius: 16px;
+  border-radius: 8px;
 }
 
 .purchaseIcon {
@@ -384,7 +389,7 @@
 .categoryLabel {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--color-zinc-500);
+  color: var(--color-zinc-900);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -402,7 +407,7 @@
   padding: 6px 12px;
   background: var(--color-white);
   border: 1px solid var(--color-zinc-200);
-  border-radius: 100px;
+  border-radius: 8px;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
