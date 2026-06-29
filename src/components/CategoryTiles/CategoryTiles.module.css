@@ -4,8 +4,12 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
@@ -24,6 +28,12 @@
     .image {
       transform: scale(1.05);
     }
+  }
+
+  @media (max-width: 767px) {
+    height: 468px;
+    margin: 0 calc(var(--app-page-padding-x) * -1);
+    gap: .5rem;
   }
 }
 

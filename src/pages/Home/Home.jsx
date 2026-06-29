@@ -16,7 +16,6 @@ export const Home = () => {
   const [dyBanner, setDyBanner] = useState(null);
   const [categoryTilesData, setCategoryTilesData] = useState(null);
   const [blogData, setBlogData] = useState(null);
-  const [categoryData, setCategoryData] = useState(null);
   const [featureBoxData, setFeatureBoxData] = useState(null);
   const [promoBannerData, setPromoBannerData] = useState(null);
 
@@ -28,7 +27,7 @@ export const Home = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [recData, heroData, dyBanner, categoryTiles, blogData, categoryData, featureBoxData, promoBanner] = await Promise.all([
+      const [recData, heroData, dyBanner, categoryTiles, blogData, featureBoxData, promoBanner] = await Promise.all([
         personalizationService.getRecommendations({groups: ['home_page_recs'], isImplicitPageview: false, cart}),
         // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
@@ -38,8 +37,6 @@ export const Home = () => {
         personalizationService.getPersonalizedBanners({groups: ['hp_category_tiles'], isImplicitPageview: false, cart}),
         // blog posts
         contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
-        // featured categories
-        contentStackService.getMultipleContent('article_box', ['bltef643043a7c5fb9b', 'blt549fadcc70f892df', 'bltccf28b95c2a9159c']),
         // feature box
         contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf']),
         // promo
@@ -50,7 +47,6 @@ export const Home = () => {
       setDyBanner(dyBanner);
       setCategoryTilesData(categoryTiles?.choices?.[0] ?? null);
       setBlogData(blogData);
-      setCategoryData(categoryData);
       setFeatureBoxData(featureBoxData);
       setPromoBannerData(promoBanner);
     };
@@ -114,50 +110,24 @@ export const Home = () => {
       }
 
       {/* Features */}
-      <section className={`dy-feature-row ${styles.tileSection} ${styles.featuresSection}`}>
+      <section className={`dy-feature-row ${styles.featuresSection}`}>
         {featureBoxData && (
-          <>
-            <div className={styles.tileGrid}>
-              {featureBoxData.map((tile, idx) => (
-                <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.tileCard}`} key={tile.uid}>
-                  <img
-                    src={tile.image.url}
-                    className={styles.tileImage}
-                    alt={tile.caption}
-                  />
-                  <div className={styles.tileOverlay} />
-                  <div className={styles.tileContent}>
-                    <h3 className={styles.tileTitle}>{tile.caption}</h3>
-                    <p className={styles.tileSubtitle}>{tile.subtitle}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Featured Categories */}
-      <section className={`dy-article-row ${styles.tileSection}`}>
-        {categoryData && (
-          <>
-            <div className={styles.tileGrid}>
-              {categoryData.map((tile, idx) => (
-                <Link to={categoryLinks[idx]} className={`dy-article-${idx} ${styles.tileCard}`} key={tile.uid}>
-                  <img
-                    src={tile.image.url}
-                    className={styles.tileImage}
-                    alt={tile.title}
-                  />
-                  <div className={styles.tileOverlay} />
-                  <div className={styles.tileContent}>
-                    <h3 className={styles.tileTitle}>{tile.title}</h3>
-                    <p className={styles.tileSubtitle}>{tile.subtitle}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </>
+          <div className={styles.featuresGrid}>
+            {featureBoxData.map((tile, idx) => (
+              <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid}>
+                <img
+                  src={tile.image.url}
+                  className={styles.featureTileImage}
+                  alt={tile.caption}
+                />
+                <div className={styles.featureTileOverlay} />
+                <div className={styles.featureTileContent}>
+                  <h3 className={styles.featureTileTitle}>{tile.caption}</h3>
+                  {tile.subtitle && <span className={styles.featureTileCta}>{tile.subtitle}</span>}
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
       </section>
 
@@ -167,26 +137,24 @@ export const Home = () => {
       ) : null}
 
       {/* Blog */}
-      <section className={`dy-blog-row ${styles.tileSection}`}>
+      <section className={`dy-blog-row ${styles.blogSection}`}>
         {blogData && (
-          <>
-            <div className={styles.tileGrid}>
-              {blogData.map((tile, idx) => (
-                <div className={`dy-blog-${idx} ${styles.tileCard}`} key={tile.uid}>
-                  <img
-                    src={tile.image.url}
-                    className={styles.tileImage}
-                    alt={tile.title}
-                  />
-                  <div className={styles.tileOverlay} />
-                  <div className={styles.tileContent}>
-                    <h3 className={styles.tileTitle}>{tile.title}</h3>
-                    <p className={styles.tileSubtitle}>{tile.subtitle}</p>
-                  </div>
+          <div className={styles.blogGrid}>
+            {blogData.map((post, idx) => (
+              <div
+                key={post.uid}
+                className={`dy-blog-${idx} ${styles.blogItem} ${idx % 2 !== 0 ? styles.blogItemReverse : ''}`}
+              >
+                <div className={styles.blogTextBox}>
+                  <h3 className={styles.blogTitle}>{post.title}</h3>
+                  <p className={styles.blogBody}>{post.subtitle}</p>
                 </div>
-              ))}
-            </div>
-          </>
+                <div className={styles.blogImageBox}>
+                  <img src={post.image.url} className={styles.blogImage} alt={post.title} />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </section>
     </div>
