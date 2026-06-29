@@ -23,6 +23,13 @@
     display: flex;
     align-items: center;
     text-decoration: none;
+
+    @media (max-width: 1023px) {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      flex: unset;
+    }
   }
 
   .navbarLogoText {
@@ -516,9 +523,18 @@
     cursor: pointer;
     background: none;
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     @media (min-width: 1024px) {
       display: none;
+    }
+  }
+
+  .desktopOnly {
+    @media (max-width: 1023px) {
+      display: none !important;
     }
   }
 

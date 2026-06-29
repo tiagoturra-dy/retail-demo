@@ -43,6 +43,11 @@ export const Navbar = ({ logoText }) => {
     <nav className={`${s.navbar} dy-nav`}>
       <div className={s.navbarContainer}>
         <div className={s.navbarInner}>
+          {/* Hamburger — left on mobile */}
+          <button className={s.mobileToggleBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X className={s.actionIcon} /> : <Menu className={s.actionIcon} />}
+          </button>
+
           {/* Logo */}
           <Link to="/" className={s.navbarLogo}>
             <BlueberryLogo />
@@ -51,8 +56,7 @@ export const Navbar = ({ logoText }) => {
           {/* Icons & Search */}
           <div className={`dy-nav-icons ${s.navbarActions}`}>
 
-            <button onClick={() => openMuse()} className={s.actionBtn} title="Shopper Assistant" data-dy-nav-icon="muse">
-              {/* <BotMessageSquare className={`dy-nav-icon ${s.actionIcon}`} /> */}
+            <button onClick={() => openMuse()} className={`${s.actionBtn} ${s.desktopOnly}`} title="Shopper Assistant" data-dy-nav-icon="muse">
               <MuseIcon className={`dy-nav-icon ${s.actionIcon}`} color="currentColor" />
             </button>
 
@@ -61,23 +65,23 @@ export const Navbar = ({ logoText }) => {
             </button>
 
             {user && user.role === 'admin' && (
-              <Link to="/admin" className={s.actionBtn} title="Admin Dashboard" data-dy-nav-icon="admin">
+              <Link to="/admin" className={`${s.actionBtn} ${s.desktopOnly}`} title="Admin Dashboard" data-dy-nav-icon="admin">
                 <LayoutDashboard className={`dy-nav-icon ${s.actionIcon}`} />
               </Link>
             )}
 
             {user && user.role !== 'admin' && (
-              <Link to="/welcome" className={s.actionBtn} title="Dashboard" data-dy-nav-icon="dashboard">
+              <Link to="/welcome" className={`${s.actionBtn} ${s.desktopOnly}`} title="Dashboard" data-dy-nav-icon="dashboard">
                 <IdCard className={`dy-nav-icon ${s.actionIcon}`} />
               </Link>
             )}
 
             {user ? (
-              <button onClick={handleLogout} className={s.actionBtn} title="Log Out" data-dy-nav-icon="logout">
+              <button onClick={handleLogout} className={`${s.actionBtn} ${s.desktopOnly}`} title="Log Out" data-dy-nav-icon="logout">
                 <LogOut className={`dy-nav-icon ${s.actionIcon}`} />
               </button>
             ) : (
-              <Link to="/login" className={s.actionBtn} title="Log In" data-dy-nav-icon="login">
+              <Link to="/login" className={`${s.actionBtn} ${s.desktopOnly}`} title="Log In" data-dy-nav-icon="login">
                 <User className={`dy-nav-icon ${s.actionIcon}`} />
               </Link>
             )}
@@ -125,10 +129,6 @@ export const Navbar = ({ logoText }) => {
                 </motion.div>
               )}
             </AnimatePresence>
-
-            <button className={s.mobileToggleBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              {isMobileMenuOpen ? <X className={s.actionIcon} /> : <Menu className={s.actionIcon} />}
-            </button>
           </div>
         </div>
       </div>
@@ -151,6 +151,25 @@ export const Navbar = ({ logoText }) => {
               </div>
 
               <div className={s.mobileFooter}>
+                <button onClick={() => { openMuse(); setIsMobileMenuOpen(false); }} className={s.mobileAccountLink}>
+                  <MuseIcon className={s.actionIcon} color="currentColor" />
+                  <span>Shopper Assistant</span>
+                </button>
+
+                {user && user.role === 'admin' && (
+                  <Link to="/admin" className={s.mobileAccountLink} onClick={() => setIsMobileMenuOpen(false)}>
+                    <LayoutDashboard className={s.actionIcon} />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+
+                {user && user.role !== 'admin' && (
+                  <Link to="/welcome" className={s.mobileAccountLink} onClick={() => setIsMobileMenuOpen(false)}>
+                    <IdCard className={s.actionIcon} />
+                    <span>My Dashboard</span>
+                  </Link>
+                )}
+
                 {user ? (
                   <button className={s.mobileAccountLink} onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
                     <LogOut className={s.actionIcon} />
