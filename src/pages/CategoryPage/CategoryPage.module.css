@@ -1,7 +1,8 @@
 .categoryPageContainer {
+  --categoryContainerPaddingTop: 3rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 3rem 0;
+  padding: var(--categoryContainerPaddingTop) 0;
 }
 
 .categoryHeader {
