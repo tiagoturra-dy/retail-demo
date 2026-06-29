@@ -16,10 +16,10 @@ const buildBaseBody = async ({type = 'search', cart = [], isImplicitKeywordSearc
     session: { dy: '' }
   }
 
+  const browserData = await Helper.getBrowserData()
+
   switch (type) {
     case 'search':
-      const browserData = await Helper.getBrowserData()
-
       body.context.page = {
         locale: "en_US",
         type: contextType ?? context.type,
@@ -39,6 +39,27 @@ const buildBaseBody = async ({type = 'search', cart = [], isImplicitKeywordSearc
         returnAnalyticsMetadata: false,
         isImplicitClientData: true,
         isImplicitKeywordSearchEvent
+      }
+    
+    case 'category':
+      body.context.page = {
+        locale: "en_US",
+        type: contextType ?? context.type,
+        data: contextType ? [""] : context.data || [""],
+        location: window.location.href
+      }
+      body.context.device = {
+        userAgent: browserData.userAgent,
+        type: browserData.type,
+        browser: browserData.browser,
+        ip: await Helper.getPublicIpAddress(),
+        dateTime: new Date().toISOString(),
+      },
+      body.context.channel = 'WEB'
+
+      body.options = {
+        returnAnalyticsMetadata: false,
+        isImplicitClientData: true
       }
       break
   
@@ -197,6 +218,97 @@ export const searchService = {
       }
     } catch (error) {
       console.error('DY Search API Error:', error);
+    }
+
+    return null;
+  },
+  browseProducts: async ({
+    subcategories, 
+    priceRanges, 
+    sortBy, 
+    filters,
+    cart = [], 
+    numItems = 48, 
+    offset = 0, 
+    type = "search",
+    contextType = null
+  }) => {
+    const dyid = Helper.getStoredValue('_dyid');
+    const dyjsession = Helper.getStoredValue('_dyjsession');
+    
+    const baseBody = await buildBaseBody({cart, contextType})
+
+    // Dynamic Yield Browse API Call
+    try {
+      const requestBody = {
+        ...baseBody,
+        query: {
+          pagination: { "numItems": numItems, "offset": offset }
+        }
+      };
+
+      if (filters && filters.length > 0) {
+        requestBody.query.filters = filters.map(f => {
+          // Special handling for price range filter structure
+          if (f.field === 'price' && f.values?.[0] && typeof f.values[0] === 'object') {
+            return {
+              field: 'price',
+              min: f.values[0].min,
+              max: f.values[0].max
+            };
+          }
+          return f;
+        });
+      } else if (subcategories && subcategories.length > 0) {
+        requestBody.query.filters = [
+          {
+            field: "categories",
+            values: subcategories
+          }
+        ];
+      }
+
+      if (sortBy && sortBy.field !== '') {
+        requestBody.query.sortBy = sortBy
+      }
+
+      const response = await fetch(`/api/browse`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({bodyData: JSON.stringify(requestBody)})
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        const dyidFromResponse = data.cookies.filter(cookie => cookie.name === '_dyid_server')[0];
+        const dySessionFromResponse = data.cookies.filter(cookie => cookie.name === '_dyjsession')[0];
+        
+        if (dyidFromResponse) {
+          Helper.setStoredValue(
+            '_dyid', 
+            dyidFromResponse.value, 
+            dyidFromResponse.maxAge ? dyidFromResponse.maxAge / (60 * 60 * 24) : 365
+          );
+        }
+        if (dySessionFromResponse) {
+          Helper.setStoredValue(
+            '_dyjsession', 
+            dySessionFromResponse.value, 
+            dySessionFromResponse.maxAge ? dySessionFromResponse.maxAge / (60 * 60 * 24) : 365
+          );
+        }
+
+        console.log('DY Browse Response:', data);
+        data.engine = "Mastercard Dynamic Yield"
+        return data;
+      }
+    } catch (error) {
+      console.error('DY Browse API Error:', error);
     }
 
     return null;

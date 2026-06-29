@@ -71,9 +71,8 @@ export const CategoryPage = () => {
     };
 
     const [response, catData] = await Promise.all([
-      searchService.searchProducts({
+      searchService.browseProducts({
         type: 'category',
-        query: '',
         filters: apiFilters,
         sortBy: apiSort,
         cart: cartRef.current,

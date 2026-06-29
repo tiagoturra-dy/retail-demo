@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useWishlist } from '../../context/WishlistContext';
 import { Star, Heart } from 'lucide-react';
 import { personalizationService } from '../../services/personalizationService';
 import { AddToCartButton } from '../../components/AddToCartButton/AddToCartButton';
@@ -17,18 +18,12 @@ export const ProductDetailPage = () => {
   const { productId } = useParams();
   const { cart } = useCart();
   const { formatPrice } = useCurrency();
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
   const [openAccordion, setOpenAccordion] = useState('details');
   const [altImageError, setAltImageError] = useState(false);
-  const [wishlist, setWishlist] = useState(() => {
-    try {
-      return JSON.parse(Helper.getStoredValue('dyRetailDemoWishlist') || '[]');
-    } catch {
-      return [];
-    }
-  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,16 +48,16 @@ export const ProductDetailPage = () => {
 
   const handleAddToWishlist = () => {
     const sku = product.sku;
-    const updated = wishlist.includes(sku)
-      ? wishlist.filter(id => id !== sku)
-      : [...wishlist, sku];
-    setWishlist(updated);
-    Helper.setStoredValue('dyRetailDemoWishlist', JSON.stringify(updated));
-    if (updated.includes(sku)) {
-      DY.API('event', {
-        name: 'Add to Wishlist',
-        properties: { dyType: 'add-to-wishlist-v1', productId: sku },
-      });
+    if (isInWishlist(sku)) {
+      removeFromWishlist(sku);
+    } else {
+      addToWishlist({ ...product, id: sku });
+      try {
+        DY.API('event', {
+          name: 'Add to Wishlist',
+          properties: { dyType: 'add-to-wishlist-v1', productId: sku },
+        });
+      } catch {}
     }
   };
 
@@ -159,7 +154,7 @@ export const ProductDetailPage = () => {
             <button className={styles.pdpWishlistBtn} onClick={handleAddToWishlist} aria-label="Add to wishlist">
               <Heart
                 className={styles.pdpWishlistIcon}
-                style={wishlist.includes(product.sku) ? { color: 'var(--color-crimson)', fill: 'var(--color-crimson)' } : undefined}
+                style={isInWishlist(product.sku) ? { color: 'var(--color-crimson)', fill: 'var(--color-crimson)' } : undefined}
               />
             </button>
           </div>

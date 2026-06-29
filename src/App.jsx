@@ -28,6 +28,7 @@ import { MyPage } from './pages/MyPage/MyPage';
 import { ContentProvider } from './context/ContentContext';
 import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
 import { MuseProvider, useMuse } from './context/MuseContext';
+import { WishlistProvider } from './context/WishlistContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect } from 'react';
 
@@ -78,6 +79,7 @@ export default function App() {
       <ContentProvider>
         <CurrencyProvider>
           <CartProvider>
+            <WishlistProvider>
             <MuseProvider>
               <MuseGlobalBridge />
               <Router>
@@ -112,6 +114,7 @@ export default function App() {
               </div>
             </Router>
             </MuseProvider>
+            </WishlistProvider>
           </CartProvider>
         </CurrencyProvider>
       </ContentProvider>
