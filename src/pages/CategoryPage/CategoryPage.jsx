@@ -179,6 +179,7 @@ export const CategoryPage = () => {
         emptyStateText="No products found in this category."
         resetButtonLabel="Reset all filters"
         imageFilters={imageFilters}
+        totalResults={totalResults}
       />
     </div>
   );

@@ -84,8 +84,8 @@ export const ProductDetailPage = () => {
   const markdownPct = product['type:number:markdown_percent'] || 0;
   const salePrice = product.price;
   const originalPrice = markdownPct > 0 ? salePrice / (1 - markdownPct / 100) : null;
-  const rating = product.rating || productRating;
-  const reviews = product.reviews || reviewCount;
+  const rating = product['type:number:rating'] || productRating;
+  const reviews = product['type:number:reviews'] || reviewCount;
   const categories = Array.isArray(product.categories)
     ? product.categories
     : (product.categories || '').split('|').filter(Boolean);
@@ -99,7 +99,7 @@ export const ProductDetailPage = () => {
     {
       key: 'sizeFit',
       label: 'SIZE & FIT:',
-      content: 'This product fits true to size. We recommend sizing up if you prefer a relaxed fit. Model is 5\'9" and wears a Small.',
+      content: 'This product fits true to size.',
     },
     {
       key: 'delivery',

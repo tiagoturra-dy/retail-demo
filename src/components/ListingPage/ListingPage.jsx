@@ -88,9 +88,11 @@ export const ListingPage = ({
           />
         </div>
 
-        <div className={styles.totalResults}>
-          {totalResults} {totalResults === 1 ? 'item' : 'items'}
-        </div>
+        {totalResults > 0 && (
+          <div className={styles.totalResults}>
+            {totalResults} {totalResults === 1 ? 'item' : 'items'}
+          </div>
+        )}
       </div>
 
       <div className={styles.resultsArea}>

@@ -93,7 +93,7 @@ export const ProductCard = ({ product, compact = false, className = '' }) => {
           {!compact && (
             <div className={styles.productRating}>
               <Star className={styles.ratingIcon} />
-              <span className={styles.ratingText}>{product.rating || Helper.getRandomRating()} ({product.reviews || Helper.getRandomReviewCount()})</span>
+              <span className={styles.ratingText}>{product['type:number:rating'] || Helper.getRandomRating()} ({product['type:number:reviews'] || Helper.getRandomReviewCount()})</span>
             </div>
           )}
           <p className={`${styles.productPrice} ${compact ? styles.compactPrice : ''}`}>{formatPrice(product.price)}</p>

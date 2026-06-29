@@ -86,8 +86,7 @@
 
   /* Adjust PromoBanner styles when inside carousel if needed */
   @media (max-width: 768px) {
-    right: 2rem;
-    bottom: 1rem;
+    right: 1rem;
     gap: 1rem;
 
     .indicatorLine {

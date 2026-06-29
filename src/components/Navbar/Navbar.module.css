@@ -541,13 +541,38 @@
   .mobileMenu {
     position: fixed;
     inset: 0;
-    top: 5rem;
+    top: 0;
     z-index: 40;
     background-color: var(--color-white);
     overflow-y: auto;
 
     @media (min-width: 1024px) {
       display: none;
+    }
+  }
+
+  .mobileMenuHeader {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-grey-200);
+    margin-bottom: 0.5rem;
+  }
+
+  .mobileCloseBtn {
+    padding: 0.5rem;
+    color: var(--color-black);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: var(--color-grey-100);
     }
   }
 
@@ -664,7 +689,6 @@
   }
 
   .mobileFooter {
-    padding-top: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -674,7 +698,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: var(--color-grey-500);
+    color: var(--color-grey-900);
     text-decoration: none;
     background: none;
     border: none;
@@ -692,6 +716,7 @@
     background-color: var(--color-grey-100);
     border-radius: 1rem;
     padding: 1.5rem;
+    margin-top: 1rem;
   }
 
   .helpHeading {

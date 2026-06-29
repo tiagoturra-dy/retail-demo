@@ -45,7 +45,7 @@ export const Navbar = ({ logoText }) => {
         <div className={s.navbarInner}>
           {/* Hamburger — left on mobile */}
           <button className={s.mobileToggleBtn} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X className={s.actionIcon} /> : <Menu className={s.actionIcon} />}
+            <Menu className={s.actionIcon} />
           </button>
 
           {/* Logo */}
@@ -144,10 +144,10 @@ export const Navbar = ({ logoText }) => {
             className={s.mobileMenu}
           >
             <div className={s.mobileMenuContainer}>
-              <div className={s.mobileCategory}>
-                <Link to="/my-page" className={s.mobileCategoryBtn} onClick={() => setIsMobileMenuOpen(false)}>
-                  My Page
-                </Link>
+              <div className={s.mobileMenuHeader}>
+                <button className={s.mobileCloseBtn} onClick={() => setIsMobileMenuOpen(false)}>
+                  <X className={s.actionIcon} />
+                </button>
               </div>
 
               <div className={s.mobileFooter}>
