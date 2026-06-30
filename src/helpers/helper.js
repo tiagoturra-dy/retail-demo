@@ -2,6 +2,7 @@ import { matchPath } from 'react-router-dom';
 
 export const Helper = {
   getProductImage: (image) => {
+    if (!image) return '';
     return image.startsWith('/') ? `https://se-demo-retail.use1.dev.pub.dydy.io/${image}` : image
   },
   getProducCategoriesDisplay: (categories) => {

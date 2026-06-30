@@ -10,7 +10,7 @@ import { personalizationService } from '../../services/personalizationService';
 import { AddToCartButton } from '../AddToCartButton/AddToCartButton';
 import styles from './ProductCard.module.css';
 
-export const ProductCard = ({ product, compact = false, className = '' }) => {
+export const ProductCard = ({ product, compact = false, className = '', style }) => {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
@@ -51,6 +51,7 @@ export const ProductCard = ({ product, compact = false, className = '' }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className={`${className} ${styles.productCard} ${compact ? styles.compact : ''}`}
+      style={style}
     >
       <div className={styles.productImageContainer}>
         <Link to={`/product/${product.sku}`} className={styles.productCardLink} onClick={handleTrackClick} data-skyu={product.sku}>

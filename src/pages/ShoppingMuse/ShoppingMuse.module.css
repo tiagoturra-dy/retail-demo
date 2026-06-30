@@ -562,4 +562,347 @@
   }
 }
 
+/* ── V1 centred modal panel ───────────────────────────────────────── */
+.panelV1 {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: 480px;
+  max-width: calc(100vw - 2rem);
+  height: 80vh;
+  max-height: 680px;
+  min-height: 360px;
+  background-color: var(--color-white);
+  z-index: 201;
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
+/* ── Shared welcome utilities ─────────────────────────────────────── */
+.welcomeSubmitBtn {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background-color: var(--color-zinc-900);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-zinc-700);
+  }
+
+  &:disabled {
+    background-color: var(--color-zinc-200);
+    color: var(--color-zinc-500);
+    cursor: not-allowed;
+  }
+}
+
+.welcomeDisclaimer {
+  font-size: 12px;
+  color: var(--color-zinc-400);
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+  padding: 1rem;
+  background-color: var(--color-white);
+  border-top: 1px solid var(--color-grey-100);
+  flex-shrink: 0;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: .5rem;
+
+  .welcomeDisclaimerLinks {
+    color: var(--color-zinc-500);
+    text-decoration: underline;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1rem;
+    justify-content: center;
+
+    &:hover {
+      color: var(--color-zinc-700);
+    }
+  }
+}
+
+/* ── V1 welcome content ───────────────────────────────────────────── */
+.welcomeV1 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .welcomeScroll {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem 2rem;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .welcomeCloseBtn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    background: transparent;
+    border: none;
+    color: var(--color-zinc-500);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: var(--color-grey-100);
+      color: var(--color-zinc-900);
+    }
+  }
+
+  .welcomeIconWrap {
+    margin-bottom: 0.25rem;
+    margin-top: 5rem;
+  }
+
+  .welcomeIconCircle {
+    --size: 3rem;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background-color: var(--color-crimson);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+
+    svg path {
+      fill: var(--color-white);
+    }
+  }
+
+  .welcomeTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-zinc-900);
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+
+  .welcomePowered {
+    font-size: 14px;
+    color: var(--color-zinc-500);
+    margin: 0;
+  }
+
+  .welcomeForm {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .welcomeInput {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid var(--color-zinc-200);
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus {
+      border-color: var(--color-zinc-900);
+      box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.1);
+    }
+  }
+
+  .welcomeChips {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 2rem;
+
+    @media (max-width: 400px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .welcomeChip {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-zinc-200);
+    border-radius: 8px;
+    background: transparent;
+    font-size: 14px;
+    color: var(--color-zinc-700);
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color 0.15s, border-color 0.15s;
+
+    &:hover {
+      background-color: var(--color-grey-100);
+      border-color: var(--color-zinc-400);
+    }
+  }
+}
+
+/* ── V2 welcome content ───────────────────────────────────────────── */
+.welcomeV2 {
+  --welcomePadding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--color-white);
+
+  .welcomeScroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--welcomePadding);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+  }
+
+  .welcomeV2SearchWrap {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .welcomeV2Form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .welcomeV2Input {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid var(--color-zinc-200);
+    outline: none;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus {
+      border-color: var(--color-zinc-200);
+      box-shadow: none;
+    }
+  }
+
+  .welcomeV2Queries {
+    position: absolute;
+    top: auto;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: var(--color-white);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0 var(--welcomePadding);
+  }
+
+  .welcomeV2QueriesLabel {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-zinc-400);
+    margin: 0;
+    padding: 12px 24px;
+  }
+
+  .welcomeV2Query {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--color-grey-100);
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: var(--color-zinc-800);
+    text-align: left;
+    transition: background-color 0.15s;
+    width: 100%;
+
+    &:hover {
+      background-color: var(--color-grey-100);
+    }
+  }
+
+  .welcomeV2Grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+
+      & > * {
+        order: var(--desktopOrder, 0);
+      }
+    }
+  }
+
+  .welcomeV2GridItem {
+    min-width: 0;
+    overflow: hidden;
+
+    & > * {
+      width: 100%;
+    }
+  }
+
+  .welcomeV2QueryCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 1rem;
+    background-color: var(--color-grey-100);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-zinc-800);
+    text-align: center;
+    line-height: 1.3;
+    transition: background-color 0.15s;
+    width: 100%;
+
+    &:hover {
+      background-color: var(--color-zinc-200);
+    }
+
+    .aiSearchIcon {
+      color: var(--color-zinc-500);
+    }
+  }
+}

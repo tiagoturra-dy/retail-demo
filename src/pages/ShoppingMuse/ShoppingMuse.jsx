@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, RotateCcw, X, SendHorizontal } from 'lucide-react';
+import { User, RotateCcw, X, SendHorizontal, Search, Sparkles } from 'lucide-react';
 import { useMuse } from '../../context/MuseContext';
 import { MicButton } from '../../components/MicButton/MicButton';
 import { LiveMicButton } from '../../components/LiveMicButton/LiveMicButton';
@@ -16,6 +16,7 @@ import { useGroqConversation } from '../../hooks/useGroqConversation';
 import styles from './ShoppingMuse.module.css';
 import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { SmartSearchIcon } from '../../icons/SmartSearchIcon/SmartSearchIcon';
 
 const ENABLE_TYPEWRITER = false; // set to false to show full text immediately
 
@@ -25,6 +26,9 @@ const CONSTANTS = {
   RESET_CHAT: "Reset Chat",
   RESET: "Reset",
   PLACEHOLDER: "Ask me anything...",
+  WELCOME_PLACEHOLDER: "What are you looking for?",
+  POWERED_BY: "Powered by AI",
+  SUGGESTED_SEARCHES: "Suggested searches",
   THINKING: "Thinking...",
   INITIAL_BOT_MESSAGE: "I'm here to help you find the perfect products. Just tell me what you need!",
   ERROR_BOT_MESSAGE: "I'm having a bit of trouble connecting right now. Please try again in a moment.",
@@ -84,10 +88,182 @@ const MuseWidgetBlock = ({ widget }) => {
   );
 };
 
+const AiSearchIcon = () => (
+  <span className={styles.aiSearchIcon}>
+    <Search size={15} />
+    <Sparkles size={9} className={styles.aiSearchSparkle} />
+  </span>
+);
+
+const MuseDisclaimer = ({ disclaimer }) => (
+  <p className={styles.welcomeDisclaimer}>
+    <span>{disclaimer.text}</span>
+    {disclaimer.links.length > 0 && (
+      <span className={styles.welcomeDisclaimerLinks}>
+        {' '}
+        {disclaimer.links.map((link, i) => (
+          <a key={i} href={link.url} target="_blank" rel="noopener noreferrer">{link.label}</a>
+        ))}
+      </span>
+    )}
+  </p>
+);
+
+const MuseSearchForm = ({ value, onChange, onSubmit, inputRef, inputClassName, formClassName, onFocus, onBlur }) => (
+  <form onSubmit={e => { e.preventDefault(); if (value.trim()) onSubmit(value.trim()); }} className={formClassName || styles.welcomeForm}>
+    <input
+      ref={inputRef}
+      type="text"
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={CONSTANTS.WELCOME_PLACEHOLDER}
+      className={inputClassName || styles.welcomeInput}
+      onFocus={onFocus}
+      onBlur={onBlur}
+    />
+    <button type="submit" className={styles.welcomeSubmitBtn} disabled={!value.trim()}>
+      <SendHorizontal size={16} />
+    </button>
+  </form>
+);
+
+const MuseWelcomeV1 = ({ museName, trendingQueries, disclaimer, onSubmit, onClose }) => {
+  const [query, setQuery] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  return (
+    <div className={styles.welcomeV1}>
+      <div className={styles.welcomeScroll}>
+        <button className={styles.welcomeCloseBtn} onClick={onClose} aria-label="Close">
+          <X size={18} />
+        </button>
+        <div className={styles.welcomeIconWrap}>
+          <div className={styles.welcomeIconCircle}>
+            <MuseIcon color="currentColor" size={22} />
+          </div>
+        </div>
+        <h1 className={styles.welcomeTitle}>{museName}</h1>
+        <p className={styles.welcomePowered}>{CONSTANTS.POWERED_BY}</p>
+        <MuseSearchForm value={query} onChange={setQuery} onSubmit={onSubmit} inputRef={inputRef} />
+        {trendingQueries.length > 0 && (
+          <div className={styles.welcomeChips}>
+            {trendingQueries.map((q, i) => (
+              <button key={i} type="button" className={styles.welcomeChip} onClick={() => onSubmit(q)}>
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <MuseDisclaimer disclaimer={disclaimer} />
+    </div>
+  );
+};
+
+const MuseWelcomeV2 = ({ museName, trendingQueries, disclaimer, welcomeProducts, onSubmit, onClose }) => {
+  const [query, setQuery] = useState('');
+  const [inputFocused, setInputFocused] = useState(false);
+  const [dropdownTop, setDropdownTop] = useState(0);
+  const inputRef = useRef(null);
+  const containerRef = useRef(null);
+  const formRef = useRef(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const handleFocus = () => {
+    if (formRef.current && containerRef.current) {
+      const formRect = formRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+      setDropdownTop(formRect.bottom - containerRect.top);
+    }
+    setInputFocused(true);
+  };
+
+  return (
+    <>
+      <div className={styles.header}>
+        <div className={styles.headerTop}>
+          <div className={styles.logoContainer}>
+            <div className={styles.museIcon}>
+              <MuseIcon color="currentColor" size={16} />
+            </div>
+            <h1 className={styles.title}>{museName}</h1>
+          </div>
+          <div className={styles.headerActions}>
+            <button onClick={onClose} className={styles.closeButton} aria-label="Close">
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className={styles.welcomeV2} ref={containerRef}>
+        <div className={styles.welcomeScroll}>
+          <div className={styles.welcomeV2SearchWrap} ref={formRef}>
+            <MuseSearchForm
+              value={query}
+              onChange={setQuery}
+              onSubmit={onSubmit}
+              inputRef={inputRef}
+              formClassName={styles.welcomeV2Form}
+              inputClassName={styles.welcomeV2Input}
+              onFocus={handleFocus}
+              onBlur={() => setInputFocused(false)}
+            />
+          </div>
+          {(welcomeProducts.length > 0 || trendingQueries.length > 0) && (
+            <div className={styles.welcomeV2Grid}>
+              {(() => {
+                const items = [];
+                const maxLen = Math.max(welcomeProducts.length, trendingQueries.length);
+                for (let i = 0; i < maxLen; i++) {
+                  const productEl = i < welcomeProducts.length ? (
+                    <div key={`p-${i}`} className={styles.welcomeV2GridItem} style={{ '--desktopOrder': i * 2 }}>
+                      <ProductCard product={welcomeProducts[i]} compact={true} style={{ maxWidth: '100%' }} />
+                    </div>
+                  ) : null;
+                  const chipEl = i < trendingQueries.length ? (
+                    <button key={`q-${i}`} type="button" className={styles.welcomeV2QueryCard} style={{ '--desktopOrder': i * 2 + 1 }} onClick={() => onSubmit(trendingQueries[i])}>
+                      <SmartSearchIcon size={28} />
+                      <span>{trendingQueries[i]}</span>
+                    </button>
+                  ) : null;
+                  // Mobile (2-col): even rows → product left / chip right; odd rows → chip left / product right
+                  if (i % 2 === 0) {
+                    if (productEl) items.push(productEl);
+                    if (chipEl) items.push(chipEl);
+                  } else {
+                    if (chipEl) items.push(chipEl);
+                    if (productEl) items.push(productEl);
+                  }
+                }
+                return items;
+              })()}
+            </div>
+          )}
+        </div>
+        <MuseDisclaimer disclaimer={disclaimer} />
+        {trendingQueries.length > 0 && inputFocused && (
+          <div className={styles.welcomeV2Queries} style={{ top: dropdownTop }}>
+            <p className={styles.welcomeV2QueriesLabel}>{CONSTANTS.SUGGESTED_SEARCHES}</p>
+            {trendingQueries.map((q, i) => (
+              <button key={i} type="button" className={styles.welcomeV2Query} onMouseDown={e => e.preventDefault()} onClick={() => onSubmit(q)}>
+                <SmartSearchIcon size={20} />
+                <span>{q}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
 export const ShoppingMuse = () => {
   const { cart } = useCart();
   const { lang } = useCurrency();
-  const { isMuseOpen, closeMuse, pendingQuery, clearPendingQuery } = useMuse();
+  const { isMuseOpen, closeMuse, pendingQuery, clearPendingQuery, museConfig } = useMuse();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -112,6 +288,15 @@ export const ShoppingMuse = () => {
 
   const MESSAGE_MAX_LEN = 150;
 
+  const museVersion = museConfig.version;       // 'chat' | 'v1' | 'v2'
+  const museName = museConfig.museName;
+  const trendingQueries = museConfig.trendingQueries;
+  const disclaimer = museConfig.disclaimer;
+  const showWelcome = messages.length === 0 && museVersion !== 'chat';
+  const isV1 = museVersion === 'v1';
+
+  const [welcomeProducts, setWelcomeProducts] = useState([]);
+
   useEffect(() => {
     if (!lastBubbleRef.current || !messagesListRef.current) return;
     const list = messagesListRef.current;
@@ -134,6 +319,17 @@ export const ShoppingMuse = () => {
   useEffect(() => {
     isLiveMicRef.current = isLiveMic;
   }, [isLiveMic]);
+
+  useEffect(() => {
+    if (museVersion !== 'v2' || !isMuseOpen) return;
+    personalizationService.getRecommendations({ selectors: ['MuseHomeRecs'] })
+      .then(data => {
+        const rawSlots = data?.choices?.[0]?.variations?.[0]?.payload?.data?.slots || [];
+        const slots = rawSlots.map(slot => ({ ...slot, ...slot.productData }));
+        setWelcomeProducts(slots);
+      })
+      .catch(() => {});
+  }, [museVersion, isMuseOpen]);
 
   const speakBotMessage = useCallback((text, msgId) => {
     if (!window.speechSynthesis) return;
@@ -264,6 +460,9 @@ export const ShoppingMuse = () => {
       if (lastProcessedQueryRef.current === queryKey) return;
       lastProcessedQueryRef.current = queryKey;
 
+      // v1/v2 with no query: show welcome screen, don't trigger bot greeting
+      if (!q && museConfig.version !== 'chat') return;
+
       if (isLiveRedirect && q) setAutoStartLive(true);
       const augmented = isLiveRedirect && q
         ? `${CONSTANTS.LIVE_PREFIX} ${q}`
@@ -272,10 +471,12 @@ export const ShoppingMuse = () => {
       return;
     }
 
-    // Panel opened without a pending query — show initial greeting if no messages yet
+    // Panel opened without a pending query — show welcome or greeting depending on version
     if (messages.length === 0 && lastProcessedQueryRef.current === null) {
       lastProcessedQueryRef.current = '';
-      handleSendMessage('');
+      if (museConfig.version === 'chat') {
+        handleSendMessage('');
+      }
     }
   }, [isMuseOpen, pendingQuery]);
 
@@ -352,7 +553,8 @@ export const ShoppingMuse = () => {
     lastProcessedQueryRef.current = '';
     resetGroq();
     Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
-    handleSendMessage('');
+    if (museVersion === 'chat') handleSendMessage('');
+    else lastProcessedQueryRef.current = null; // allow welcome screen to re-init on next open
   };
 
   const handleSubmit = (e) => {
@@ -380,13 +582,34 @@ export const ShoppingMuse = () => {
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
+            {showWelcome ? (
+              isV1 ? (
+                <MuseWelcomeV1
+                  museName={museName}
+                  trendingQueries={trendingQueries}
+                  disclaimer={disclaimer}
+                  onSubmit={handleSendMessage}
+                  onClose={closeMuse}
+                />
+              ) : (
+                <MuseWelcomeV2
+                  museName={museName}
+                  trendingQueries={trendingQueries}
+                  disclaimer={disclaimer}
+                  welcomeProducts={welcomeProducts}
+                  onSubmit={handleSendMessage}
+                  onClose={closeMuse}
+                />
+              )
+            ) : (
+              <>
       <div className={styles.header}>
         <div className={styles.headerTop}>
           <div className={styles.logoContainer}>
             <div className={styles.museIcon}>
               <MuseIcon className={`dy-nav-icon ${styles.botIcon}`} color="currentColor" size={16} />
             </div>
-            <h1 className={styles.title}>{CONSTANTS.TITLE}</h1>
+            <h1 className={styles.title}>{museName}</h1>
           </div>
           <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
           <div className={styles.headerActions}>
@@ -513,6 +736,8 @@ export const ShoppingMuse = () => {
           </button>
         </form>
       </div>
+              </>
+            )}
           </motion.div>
         </>
       )}
