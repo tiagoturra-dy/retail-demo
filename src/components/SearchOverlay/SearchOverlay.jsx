@@ -23,14 +23,14 @@ const constants = {
   topSearchesTitle: 'Top Searches',
   recentSearchesTitle: 'Recent Searches',
   noSuggestionsText: "Couldn't find any suggestions...",
-  askAssistantTitle: 'Ask Our Assistant',
+  askAssistantTitle: 'Ask Our Stylist',
   searchResultsTitle: 'Search Results',
   recommendedTitle: 'Recommended For You',
-  museEmptyText: 'Our assistant will help you find',
+  museEmptyText: 'Our stylist will help you find',
   noResultsText: 'No results found for',
   loadingRecsText: 'Loading recommendations...',
   viewAllText: 'View all results',
-  museSearchFallbackText: 'Try our search engine instead',
+  museSearchFallbackText: 'Try our Experience Search instead',
 };
 
 export const SearchOverlay = ({ isOpen, onClose }) => {
