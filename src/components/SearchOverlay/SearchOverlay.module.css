@@ -49,7 +49,6 @@
   }
 
   .searchMain {
-    flex-grow: 1;
     overflow-y: visible;
     overflow-x: hidden;
     width: min(1282px, 100%);
@@ -58,9 +57,12 @@
     top: -3.5rem;
     position: relative;
     font-family: var(--font-body);
+    min-height: 550px;
 
     @media (max-width: 768px) {
       top: 0;
+      flex-grow: 1;
+      min-height: inherit;
     }
   }
 
