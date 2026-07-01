@@ -13,7 +13,7 @@
   width: 640px;
   max-width: 100vw;
   background-color: #f9fafb;
-  z-index: 201;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   box-shadow: -4px 0 32px rgba(0, 0, 0, 0.15);
@@ -573,7 +573,7 @@
   max-height: 680px;
   min-height: 360px;
   background-color: var(--color-white);
-  z-index: 201;
+  z-index: 9999;
   border-radius: 1.25rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   overflow: hidden;
