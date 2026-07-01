@@ -17,6 +17,22 @@ import { LiveMicButton } from '../LiveMicButton/LiveMicButton';
 import { useMuse } from '../../context/MuseContext';
 import { MuseStripBanner } from '../MuseStripBanner/MuseStripBanner';
 
+const constants = {
+  searchPlaceholder: 'Type to search...',
+  voiceTooltip: 'Voice language: English only',
+  topSearchesTitle: 'Top Searches',
+  recentSearchesTitle: 'Recent Searches',
+  noSuggestionsText: "Couldn't find any suggestions...",
+  askAssistantTitle: 'Ask Our Assistant',
+  searchResultsTitle: 'Search Results',
+  recommendedTitle: 'Recommended For You',
+  museEmptyText: 'Our assistant will help you find',
+  noResultsText: 'No results found for',
+  loadingRecsText: 'Loading recommendations...',
+  viewAllText: 'View all results',
+  museSearchFallbackText: 'Try our search engine instead',
+};
+
 export const SearchOverlay = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { openMuse } = useMuse();
@@ -233,7 +249,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Type to search..."
+                    placeholder={constants.searchPlaceholder}
                     className={styles.searchInput}
                   />
                 </form>
@@ -241,7 +257,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 <MicButton
                   onTranscript={(t) => setQuery(prev => prev ? `${prev} ${t}` : t)}
                   lang="en-US"
-                  tooltip={`Voice language: English only`}
+                  tooltip={constants.voiceTooltip}
                   className={styles.mic}
                 />
                 <LiveMicButton
@@ -260,7 +276,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 {/* Suggestions Column */}
                 <div className={styles.searchSuggestionsCol}>
                   <section>
-                    <h3 className={styles.searchSectionTitle}>Top Searches</h3>
+                    <h3 className={styles.searchSectionTitle}>{constants.topSearchesTitle}</h3>
                     <div className={styles.searchTags}>
                       {displaySuggestions.length > 0 ? displaySuggestions.map((suggestion) => (
                         <button
@@ -272,14 +288,14 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                         </button>
                       )) : 
                       (
-                        <div className={styles.suggestionsEmpty}>Couldn't find any suggestions...</div>
+                        <div className={styles.suggestionsEmpty}>{constants.noSuggestionsText}</div>
                       )}
                     </div>
                   </section>
 
                   {recentSearches.length > 0 && query.length < 3 && (
                     <section className={styles.recentSearchesSection}>
-                      <h3 className={styles.searchSectionTitle}>Recent Searches</h3>
+                      <h3 className={styles.searchSectionTitle}>{constants.recentSearchesTitle}</h3>
                       <div className={styles.recentSearchesList}>
                         {recentSearches.map((term, i) => (
                           <button
@@ -305,7 +321,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                 {/* Suggestion / Results Preview Column */}
                 <div className={styles.searchResultsCol}>
                   <h3 className={styles.searchSectionTitle}>
-                    {isMuse ? 'Ask Our Assistant' : query.length >= 3 ? 'Search Results' : 'Recommended For You'}
+                    {isMuse ? constants.askAssistantTitle : query.length >= 3 ? constants.searchResultsTitle : constants.recommendedTitle}
                   </h3>
                   <div className={styles.searchResultsList}>
                     {results.length > 0 ? (
@@ -318,8 +334,8 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                       })
                     ) : query.length >= 3 ? (
                       isMuse
-                        ? <div className={styles.searchEmpty}>Our assistant will help you find &ldquo;{query}&rdquo;</div>
-                        : <div className={styles.searchEmpty}>No results found for &ldquo;{query}&rdquo;</div>
+                        ? <div className={styles.searchEmpty}><span>{constants.museEmptyText} <q>{query}</q><button className={styles.searchFallbackLink} onClick={() => { navigate(`/search?q=${encodeURIComponent(query)}`); onClose(); }}>{constants.museSearchFallbackText}</button></span></div>
+                        : <div className={styles.searchEmpty}><span>{constants.noResultsText} <q>{query}</q></span></div>
                     ) : recommendations.length > 0 ? (
                       recommendations.map((product) => {
                         product = {...product, ...product.productData}
@@ -329,7 +345,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                         );
                       })
                     ) : (
-                      <div className={styles.searchEmpty}>Loading recommendations...</div>
+                      <div className={styles.searchEmpty}>{constants.loadingRecsText}</div>
                     )}
                   </div>
 
@@ -337,7 +353,7 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
                     <div className={styles.searchViewAllContainer}>
                       <PoweredBy />
                       <button onClick={handleSearch} className={styles.searchViewAllBtn}>
-                        View all results
+                        {constants.viewAllText}
                         <span className={`material-symbols-outlined ${styles.viewAllIcon}`}>
                           <ArrowUpRight />
                         </span>
