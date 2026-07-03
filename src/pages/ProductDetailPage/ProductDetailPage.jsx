@@ -79,7 +79,7 @@ export const ProductDetailPage = () => {
   const markdownPct = product['type:number:markdown_percent'] || 0;
   const salePrice = product.price;
   const originalPrice = markdownPct > 0 ? salePrice / (1 - markdownPct / 100) : null;
-  const rating = product['type:number:rating'] || productRating;
+  const rating = parseFloat(product['type:number:rating'] || productRating).toFixed(1);
   const reviews = product['type:number:reviews'] || reviewCount;
   const categories = Array.isArray(product.categories)
     ? product.categories

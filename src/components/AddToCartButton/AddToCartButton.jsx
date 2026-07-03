@@ -1,9 +1,10 @@
-import React from 'react';
-import { ShoppingBag } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingBag, Check } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
-export const AddToCartButton = ({ product, className, showText = false, iconClass, trackProductClick }) => {
+export const AddToCartButton = ({ product, className, showText = false, iconClass, trackProductClick, showFeedback = false }) => {
   const { addToCart } = useCart();
+  const [added, setAdded] = useState(false);
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -29,16 +30,22 @@ export const AddToCartButton = ({ product, className, showText = false, iconClas
       category, 
       subcategory 
     });
+
+    if (showFeedback) {
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2500);
+    }
   };
 
   return (
     <button
       onClick={handleAdd}
       className={className}
-      aria-label="Add to cart"
+      aria-label={added ? 'Added to cart' : 'Add to cart'}
+      disabled={added}
     >
-      <ShoppingBag className={iconClass} />
-      {showText && <span> Add to Cart</span>}
+      {added ? <Check className={iconClass} /> : <ShoppingBag className={iconClass} />}
+      {showText && <span>{added ? ' Added to cart' : ' Add to Cart'}</span>}
     </button>
   );
 };

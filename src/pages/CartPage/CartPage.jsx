@@ -13,10 +13,11 @@ import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
 
 export const CartPage = () => {
   const navigate = useNavigate();
-  const { cart, removeFromCart, updateQuantity, subtotal, shippingFee, totalItems } = useCart();
+  const { cart, removeFromCart, updateQuantity, clearCart, subtotal, shippingFee, totalItems } = useCart();
   const { formatPrice } = useCurrency();
   const [isCheckingOut] = useState(false);
   const [itemToRemove, setItemToRemove] = useState(null);
+  const [clearAllPending, setClearAllPending] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [promoOpen, setPromoOpen] = useState(false);
   const [wishlist, setWishlist] = useState(() => {
@@ -52,6 +53,11 @@ export const CartPage = () => {
     }
   };
 
+  const handleConfirmClearAll = () => {
+    clearCart();
+    setClearAllPending(false);
+  };
+
   const handleWishlist = (item) => {
     const updated = wishlist.includes(item.id)
       ? wishlist.filter(id => id !== item.id)
@@ -63,10 +69,10 @@ export const CartPage = () => {
   if (cart.length === 0) {
     return (
       <div className={`cart__emptyContainer ${styles.cartEmptyContainer}`}>
-        <h2 className={styles.cartEmptyTitle}>Your bag is empty</h2>
-        <p className={styles.cartEmptySubtitle}>Looks like you haven't added anything to your bag yet.</p>
+        <h2 className={styles.cartEmptyTitle}>Your Shopping Bag is empty</h2>
+        <p className={styles.cartEmptySubtitle}>Looks like you haven't added anything to your shopping bag yet.</p>
         <Link to="/category/all" className={styles.cartEmptyBtn}>
-          Start Shopping
+          START SHOPPING
         </Link>
       </div>
     );
@@ -74,7 +80,10 @@ export const CartPage = () => {
 
   return (
     <div className={`dy-cart-container ${styles.cartPageContainer}`}>
-      <h1 className={styles.cartPageTitle}>Shopping Bag [{totalItems}]</h1>
+      <div className={styles.cartPageTitleRow}>
+        <h1 className={styles.cartPageTitle}>Shopping Bag [{totalItems}]</h1>
+        <button className={styles.clearAllBtn} onClick={() => setClearAllPending(true)}>Clear all</button>
+      </div>
 
       <div className={styles.cartGrid}>
         {/* Cart Items */}
@@ -215,6 +224,16 @@ export const CartPage = () => {
         message={`Are you sure you want to remove "${itemToRemove?.name}" from your bag?`}
         confirmText="Remove"
         cancelText="Keep it"
+      />
+
+      <ConfirmationModal
+        isOpen={clearAllPending}
+        onClose={() => setClearAllPending(false)}
+        onConfirm={handleConfirmClearAll}
+        title="Clear bag?"
+        message="Are you sure you want to remove all items from your bag?"
+        confirmText="Clear all"
+        cancelText="Keep items"
       />
     </div>
   );

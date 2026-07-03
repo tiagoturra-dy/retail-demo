@@ -10,7 +10,7 @@ import { personalizationService } from '../../services/personalizationService';
 import { AddToCartButton } from '../AddToCartButton/AddToCartButton';
 import styles from './ProductCard.module.css';
 
-export const ProductCard = ({ product, compact = false, className = '', style }) => {
+export const ProductCard = ({ product, compact = false, className = '', style, addToCartPosition, onNavigate }) => {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
@@ -23,6 +23,7 @@ export const ProductCard = ({ product, compact = false, className = '', style })
     } else {
       console.warn('No decisionId found for product:', product.name);
     }
+    if (onNavigate) onNavigate();
   };
 
   const handleWishlistClick = (event) => {
@@ -83,20 +84,31 @@ export const ProductCard = ({ product, compact = false, className = '', style })
           {!compact && (
             <div className={styles.productRating}>
               <Star className={styles.ratingIcon} />
-              <span className={styles.ratingText}>{product['type:number:rating'] || Helper.getRandomRating()} ({product['type:number:reviews'] || Helper.getRandomReviewCount()})</span>
+              <span className={styles.ratingText}>{parseFloat(product['type:number:rating'] || Helper.getRandomRating()).toFixed(1)} ({product['type:number:reviews'] || Helper.getRandomReviewCount()})</span>
             </div>
           )}
           <p className={`${styles.productPrice} ${compact ? styles.compactPrice : ''}`}>{formatPrice(product.price)}</p>
         </div>
-        {!compact && (
+        {(!compact || addToCartPosition === 'right') && (
           <AddToCartButton 
             product={product} 
             className={styles.addToCartBtn} 
             iconClass={styles.cartIcon} 
             trackProductClick={handleTrackClick}
+            showFeedback={true}
           />
         )}
       </div>
+      {addToCartPosition === 'bottom' && (
+        <AddToCartButton
+          product={product}
+          showText={true}
+          showFeedback={true}
+          className={styles.addToCartBtnBottom}
+          iconClass={styles.cartIcon}
+          trackProductClick={handleTrackClick}
+        />
+      )}
     </motion.div>
   );
 };

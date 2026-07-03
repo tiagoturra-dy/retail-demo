@@ -36,7 +36,7 @@ const CONSTANTS = {
   LIVE_PREFIX: "Ask follow-ups before results. Confirm gender. Keep chat moving. Be brief."
 };
 
-const MuseCarousel = ({ slots, onApiReady }) => {
+const MuseCarousel = ({ slots, onApiReady, onNavigate }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     align: 'start',
     containScroll: 'trimSnaps',
@@ -52,7 +52,7 @@ const MuseCarousel = ({ slots, onApiReady }) => {
       <div className={styles.emblaContainer}>
         {slots.map((product, pIdx) => (
           <div key={product.sku || pIdx} className={styles.emblaSlide}>
-            <ProductCard product={product} compact={true} />
+            <ProductCard product={product} compact={true} addToCartPosition='bottom' onNavigate={onNavigate} />
           </div>
         ))}
       </div>
@@ -60,7 +60,7 @@ const MuseCarousel = ({ slots, onApiReady }) => {
   );
 };
 
-const MuseWidgetBlock = ({ widget }) => {
+const MuseWidgetBlock = ({ widget, onNavigate }) => {
   const emblaApiRef = useRef(null);
 
   const scrollPrev = useCallback(() => emblaApiRef.current?.scrollPrev(), []);
@@ -83,7 +83,7 @@ const MuseWidgetBlock = ({ widget }) => {
           </button>
         </div>
       </div>
-      <MuseCarousel slots={widget.slots} onApiReady={handleApiReady} />
+      <MuseCarousel slots={widget.slots} onApiReady={handleApiReady} onNavigate={onNavigate} />
     </div>
   );
 };
@@ -220,7 +220,7 @@ const MuseWelcomeV2 = ({ museName, trendingQueries, disclaimer, welcomeProducts,
                 for (let i = 0; i < maxLen; i++) {
                   const productEl = i < welcomeProducts.length ? (
                     <div key={`p-${i}`} className={styles.welcomeV2GridItem} style={{ '--desktopOrder': i * 2 }}>
-                      <ProductCard product={welcomeProducts[i]} compact={true} style={{ maxWidth: '100%' }} />
+                      <ProductCard product={welcomeProducts[i]} compact={true} addToCartPosition='right' onNavigate={closeMuse} style={{ maxWidth: '100%' }} />
                     </div>
                   ) : null;
                   const chipEl = i < trendingQueries.length ? (
@@ -662,7 +662,7 @@ export const ShoppingMuse = () => {
                   {msg.widgets && msg.widgets.length > 0 && ttsState?.msgId !== msg.id && (
                     <div className={styles.widgetsContainer}>
                       {msg.widgets.map((widget, wIdx) => (
-                        <MuseWidgetBlock key={wIdx} widget={widget} />
+                        <MuseWidgetBlock key={wIdx} widget={widget} onNavigate={closeMuse} />
                       ))}
                     </div>
                   )}

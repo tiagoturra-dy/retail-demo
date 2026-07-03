@@ -15,7 +15,7 @@ export const Helper = {
    * @param {number} precision - Number of decimal places (default is 1).
    */
   getRandomRating: (precision = 1) => {
-    const randomValue = Math.random() * 5;
+    const randomValue = 4 + Math.random() * 1; // Generates a number between 4 and 5
     return parseFloat(randomValue.toFixed(precision));
   },
   /**
