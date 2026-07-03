@@ -220,7 +220,7 @@ const MuseWelcomeV2 = ({ museName, trendingQueries, disclaimer, welcomeProducts,
                 for (let i = 0; i < maxLen; i++) {
                   const productEl = i < welcomeProducts.length ? (
                     <div key={`p-${i}`} className={styles.welcomeV2GridItem} style={{ '--desktopOrder': i * 2 }}>
-                      <ProductCard product={welcomeProducts[i]} compact={true} addToCartPosition='right' onNavigate={closeMuse} style={{ maxWidth: '100%' }} />
+                      <ProductCard product={welcomeProducts[i]} compact={true} addToCartPosition='right' onNavigate={onClose} style={{ maxWidth: '100%' }} />
                     </div>
                   ) : null;
                   const chipEl = i < trendingQueries.length ? (
