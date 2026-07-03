@@ -512,7 +512,7 @@
         transition: background-color 0.15s;
         border-radius: 8px;
 
-        &:hover { background-color: var(--color-zinc-700); }
+        &:hover { background-color: var(--color-zinc-800); }
       }
     }
   }

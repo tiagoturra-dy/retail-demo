@@ -14,7 +14,7 @@ export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { totalItems, lastAdded, clearLastAdded } = useCart();
+  const { totalItems, lastAdded, clearLastAdded, subtotal } = useCart();
   const { user, logout } = useAuth();
   const { openMuse } = useMuse();
 
@@ -89,7 +89,7 @@ export const Navbar = ({ logoText }) => {
             <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`} data-dy-nav-icon="cart">
               <ShoppingBag className={`dy-nav-icon ${s.actionIcon}`} />
               {totalItems > 0 && (
-                <span className={s.cartBadge}>{totalItems}</span>
+                <span className={`${s.cartBadge} cart-badge`} cart-total-items={totalItems || 0} cart-subtotal={subtotal}>{totalItems}</span>
               )}
             </Link>
 
