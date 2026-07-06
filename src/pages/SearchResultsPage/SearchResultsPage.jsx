@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { parseFiltersFromParams, buildParamsWithFilters } from '../../helpers/filterUrlHelper';
 import { searchService } from '../../services/searchService';
 import { ListingPage } from '../../components/ListingPage/ListingPage';
 import { useCart } from '../../context/CartContext';
@@ -16,8 +17,8 @@ export const SearchResultsPage = () => {
   const [imageFilters, setImageFilters] = useState([]);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [selectedFilters, setSelectedFilters] = useState({});
-  const [sortBy, setSortBy] = useState('');
+  const selectedFilters = useMemo(() => parseFiltersFromParams(searchParams), [searchParams]);
+  const sortBy = searchParams.get('sort') || '';
   const itemsPerPage = 48;
 
   const sortOptions = [
@@ -87,15 +88,6 @@ export const SearchResultsPage = () => {
     fetchResults();
   }, [fetchResults]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    if (searchParams.get('page')) {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.delete('page');
-      setSearchParams(newParams);
-    }
-  }, [query, selectedFilters, sortBy]);
-
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     if (page === 1) {
@@ -107,9 +99,22 @@ export const SearchResultsPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleApplyFilters = (newFilters) => {
+    const newParams = buildParamsWithFilters(searchParams, newFilters, sortBy);
+    newParams.delete('page');
+    setSearchParams(newParams);
+  };
+
+  const handleSetSortBy = (newSort) => {
+    const newParams = buildParamsWithFilters(searchParams, selectedFilters, newSort);
+    newParams.delete('page');
+    setSearchParams(newParams);
+  };
+
   const clearFilters = () => {
-    setSelectedFilters({});
-    setSortBy('');
+    const newParams = new URLSearchParams();
+    if (query) newParams.set('q', query);
+    setSearchParams(newParams);
   };
 
   const totalPages = Math.ceil(totalResults / itemsPerPage);
@@ -130,10 +135,10 @@ export const SearchResultsPage = () => {
         products={results}
         facets={facets}
         selectedFilters={selectedFilters}
-        onApplyFilters={setSelectedFilters}
+        onApplyFilters={handleApplyFilters}
         onClearAllFilters={clearFilters}
         sortBy={sortBy}
-        setSortBy={setSortBy}
+        setSortBy={handleSetSortBy}
         sortOptions={sortOptions}
         currentPage={currentPage}
         totalPages={totalPages}

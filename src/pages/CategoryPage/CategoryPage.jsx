@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { parseFiltersFromParams, buildParamsWithFilters } from '../../helpers/filterUrlHelper';
 import { catalogService } from '../../services/catalogService';
 import { searchService } from '../../services/searchService';
 import { CategoryBanner } from '../../components/CategoryBanner/CategoryBanner';
@@ -22,8 +23,8 @@ export const CategoryPage = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedFilters, setSelectedFilters] = useState({});
-  const [sortBy, setSortBy] = useState('');
+  const selectedFilters = useMemo(() => parseFiltersFromParams(searchParams), [searchParams]);
+  const sortBy = searchParams.get('sort') || '';
   const [imageFilters, setImageFilters] = useState([]);
   const itemsPerPage = 48;
 
@@ -114,15 +115,6 @@ export const CategoryPage = () => {
     fetchData();
   }, [fetchData]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    if (searchParams.get('page')) {
-      const newParams = new URLSearchParams(searchParams);
-      newParams.delete('page');
-      setSearchParams(newParams);
-    }
-  }, [categoryName, selectedFilters, sortBy]);
-
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     if (page === 1) {
@@ -134,9 +126,19 @@ export const CategoryPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleApplyFilters = (newFilters) => {
+    const newParams = buildParamsWithFilters(searchParams, newFilters, sortBy);
+    newParams.delete('page');
+    setSearchParams(newParams);
+  };
+
+  const handleSetSortBy = (newSort) => {
+    const newParams = buildParamsWithFilters(searchParams, selectedFilters, newSort);
+    newParams.delete('page');
+    setSearchParams(newParams);
+  };
+
   const clearFilters = () => {
-    setSelectedFilters({});
-    setSortBy('');
     navigate(`/category/${categoryName}`);
   };
 
@@ -167,10 +169,10 @@ export const CategoryPage = () => {
         products={products}
         facets={categoryFacets}
         selectedFilters={selectedFilters}
-        onApplyFilters={setSelectedFilters}
+        onApplyFilters={handleApplyFilters}
         onClearAllFilters={clearFilters}
         sortBy={sortBy}
-        setSortBy={setSortBy}
+        setSortBy={handleSetSortBy}
         sortOptions={sortOptions}
         currentPage={currentPage}
         totalPages={totalPages}
