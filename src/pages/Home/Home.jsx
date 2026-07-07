@@ -108,7 +108,7 @@ export const Home = () => {
         {featureBoxData && (
           <div className={styles.featuresGrid}>
             {featureBoxData.map((tile, idx) => (
-              <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid}>
+              <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
                 <img
                   src={tile.image.url}
                   className={styles.featureTileImage}
