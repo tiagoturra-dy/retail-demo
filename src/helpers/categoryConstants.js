@@ -48,15 +48,31 @@ export const CATEGORIES = [
     "sections": [
       {
         "title": "Baby",
-        "items": ["Baby Accessories", "Baby Boy Clothing", "Baby Boy Shoes", "Baby Girl Clothing", "Baby Girl Shoes", "Baby Shoes"]
+        "items": ["Accessories", "Coats & Jackets", "Outfits & Sets", "Shoes"]
+      },
+      {
+        "title": "Baby Boy",
+        "items": ["One-Piece", "Separates"]
+      },
+      {
+        "title": "Baby Girl",
+        "items": ["Coats & Jackets", "Dresses", "One-Piece", "Separates"]
       },
       {
         "title": "Boys",
-        "items": ["Boy's Accessories", "Boy's Shoes", "Boys Clothing"]
+        "items": ["Accessories", "Bottoms", "Coats & Jackets", "Shoes", "Suits & Separates", "Swimwear", "Tops"]
       },
       {
         "title": "Girls",
-        "items": ["Girl's Accessories", "Girl's Shoes", "Girls Clothing"]
+        "items": ["Accessories", "Bottoms", "Coats & Jackets", "Dresses", "Outfits & Sets", "Pajamas", "Shoes", "Swimwear & Cover-ups", "Tops"]
+      },
+      {
+        "title": "Gear & Essentials",
+        "items": ["Bath & Feeding", "Blankets & Swaddles", "Car Seats & Accessories", "Diaper Bags", "Strollers & Accessories"]
+      },
+      {
+        "title": "Dresses",
+        "items": ["Party Dresses"]
       }
     ],
     "banner": { "entryId": "bltf0329416d7716b65", "contentType": "category_banner" }
@@ -87,28 +103,44 @@ export const CATEGORIES = [
     "name": "Home",
     "sections": [
       {
-        "title": "Bathroom",
-        "items": ["Bath Mats", "Bathroom Décor & Accessories", "Robes and Slippers", "Towels"]
+        "title": "Bath",
+        "items": ["Bath Accessories", "Bath Mats", "Towels"]
       },
       {
-        "title": "Bedroom",
-        "items": ["Bedding", "Throws and Blankets"]
+        "title": "Bedding",
+        "items": ["Bedding Essentials", "Blankets & Throws", "Duvets & Shams", "Quilts & Coverlets", "Sheet Sets & Pillowcases"]
       },
       {
-        "title": "Dining",
-        "items": ["Drinkware", "Kitchenware", "Serveware", "Tableware"]
+        "title": "Dinnerware",
+        "items": ["Bowls", "Charger Plates", "Dinner Plates", "Dinnerware Sets", "Salad & Dessert Plates"]
       },
       {
-        "title": "Furniture",
-        "items": ["Bedroom Furniture", "Dining Tables & Chairs", "Home Storage", "Living Room Furniture", "Sofas & Armchairs"]
+        "title": "Drinkware & Glassware",
+        "items": ["Champagne Flutes & Glasses", "Cocktail & Martini Glasses", "Coffee Mugs & Teacups", "Decanters & Carafes", "Drinking Glasses", "Wine Glasses & Stemware"]
       },
       {
-        "title": "Gifting & Stationery",
-        "items": ["Bloomingdale's Merchandise", "Gifting Accessories", "Stationary"]
+        "title": "Home Decor",
+        "items": ["Accent Furniture & Rugs", "Books", "Bowls, Vases & Trays", "Candles & Diffusers", "Decorative Pillows", "Games & Entertainment", "Home Accents", "Picture Frames", "Plants and Flowers", "Wall Decor & Mirrors"]
       },
       {
-        "title": "Home Furnishing & Accessories",
-        "items": ["Artwork & Paintings", "Bathroom Décor & Accessories", "Bedding", "Candles & Home Fragrance", "Cushions & Poufs", "Decorative Accessories", "Lighting", "Mats And Rugs", "Mirrors", "Photo Frames & Accessories", "Rugs", "Throws & Blankets", "Towels"]
+        "title": "Kitchen",
+        "items": ["Coffee & Tea", "Kitchen Appliances", "Kitchen Tools & Accessories", "Knives"]
+      },
+      {
+        "title": "Luggage & Travel Gear",
+        "items": ["Carry-ons", "Checked Luggage", "Duffle Bags", "Travel Accessories"]
+      },
+      {
+        "title": "Serveware",
+        "items": ["Serving Bowls, Trays and Platters", "Serving Utensils & Accessories"]
+      },
+      {
+        "title": "Office & Stationery",
+        "items": ["Office & Stationery"]
+      },
+      {
+        "title": "Pet Accessories",
+        "items": ["Pet Accessories"]
       }
     ],
     "banner": { "entryId": "blt24b45ca8ba0b5548", "contentType": "category_banner" }
