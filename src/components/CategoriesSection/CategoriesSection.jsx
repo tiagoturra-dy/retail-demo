@@ -59,6 +59,7 @@ export const CategoriesSection = () => {
             key={category.name}
             className={styles.categoryItemWrapper}
             onMouseEnter={(e) => handleMouseEnter(category.name, e)}
+            data-dy-category-menu={category.name}
           >
             <Link 
               to={`/category/${category.name}`}

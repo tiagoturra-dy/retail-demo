@@ -119,6 +119,7 @@
     .megaMenuContent {
       margin-left: auto;
       margin-right: auto;
+      max-width: 1400px;
       padding-left: 2rem;
       padding-right: 2rem;
       padding-top: 1.25rem;
@@ -145,21 +146,38 @@
         }
 
         .megaMenuGrid {
-          flex: 0;
+          flex: 1;
           display: flex;
+          flex-flow: row wrap;
           align-items: flex-start;
-          justify-content: center;
+          justify-content: flex-start;
           gap: 1.5rem;
 
+          > * {
+            flex: 0 0 calc((100% - 4 * 1.5rem) / 4);
+            max-width: calc((100% - 4 * 1.5rem) / 4);
+            min-width: 120px;
+          }
+
           @media (max-width: 1023px) {
-            grid-template-columns: repeat(3, 1fr);
             gap: 2rem;
+
+            > * {
+              flex: 0 0 calc((100% - 2 * 2rem) / 3);
+              max-width: calc((100% - 2 * 2rem) / 3);
+            }
           }
 
           @media (max-width: 639px) {
-            flex-flow: column nowrap;
+            flex-direction: column;
+            flex-wrap: nowrap;
             gap: 1.5rem;
             width: 100%;
+
+            > * {
+              flex: unset;
+              max-width: unset;
+            }
           }
         }
       }
