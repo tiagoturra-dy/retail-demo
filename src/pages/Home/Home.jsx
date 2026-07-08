@@ -60,9 +60,9 @@ export const Home = () => {
         // dy category tiles
         personalizationService.getPersonalizedBanners({groups: ['hp_category_tiles'], isImplicitPageview: false, cart}),
         // blog posts
-        contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
+        fetchAmplienceContent('e69c84ae-89aa-47fe-9090-8d58fde827fc'),
         // feature box
-        contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf']),
+        fetchAmplienceContent('7fed8e7e-a4f5-41cf-b78f-25e12ab8f151'),
         //social images
         fetchAmplienceContent('5d323b25-9727-4633-934c-8adc00bd1e80'),
       ]);
@@ -140,19 +140,19 @@ export const Home = () => {
 
       {/* Features */}
       <section className={`dy-feature-row ${styles.tileSection} ${styles.featuresSection}`}>
-        {featureBoxData && (
+        {featureBoxData?.items && featureBoxData?.items.length > 0 && (
           <>
             <div className={styles.featuresGrid}>
-              {featureBoxData.map((tile, idx) => (
+              {featureBoxData.items.map((tile, idx) => (
                 <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
                   <img
-                    src={tile.image.url}
+                    src={getAmplienceImageUrl(tile?.imageholder?.image?.image)}
                     className={styles.featureTileImage}
-                    alt={tile.caption}
+                    alt={tile?.imageholder?.imageAltText}
                   />
                   <div className={styles.featureTileOverlay} />
                   <div className={styles.featureTileContent}>
-                    <h3 className={styles.featureTileTitle}>{tile.caption}</h3>
+                    <h3 className={styles.featureTileTitle}>{tile?.title}</h3>
                     <p className={styles.featureTileCta}>{tile.subtitle}</p>
                   </div>
                 </Link>
@@ -164,19 +164,19 @@ export const Home = () => {
 
       {/* Blog */}
       <section className={`dy-blog-row ${styles.blogSection}`}>
-        {blogData && (
+        {blogData?.items && blogData?.items.length > 0 && (
           <div className={styles.blogGrid}>
-            {blogData.map((post, idx) => (
+            {blogData.items.map((post, idx) => (
               <div
                 key={post.uid}
                 className={`dy-blog-${idx} ${styles.blogItem} ${idx % 2 !== 0 ? styles.blogItemReverse : ''}`}
               >
                 <div className={styles.blogTextBox}>
                   <h3 className={styles.blogTitle}>{post.title}</h3>
-                  <p className={styles.blogBody}>{post.subtitle}</p>
+                  <p className={styles.blogBody}>{post.description}</p>
                 </div>
                 <div className={styles.blogImageBox}>
-                  <img src={post.image.url} className={styles.blogImage} alt={post.title} />
+                  <img src={getAmplienceImageUrl(post?.imageholder?.image?.image)} className={styles.blogImage} alt={post.title} />
                 </div>
               </div>
             ))}
