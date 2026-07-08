@@ -44,6 +44,8 @@ export const BlogArticlePage = () => {
     fetchArticle();
   }, [articleId]);
 
+  const { openMuse } = useMuse();
+
   if (loading) return <div className={styles.state}>Loading...</div>;
   if (error) return <div className={styles.state}>{error}</div>;
   if (!article) return null;
@@ -61,8 +63,6 @@ export const BlogArticlePage = () => {
         return { label: label.trim(), prompt: (prompt ?? '').trim() };
       })
     : [];
-
-  const { openMuse } = useMuse();
 
   return (
     <article className={styles.article}>
@@ -90,7 +90,7 @@ export const BlogArticlePage = () => {
             })}
           </p>
         )}
-        
+
         {musePills.length > 0 && (
           <div className={styles.pillRow}>
             {musePills.map(({ label, prompt }) => (
