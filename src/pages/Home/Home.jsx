@@ -8,6 +8,7 @@ import styles from './Home.module.css';
 import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
 import { BannerCarousel } from '../../components/BannerCarousel/BannerCarousel';
 import { CategoryTiles } from '../../components/CategoryTiles/CategoryTiles';
+import { ContentClient } from 'dc-delivery-sdk-js';
 
 export const Home = () => {
   const { cart } = useCart();
@@ -25,6 +26,28 @@ export const Home = () => {
   ]
 
   useEffect(() => {
+    const amplienceClient = process.env.AMPLIENCE_HUB_NAME
+      ? new ContentClient({ 
+        hubName: process.env.AMPLIENCE_HUB_NAME,
+        parameters: {
+          depth: 'all',
+          format: 'inlined'
+        }
+       })
+      : null;
+
+    const fetchAmplienceContent = async (contentId) => {
+      if (!amplienceClient) {
+        return;
+      }
+      try {
+        const response = await amplienceClient.getContentItemById(contentId);
+        return response.body;
+      } catch (error) {
+        console.error('Amplience fetch failed:', error);
+      }
+    };
+
     const fetchData = async () => {
       const [recData, heroData, dyBanner, categoryTiles, blogData, featureBoxData] = await Promise.all([
         personalizationService.getRecommendations({groups: ['home_page_recs'], isImplicitPageview: false, cart}),
@@ -37,7 +60,8 @@ export const Home = () => {
         // blog posts
         contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
         // feature box
-        contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf'])
+        fetchAmplienceContent('5d323b25-9727-4633-934c-8adc00bd1e80'),
+        // contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf'])
       ]);
       setRecommendations(recData);
       setHeroBanner(heroData);
@@ -48,6 +72,13 @@ export const Home = () => {
     };
     fetchData();
   }, [cart]);
+
+  const getAmplienceImageUrl = (imageObject) => {
+    if (imageObject?.defaultHost && imageObject?.endpoint && imageObject?.name) {
+      return `https://${imageObject.defaultHost}/i/${imageObject.endpoint}/${imageObject.name}`;
+    }
+    return '';
+  };
 
   const transformCSBanner = (data) => {
     if (!data) return null
@@ -103,28 +134,6 @@ export const Home = () => {
         ))
       }
 
-      {/* Features */}
-      <section className={`dy-feature-row ${styles.featuresSection}`}>
-        {featureBoxData && (
-          <div className={styles.featuresGrid}>
-            {featureBoxData.map((tile, idx) => (
-              <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
-                <img
-                  src={tile.image.url}
-                  className={styles.featureTileImage}
-                  alt={tile.caption}
-                />
-                <div className={styles.featureTileOverlay} />
-                <div className={styles.featureTileContent}>
-                  <h3 className={styles.featureTileTitle}>{tile.caption}</h3>
-                  {tile.subtitle && <span className={styles.featureTileCta}>{tile.subtitle}</span>}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
       {/* Blog */}
       <section className={`dy-blog-row ${styles.blogSection}`}>
         {blogData && (
@@ -144,6 +153,31 @@ export const Home = () => {
               </div>
             ))}
           </div>
+        )}
+      </section>
+
+      {/* Features */}
+      <section className={`dy-feature-row ${styles.featuresSection}`}>
+        {featureBoxData && (
+          <>
+            <div className={styles.featuresHeader}>
+              <h2 className={styles.featuresTitle}>{featureBoxData?.title?.split('|')[0] || 'How You Wear It'}</h2>
+              <p className={styles.featuresSubtitle}>{featureBoxData?.title?.split('|')[1] || 'See what our clients post on socials'}</p>
+            </div>
+            {featureBoxData?.items && featureBoxData?.items.length > 0 && (
+              <div className={styles.featuresGrid}>
+                {featureBoxData.items.map((tile, idx) => (
+                  <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
+                    <img
+                      src={getAmplienceImageUrl(tile?.imageholder?.image?.image)}
+                      className={styles.featureTileImage}
+                      alt={tile?.imageholder?.imageAltText}
+                    />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

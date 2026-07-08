@@ -79,17 +79,40 @@
   width: 100%;
 
   & .featuresGrid {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 1rem;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
 
     @media (max-width: 767px) {
       margin: 0 calc(var(--app-page-padding-x) * -1);
       gap: 0.5rem;
+    }
+  }
+
+  .featuresHeader {
+    margin: 15px 0;
+    
+    .featuresTitle {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: var(--font-headline);
+      color: var(--color-black);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin: 0;
+
+      @media (max-width: 1024px) {
+        font-size: 2rem;
+      }
+    }
+
+    .featuresSubtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      font-family: var(--font-body);
+      color: var(--color-grey-800);
+      line-height: 1.5;
+      margin: 0;
     }
   }
 
@@ -99,7 +122,7 @@
     overflow: hidden;
     text-decoration: none;
     background-color: #1a1a1a;
-    max-height: 650px;
+    width: 320px;
 
     &:hover {
       & .featureTileImage {
