@@ -27,6 +27,7 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPag
 import { MyPage } from './pages/MyPage/MyPage';
 import { ContentProvider } from './context/ContentContext';
 import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
+import { BlogArticlePage } from './pages/BlogArticlePage/BlogArticlePage';
 import { MuseProvider, useMuse } from './context/MuseContext';
 import { WishlistProvider } from './context/WishlistContext';
 import Clarity from '@microsoft/clarity';
@@ -104,6 +105,7 @@ export default function App() {
                       <Route path="/admin" element={<AdminDashboardPage />} />
                       <Route path="/search" element={<SearchResultsPage />} />
                       <Route path="/muse" element={<MuseRoute />} />
+                      <Route path="/blog/:articleId" element={<BlogArticlePage />} />
                       <Route path="/thank-you" element={<ThankYouPage />} />
                       <Route path="/my-page" element={<MyPage />} />
                       <Route path="*" element={<NotFoundPage />} />

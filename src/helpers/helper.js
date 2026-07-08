@@ -1,6 +1,12 @@
 import { matchPath } from 'react-router-dom';
 
 export const Helper = {
+  getAmplienceImageUrl: (imageObject) => {
+    if (imageObject?.defaultHost && imageObject?.endpoint && imageObject?.name) {
+      return `https://${imageObject.defaultHost}/i/${imageObject.endpoint}/${imageObject.name}`;
+    }
+    return '';
+  },
   getProductImage: (image) => {
     if (!image) return '';
     return image.startsWith('/') ? `https://se-demo-retail.use1.dev.pub.dydy.io/${image}` : image

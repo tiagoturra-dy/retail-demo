@@ -9,6 +9,7 @@ import { PromoBanner } from '../../components/PromoBanner/PromoBanner';
 import { BannerCarousel } from '../../components/BannerCarousel/BannerCarousel';
 import { CategoryTiles } from '../../components/CategoryTiles/CategoryTiles';
 import { ContentClient } from 'dc-delivery-sdk-js';
+import { Helper } from '../../helpers/helper';
 
 export const Home = () => {
   const { cart } = useCart();
@@ -37,13 +38,13 @@ export const Home = () => {
        })
       : null;
 
-    const fetchAmplienceContent = async (contentId) => {
+    const fetchAmplienceContent = async (contentId, type = '') => {
       if (!amplienceClient) {
         return;
       }
       try {
         const response = await amplienceClient.getContentItemById(contentId);
-        console.log('Amplience data:', response);
+        console.log(`Amplience data for ${type || contentId}:`, response);
         return response.body;
       } catch (error) {
         console.error('Amplience fetch failed:', error);
@@ -60,11 +61,11 @@ export const Home = () => {
         // dy category tiles
         personalizationService.getPersonalizedBanners({groups: ['hp_category_tiles'], isImplicitPageview: false, cart}),
         // blog posts
-        fetchAmplienceContent('e69c84ae-89aa-47fe-9090-8d58fde827fc'),
+        fetchAmplienceContent('0d01cb20-6df3-414e-93fe-de248d118d6f', 'blog'),
         // feature box
-        fetchAmplienceContent('7fed8e7e-a4f5-41cf-b78f-25e12ab8f151'),
+        fetchAmplienceContent('7fed8e7e-a4f5-41cf-b78f-25e12ab8f151', 'featureBox'),
         //social images
-        fetchAmplienceContent('5d323b25-9727-4633-934c-8adc00bd1e80'),
+        fetchAmplienceContent('5d323b25-9727-4633-934c-8adc00bd1e80', 'socialImages'),
       ]);
       setRecommendations(recData);
       setHeroBanner(heroData);
@@ -76,13 +77,6 @@ export const Home = () => {
     };
     fetchData();
   }, [cart]);
-
-  const getAmplienceImageUrl = (imageObject) => {
-    if (imageObject?.defaultHost && imageObject?.endpoint && imageObject?.name) {
-      return `https://${imageObject.defaultHost}/i/${imageObject.endpoint}/${imageObject.name}`;
-    }
-    return '';
-  };
 
   const transformCSBanner = (data) => {
     if (!data) return null
@@ -146,8 +140,7 @@ export const Home = () => {
               {featureBoxData.items.map((tile, idx) => (
                 <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
                   <img
-                    src={getAmplienceImageUrl(tile?.imageholder?.image?.image)}
-                    className={styles.featureTileImage}
+                    src={Helper.getAmplienceImageUrl(tile?.imageholder?.image?.image)}
                     alt={tile?.imageholder?.imageAltText}
                   />
                   <div className={styles.featureTileOverlay} />
@@ -167,18 +160,19 @@ export const Home = () => {
         {blogData?.items && blogData?.items.length > 0 && (
           <div className={styles.blogGrid}>
             {blogData.items.map((post, idx) => (
-              <div
+              <Link
                 key={post.uid}
+                to={`${post.urls[0].url}`}
                 className={`dy-blog-${idx} ${styles.blogItem} ${idx % 2 !== 0 ? styles.blogItemReverse : ''}`}
               >
                 <div className={styles.blogTextBox}>
-                  <h3 className={styles.blogTitle}>{post.title}</h3>
-                  <p className={styles.blogBody}>{post.description}</p>
+                  <h3 className={styles.blogTitle}>{post.blogcontent.title}</h3>
+                  <p className={styles.blogBody}>{post.blogcontent.description}</p>
                 </div>
                 <div className={styles.blogImageBox}>
-                  <img src={getAmplienceImageUrl(post?.imageholder?.image?.image)} className={styles.blogImage} alt={post.title} />
+                  <img src={Helper.getAmplienceImageUrl(post?.blogcontent.image.image)} className={styles.blogImage} alt={post?.blogcontent.image?.altText} />
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
@@ -197,8 +191,7 @@ export const Home = () => {
                 {socialImagesData.items.map((tile, idx) => (
                   <div className={`dy-social-${idx} ${styles.socialTile}`} key={tile.uid}>
                     <img
-                      src={getAmplienceImageUrl(tile?.imageholder?.image?.image)}
-                      className={styles.socialTileImage}
+                      src={Helper.getAmplienceImageUrl(tile?.imageholder?.image?.image)}
                       alt={tile?.imageholder?.imageAltText}
                     />
                   </div>
