@@ -18,6 +18,7 @@ export const Home = () => {
   const [categoryTilesData, setCategoryTilesData] = useState(null);
   const [blogData, setBlogData] = useState(null);
   const [featureBoxData, setFeatureBoxData] = useState(null);
+  const [socialImagesData, setSocialImagesData] = useState(null);
 
   const categoryLinks = [
     '/category/Men',
@@ -42,6 +43,7 @@ export const Home = () => {
       }
       try {
         const response = await amplienceClient.getContentItemById(contentId);
+        console.log('Amplience data:', response);
         return response.body;
       } catch (error) {
         console.error('Amplience fetch failed:', error);
@@ -49,7 +51,7 @@ export const Home = () => {
     };
 
     const fetchData = async () => {
-      const [recData, heroData, dyBanner, categoryTiles, blogData, featureBoxData] = await Promise.all([
+      const [recData, heroData, dyBanner, categoryTiles, blogData, featureBoxData, socialImagesData] = await Promise.all([
         personalizationService.getRecommendations({groups: ['home_page_recs'], isImplicitPageview: false, cart}),
         // hero
         contentStackService.getContent('banner_block', 'blte0ad912575f1ee77'),
@@ -60,8 +62,9 @@ export const Home = () => {
         // blog posts
         contentStackService.getMultipleContent('copy_of_blog_post', ['bltbf00c8dfb13c8300', 'blt4ba2c94b615d42b4', 'bltdcd85d58382a3c5f']),
         // feature box
+        contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf']),
+        //social images
         fetchAmplienceContent('5d323b25-9727-4633-934c-8adc00bd1e80'),
-        // contentStackService.getMultipleContent('feature_box', ['bltb519043d64df59bd', 'blt8dcb1cfd02aadb79', 'blt734af01fcb4068cf'])
       ]);
       setRecommendations(recData);
       setHeroBanner(heroData);
@@ -69,6 +72,7 @@ export const Home = () => {
       setCategoryTilesData(categoryTiles?.choices?.[0] ?? null);
       setBlogData(blogData);
       setFeatureBoxData(featureBoxData);
+      setSocialImagesData(socialImagesData);
     };
     fetchData();
   }, [cart]);
@@ -134,6 +138,30 @@ export const Home = () => {
         ))
       }
 
+      {/* Features */}
+      <section className={`dy-feature-row ${styles.tileSection} ${styles.featuresSection}`}>
+        {featureBoxData && (
+          <>
+            <div className={styles.featuresGrid}>
+              {featureBoxData.map((tile, idx) => (
+                <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
+                  <img
+                    src={tile.image.url}
+                    className={styles.featureTileImage}
+                    alt={tile.caption}
+                  />
+                  <div className={styles.featureTileOverlay} />
+                  <div className={styles.featureTileContent}>
+                    <h3 className={styles.featureTileTitle}>{tile.caption}</h3>
+                    <p className={styles.featureTileCta}>{tile.subtitle}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+
       {/* Blog */}
       <section className={`dy-blog-row ${styles.blogSection}`}>
         {blogData && (
@@ -156,24 +184,24 @@ export const Home = () => {
         )}
       </section>
 
-      {/* Features */}
-      <section className={`dy-feature-row ${styles.featuresSection}`}>
-        {featureBoxData && (
+      {/* Social Images */}
+      <section className={`dy-social-row ${styles.socialSection}`}>
+        {socialImagesData && (
           <>
-            <div className={styles.featuresHeader}>
-              <h2 className={styles.featuresTitle}>{featureBoxData?.title?.split('|')[0] || 'How You Wear It'}</h2>
-              <p className={styles.featuresSubtitle}>{featureBoxData?.title?.split('|')[1] || 'See what our clients post on socials'}</p>
+            <div className={styles.socialHeader}>
+              <h2 className={styles.socialTitle}>{socialImagesData?.title?.split('|')[0]}</h2>
+              <p className={styles.socialSubtitle}>{socialImagesData?.title?.split('|')[1]}</p>
             </div>
-            {featureBoxData?.items && featureBoxData?.items.length > 0 && (
-              <div className={styles.featuresGrid}>
-                {featureBoxData.items.map((tile, idx) => (
-                  <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
+            {socialImagesData?.items && socialImagesData?.items.length > 0 && (
+              <div className={styles.socialGrid}>
+                {socialImagesData.items.map((tile, idx) => (
+                  <div className={`dy-social-${idx} ${styles.socialTile}`} key={tile.uid}>
                     <img
                       src={getAmplienceImageUrl(tile?.imageholder?.image?.image)}
-                      className={styles.featureTileImage}
+                      className={styles.socialTileImage}
                       alt={tile?.imageholder?.imageAltText}
                     />
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
