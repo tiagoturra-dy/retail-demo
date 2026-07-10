@@ -138,7 +138,7 @@ export const Home = () => {
           <>
             <div className={styles.featuresGrid}>
               {featureBoxData.items.map((tile, idx) => (
-                <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={tile.uid} feature-pos={idx + 1}>
+                <Link to={categoryLinks[idx]} className={`dy-feature-${idx} ${styles.featureTile}`} key={idx} feature-pos={idx + 1}>
                   <img
                     src={Helper.getAmplienceImageUrl(tile?.imageholder?.image?.image)}
                     alt={tile?.imageholder?.imageAltText}
@@ -161,7 +161,7 @@ export const Home = () => {
           <div className={styles.blogGrid}>
             {blogData.items.map((post, idx) => (
               <Link
-                key={post.uid}
+                key={idx}
                 to={`${post.urls[0].url}`}
                 className={`dy-blog-${idx} ${styles.blogItem} ${idx % 2 !== 0 ? styles.blogItemReverse : ''}`}
               >
@@ -189,7 +189,7 @@ export const Home = () => {
             {socialImagesData?.items && socialImagesData?.items.length > 0 && (
               <div className={styles.socialGrid}>
                 {socialImagesData.items.map((tile, idx) => (
-                  <div className={`dy-social-${idx} ${styles.socialTile}`} key={tile.uid}>
+                  <div className={`dy-social-${idx} ${styles.socialTile}`} key={idx}>
                     <img
                       src={Helper.getAmplienceImageUrl(tile?.imageholder?.image?.image)}
                       alt={tile?.imageholder?.imageAltText}
