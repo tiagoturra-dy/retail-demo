@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { ContentClient } from 'dc-delivery-sdk-js';
 import { CATEGORIES } from '../../helpers/categoryConstants';
-import { useContent } from '../../context/ContentContext';
+import { Helper } from '../../helpers/helper';
 import styles from './CategoriesSection.module.css';
 
 export const CategoriesSection = () => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState(0);
   const [expandedSections, setExpandedSections] = useState({});
-  const { banners, loading, fetchBanner } = useContent();
-  const containerRef = React.useRef(null);
+  const [banners, setBanners] = useState({});
+  const [loadingBanners, setLoadingBanners] = useState({});
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -28,13 +30,22 @@ export const CategoriesSection = () => {
   }, []);
 
   useEffect(() => {
-    if (hoveredCategory) {
-      const category = CATEGORIES.find(c => c.name === hoveredCategory);
-      if (category?.banner) {
-        fetchBanner(category.banner.contentType, category.banner.entryId);
-      }
-    }
-  }, [hoveredCategory, fetchBanner]);
+    if (!hoveredCategory || !process.env.AMPLIENCE_HUB_NAME) return;
+    const category = CATEGORIES.find(c => c.name === hoveredCategory);
+    const entryId = category?.banner?.entryId;
+    if (!entryId || banners[entryId] || loadingBanners[entryId]) return;
+
+    const client = new ContentClient({
+      hubName: process.env.AMPLIENCE_HUB_NAME,
+      parameters: { depth: 'all', format: 'inlined' },
+    });
+
+    setLoadingBanners(prev => ({ ...prev, [entryId]: true }));
+    client.getContentItemById(entryId)
+      .then((res) => setBanners(prev => ({ ...prev, [entryId]: res.body })))
+      .catch((err) => console.error('Amplience nav banner fetch failed:', err))
+      .finally(() => setLoadingBanners(prev => ({ ...prev, [entryId]: false })));
+  }, [hoveredCategory]);
 
   const handleMouseEnter = (categoryName, e) => {
     setHoveredCategory(categoryName);
@@ -128,8 +139,9 @@ export const CategoriesSection = () => {
                   })}
                 </div>
                 {category.banner && (() => {
-                  const bannerData = banners[category.banner.entryId];
-                  const isBannerLoading = loading[category.banner.entryId];
+                  const entryId = category.banner.entryId;
+                  const bannerData = banners[entryId];
+                  const isBannerLoading = loadingBanners[entryId];
 
                   if (isBannerLoading) {
                     return (
@@ -142,18 +154,21 @@ export const CategoriesSection = () => {
 
                   if (!bannerData) return null;
 
+                  const bannerImageUrl = Helper.getAmplienceImageUrl(bannerData?.image?.image);
+                  const bannerTitle = bannerData?.bannerText?.header;
+
                   return (
                     <div className={styles.megaMenuFeatured}>
                       <div className={styles.featuredImageContainer}>
                         <img
-                          src={bannerData.banner_image?.url}
-                          alt={bannerData.caption}
+                          src={bannerImageUrl}
+                          alt={bannerTitle}
                           className={styles.featuredImage}
                         />
                         <div className={styles.featuredOverlay} />
                         <div className={styles.featuredText}>
-                          <p className={styles.featuredLabel}>{bannerData?.caption || category.name.toUpperCase()}</p>
-                          <p className={styles.featuredTitle}>{bannerData?.subtitle || `The ${category.name} Edit`}</p>
+                          <p className={styles.featuredLabel}>{bannerTitle || category.name.toUpperCase()}</p>
+                          <p className={styles.featuredTitle}>{`The ${category.name} Edit`}</p>
                         </div>
                       </div>
                       <div className={styles.featuredOffer}>

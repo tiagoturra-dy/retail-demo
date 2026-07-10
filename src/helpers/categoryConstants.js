@@ -19,7 +19,7 @@ export const CATEGORIES = [
         "items": ["Boots", "Driving Shoes", "Formal Shoes", "Loafers", "Sandals", "Sneakers"]
       }
     ],
-    "banner": { "entryId": "blt21433dedc5524d1e", "contentType": "category_banner" }
+    "banner": { "entryId": "8ba583ee-bd61-4ab4-ad25-a6a42fad5194", "contentType": "category_banner" }
   },
   {
     "name": "Women",
@@ -41,7 +41,7 @@ export const CATEGORIES = [
         "items": ["Boots", "Flats", "Heels", "Mules", "Sandals", "Sneakers"]
       }
     ],
-    "banner": { "entryId": "bltf764523660f2080c", "contentType": "category_banner" }
+    "banner": { "entryId": "5ee12447-6bd6-49a1-bc9c-dab9f7b1052e", "contentType": "category_banner" }
   },
   {
     "name": "Kids",
@@ -75,7 +75,7 @@ export const CATEGORIES = [
         "items": ["Party Dresses"]
       }
     ],
-    "banner": { "entryId": "bltf0329416d7716b65", "contentType": "category_banner" }
+    "banner": { "entryId": "64a0c36e-93a9-4e27-9219-681ef5f36818", "contentType": "category_banner" }
   },
   {
     "name": "Beauty",
@@ -97,7 +97,7 @@ export const CATEGORIES = [
         "items": ["Male Grooming", "Skincare tools"]
       }
     ],
-    "banner": { "entryId": "blt7c148b0acf38b0ca", "contentType": "category_banner" }
+    "banner": { "entryId": "d22582f3-d362-45d2-a5a1-6c312448f897", "contentType": "category_banner" }
   },
   {
     "name": "Home",
@@ -143,6 +143,6 @@ export const CATEGORIES = [
         "items": ["Pet Accessories"]
       }
     ],
-    "banner": { "entryId": "blt24b45ca8ba0b5548", "contentType": "category_banner" }
+    "banner": { "entryId": "81234474-383c-4098-9ebf-8c5b5b4a034e", "contentType": "category_banner" }
   }
 ];
