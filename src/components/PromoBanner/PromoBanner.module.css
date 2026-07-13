@@ -60,6 +60,10 @@
 
     &.center {
       justify-content: center;
+
+      .heroTexts {
+        text-align: center;
+      }
     }
 
     &.right {

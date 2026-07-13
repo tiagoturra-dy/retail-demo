@@ -199,7 +199,7 @@ const MuseWelcomeV2 = ({ museName, trendingQueries, disclaimer, welcomeProducts,
         </div>
       </div>
       <div className={styles.welcomeV2} ref={containerRef}>
-        <div className={styles.welcomeScroll}>
+        <div className={styles.welcomeScroll} style={inputFocused ? { overflowY: 'hidden' } : undefined}>
           <div className={styles.welcomeV2SearchWrap} ref={formRef}>
             <MuseSearchForm
               value={query}

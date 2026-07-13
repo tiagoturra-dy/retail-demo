@@ -23,6 +23,7 @@ export const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
   const [openAccordion, setOpenAccordion] = useState('details');
+  const [quantity, setQuantity] = useState(1);
   const [altImageError, setAltImageError] = useState(false);
 
   useEffect(() => {
@@ -175,8 +176,14 @@ export const ProductDetailPage = () => {
 
           {/* CTA */}
           <div id="dy-action-buttons" className={styles.pdpCtaRow}>
+            <div className={styles.pdpQtyStepper}>
+              <button className={styles.pdpQtyBtn} onClick={() => setQuantity(q => Math.max(1, q - 1))} aria-label="Decrease quantity">−</button>
+              <span className={styles.pdpQtyValue}>{quantity}</span>
+              <button className={styles.pdpQtyBtn} onClick={() => setQuantity(q => q + 1)} aria-label="Increase quantity">+</button>
+            </div>
             <AddToCartButton
               product={product}
+              quantity={quantity}
               className={styles.pdpAddToCartBtn}
               iconClass={styles.pdpAddToCartIcon}
               showText={true}

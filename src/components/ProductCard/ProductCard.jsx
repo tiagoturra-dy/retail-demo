@@ -96,6 +96,7 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
             iconClass={styles.cartIcon} 
             trackProductClick={handleTrackClick}
             showFeedback={true}
+            size={compact ? 14 : 24}
           />
         )}
       </div>
@@ -107,6 +108,7 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
           className={styles.addToCartBtnBottom}
           iconClass={styles.cartIcon}
           trackProductClick={handleTrackClick}
+          size={compact ? 14 : 24}
         />
       )}
     </motion.div>

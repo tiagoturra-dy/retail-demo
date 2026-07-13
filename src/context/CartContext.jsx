@@ -18,16 +18,16 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('retail_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       let newCart;
       if (existing) {
         newCart = prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
         );
       } else {
-        newCart = [...prev, { ...product, quantity: 1 }];
+        newCart = [...prev, { ...product, quantity }];
       }
 
       setLastAdded(product);
@@ -41,7 +41,7 @@ export const CartProvider = ({ children }) => {
             value: product.price,
             currency: "USD",
             productId: String(product.id),
-            quantity: 1,
+            quantity: quantity,
             cart: newCart.map(item => ({
               productId: String(item.id),
               quantity: item.quantity,

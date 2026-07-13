@@ -1,16 +1,16 @@
-/* ========= Loading / Not Found ========= */
+﻿/* ========= Loading / Not Found ========= */
 .pdpLoading,
 .pdpNotFound {
   padding: 5rem 0;
   text-align: center;
 
-  & .pdpNotFoundTitle {
+  .pdpNotFoundTitle {
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
   }
 
-  & .pdpNotFoundLink {
+  .pdpNotFoundLink {
     color: var(--color-zinc-500);
     text-decoration: underline;
   }
@@ -21,9 +21,10 @@
   padding-bottom: 4rem;
 
   /* ========= Two-column Grid ========= */
-  & .pdpGrid {
+  .pdpGrid {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 2rem;
     margin-bottom: 48px;
 
     @media (min-width: 1024px) {
@@ -33,7 +34,7 @@
   }
 
   /* ========= Gallery (left column) ========= */
-  & .pdpGallery {
+  .pdpGallery {
     display: flex;
     flex-direction: column;
 
@@ -42,14 +43,14 @@
       top: 0;
     }
 
-    & .pdpMainImage {
+    .pdpMainImage {
       width: 100%;
       aspect-ratio: 3 / 4;
       object-fit: cover;
       display: block;
     }
 
-    & .pdpThumbnails {
+    .pdpThumbnails {
       display: none;
 
       @media (min-width: 1024px) {
@@ -59,7 +60,7 @@
         padding: 0.5rem 0 0;
       }
 
-      & .pdpThumbItem {
+      .pdpThumbItem {
         aspect-ratio: 1;
         overflow: hidden;
         cursor: pointer;
@@ -68,7 +69,7 @@
           opacity: 0.8;
         }
 
-        & .pdpThumbImg {
+        .pdpThumbImg {
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -78,7 +79,7 @@
   }
 
   /* ========= Info Panel (right column) ========= */
-  & .pdpInfo {
+  .pdpInfo {
     padding: 2rem 1rem;
 
     @media (min-width: 1024px) {
@@ -87,14 +88,14 @@
     }
 
     /* Breadcrumb */
-    & .pdpBreadcrumb {
+    .pdpBreadcrumb {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 0.375rem;
       margin-bottom: 1rem;
 
-      & .pdpBreadcrumbLink {
+      .pdpBreadcrumbLink {
         font-size: 0.6875rem;
         font-weight: 600;
         text-transform: uppercase;
@@ -107,20 +108,20 @@
         }
       }
 
-      & .pdpBreadcrumbSep {
+      .pdpBreadcrumbSep {
         font-size: 0.6875rem;
         color: var(--color-zinc-400);
       }
     }
 
     /* Title Row */
-    & .pdpTitleRow {
+    .pdpTitleRow {
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
       margin-bottom: 0.875rem;
 
-      & .pdpTitle {
+      .pdpTitle {
         flex: 1;
         font-size: 1.625rem;
         font-weight: 700;
@@ -132,7 +133,7 @@
         }
       }
 
-      & .pdpWishlistBtn {
+      .pdpWishlistBtn {
         background: none;
         border: none;
         padding: 0.125rem;
@@ -140,7 +141,7 @@
         flex-shrink: 0;
         margin-top: 0.375rem;
 
-        & .pdpWishlistIcon {
+        .pdpWishlistIcon {
           width: 1.375rem;
           height: 1.375rem;
           color: var(--color-zinc-900);
@@ -149,19 +150,19 @@
     }
 
     /* Price */
-    & .pdpPriceRow {
+    .pdpPriceRow {
       display: flex;
       align-items: baseline;
       gap: 0.75rem;
       margin-bottom: 0.5rem;
 
-      & .pdpSalePrice {
+      .pdpSalePrice {
         font-size: 1.25rem;
         font-weight: 700;
         color: var(--color-zinc-900);
       }
 
-      & .pdpOriginalPrice {
+      .pdpOriginalPrice {
         font-size: 1rem;
         color: var(--color-zinc-400);
         text-decoration: line-through;
@@ -169,18 +170,18 @@
     }
 
     /* Rating */
-    & .pdpRatingRow {
+    .pdpRatingRow {
       display: flex;
       align-items: center;
       gap: 0.625rem;
       margin-bottom: 1.5rem;
 
-      & .pdpStars {
+      .pdpStars {
         display: flex;
         align-items: center;
         gap: 0.125rem;
 
-        & .pdpStar {
+        .pdpStar {
           width: 1rem;
           height: 1rem;
 
@@ -200,17 +201,17 @@
         }
       }
 
-      & .pdpRatingText {
+      .pdpRatingText {
         font-size: 0.8125rem;
         color: var(--color-zinc-500);
       }
     }
 
     /* Generic section */
-    & .pdpSection {
+    .pdpSection {
       margin-bottom: 1.25rem;
 
-      & .pdpSectionLabel {
+      .pdpSectionLabel {
         font-size: 0.6875rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -218,19 +219,19 @@
         color: var(--color-zinc-900);
         margin-bottom: 0.625rem;
 
-        & .pdpSectionValue {
+        .pdpSectionValue {
           font-weight: 400;
           color: var(--color-zinc-600);
         }
       }
 
       /* Color Swatches */
-      & .pdpColorSwatches {
+      .pdpColorSwatches {
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
 
-        & .pdpColorSwatch {
+        .pdpColorSwatch {
           width: 1.625rem;
           height: 1.625rem;
           border-radius: 9999px;
@@ -250,12 +251,12 @@
       }
 
       /* Size Grid */
-      & .pdpSizeGrid {
+      .pdpSizeGrid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 0.5rem;
 
-        & .pdpSizeBtn {
+        .pdpSizeBtn {
           padding: 0.625rem 0.25rem;
           border: 1px solid var(--color-zinc-300);
           background: white;
@@ -301,10 +302,13 @@
     }
 
     /* CTA Row */
-    & .pdpCtaRow {
+    .pdpCtaRow {
+      display: flex;
+      align-items: stretch;
+      gap: 0.75rem;
       margin-bottom: 1rem;
 
-      & .pdpChooseSizeBtn {
+      .pdpChooseSizeBtn {
         width: 100%;
         padding: 1rem;
         background: var(--color-zinc-100);
@@ -319,9 +323,50 @@
         font-family: inherit;
       }
 
-      & .pdpAddToCartBtn {
-        width: 100%;
-        padding: 1rem;
+      .pdpQtyStepper {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--color-zinc-200);
+        border-radius: 0.25rem;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        .pdpQtyBtn {
+          width: 2.25rem;
+          background: transparent;
+          border: none;
+          font-size: 1.1rem;
+          color: var(--color-zinc-900);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          align-self: stretch;
+          transition: background-color 150ms ease;
+
+          &:hover {
+            background-color: var(--color-zinc-100);
+          }
+        }
+
+        .pdpQtyValue {
+          min-width: 2rem;
+          text-align: center;
+          font-size: 0.875rem;
+          font-weight: 500;
+          border-left: 1px solid var(--color-zinc-200);
+          border-right: 1px solid var(--color-zinc-200);
+          padding: 0 0.25rem;
+          align-self: stretch;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      .pdpAddToCartBtn {
+        flex: 1;
+        padding: 8px 24px;
         background-color: var(--color-zinc-900);
         color: white;
         border: none;
@@ -341,7 +386,7 @@
           background-color: var(--color-zinc-800);
         }
 
-        & .pdpAddToCartIcon {
+        .pdpAddToCartIcon {
           width: 1.125rem;
           height: 1.125rem;
         }
@@ -349,7 +394,7 @@
     }
 
     /* Promo Banner */
-    & .pdpPromoBanner {
+    .pdpPromoBanner {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -360,14 +405,14 @@
       gap: 1rem;
       flex-wrap: wrap;
 
-      & .pdpPromoText {
+      .pdpPromoText {
         font-size: 0.6875rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
-      & .pdpPromoSignUp {
+      .pdpPromoSignUp {
         background: none;
         border: none;
         color: white;
@@ -387,14 +432,14 @@
     }
 
     /* Accordions */
-    & .pdpAccordion {
+    .pdpAccordion {
       border-top: 1px solid var(--color-zinc-200);
 
       &.pdpAccordionLast {
         border-bottom: 1px solid var(--color-zinc-200);
       }
 
-      & .pdpAccordionHeader {
+      .pdpAccordionHeader {
         width: 100%;
         display: flex;
         align-items: center;
@@ -406,7 +451,7 @@
         text-align: left;
         gap: 1rem;
 
-        & .pdpAccordionLabel {
+        .pdpAccordionLabel {
           font-size: 16px;
           font-weight: 700;
           letter-spacing: 0.08em;
@@ -414,26 +459,26 @@
           color: var(--color-zinc-900);
         }
 
-        & .pdpAccordionIcon {
+        .pdpAccordionIcon {
           font-size: 1.125rem;
           color: var(--color-zinc-500);
           flex-shrink: 0;
           line-height: 1;
         }
 
-        & .pdpAccordionRatingSummary {
+        .pdpAccordionRatingSummary {
           display: flex;
           align-items: center;
           gap: 0.5rem;
 
-          & .pdpAccordionRatingValue {
+          .pdpAccordionRatingValue {
             font-size: 0.8125rem;
             color: var(--color-zinc-500);
           }
         }
       }
 
-      & .pdpAccordionContent {
+      .pdpAccordionContent {
         padding: 0 0 1rem;
         font-size: 0.875rem;
         color: var(--color-zinc-600);
@@ -441,428 +486,4 @@
       }
     }
   }
-}
-
-
-/* ========= Two-column Grid ========= */
-.pdpGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  margin-bottom: 48px;
-  gap: 2rem;
-
-  @media (min-width: 1024px) {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
-
-/* ========= Gallery (left column) ========= */
-.pdpGallery {
-  display: flex;
-  flex-direction: column;
-
-  @media (min-width: 1024px) {
-    position: sticky;
-    top: 0;
-  }
-}
-
-.pdpMainImage {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  display: block;
-}
-
-.pdpThumbnails {
-  display: none;
-
-  @media (min-width: 1024px) {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    padding: 0.5rem 0 0;
-  }
-}
-
-.pdpThumbItem {
-  aspect-ratio: 1;
-  overflow: hidden;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.pdpThumbImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ========= Info Panel (right column) ========= */
-.pdpInfo {
-  padding: 2rem 1rem;
-
-  @media (min-width: 1024px) {
-    padding: 2.5rem 2.5rem 2.5rem 3rem;
-    overflow-y: auto;
-  }
-}
-
-/* Breadcrumb */
-.pdpBreadcrumb {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-bottom: 1rem;
-}
-
-.pdpBreadcrumbLink {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-zinc-500);
-  text-decoration: none;
-
-  &:hover {
-    color: var(--color-zinc-900);
-  }
-}
-
-.pdpBreadcrumbSep {
-  font-size: 0.6875rem;
-  color: var(--color-zinc-400);
-}
-
-/* Title Row */
-.pdpTitleRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.875rem;
-}
-
-.pdpTitle {
-  flex: 1;
-  font-size: 1.625rem;
-  font-weight: 700;
-  color: var(--color-zinc-900);
-  line-height: 1.2;
-
-  @media (min-width: 1024px) {
-    font-size: 1.875rem;
-  }
-}
-
-.pdpWishlistBtn {
-  background: none;
-  border: none;
-  padding: 0.125rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 0.375rem;
-}
-
-.pdpWishlistIcon {
-  width: 1.375rem;
-  height: 1.375rem;
-  color: var(--color-zinc-900);
-}
-
-/* Price */
-.pdpPriceRow {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.pdpSalePrice {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-zinc-900);
-}
-
-.pdpOriginalPrice {
-  font-size: 1rem;
-  color: var(--color-zinc-400);
-  text-decoration: line-through;
-}
-
-/* Rating */
-.pdpRatingRow {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  margin-bottom: 1.5rem;
-}
-
-.pdpStars {
-  display: flex;
-  align-items: center;
-  gap: 0.125rem;
-}
-
-.pdpStar {
-  width: 1rem;
-  height: 1rem;
-
-  &.pdpStarSm {
-    width: 0.8125rem;
-    height: 0.8125rem;
-  }
-
-  &.pdpStarFilled {
-    fill: var(--color-yellow-400);
-    color: var(--color-yellow-400);
-  }
-
-  &.pdpStarEmpty {
-    color: var(--color-zinc-200);
-  }
-}
-
-.pdpRatingText {
-  font-size: 0.8125rem;
-  color: var(--color-zinc-500);
-}
-
-/* Generic section spacing */
-.pdpSection {
-  margin-bottom: 1.25rem;
-}
-
-.pdpSectionLabel {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-zinc-900);
-  margin-bottom: 0.625rem;
-}
-
-.pdpSectionValue {
-  font-weight: 400;
-  color: var(--color-zinc-600);
-}
-
-/* Color Swatches */
-.pdpColorSwatches {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.pdpColorSwatch {
-  width: 1.625rem;
-  height: 1.625rem;
-  border-radius: 9999px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  padding: 0;
-  transition: box-shadow 150ms ease;
-
-  &:hover {
-    box-shadow: 0 0 0 2px var(--color-zinc-300);
-  }
-
-  &.pdpColorSwatchActive {
-    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--color-zinc-900);
-  }
-}
-
-/* Size Grid */
-.pdpSizeGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-}
-
-.pdpSizeBtn {
-  padding: 0.625rem 0.25rem;
-  border: 1px solid var(--color-zinc-300);
-  background: white;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  border-radius: 0.25rem;
-  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
-
-  &:hover:not(:disabled) {
-    border-color: var(--color-zinc-700);
-  }
-
-  &.pdpSizeBtnActive {
-    border-color: var(--color-zinc-900);
-    background-color: var(--color-zinc-900);
-    color: white;
-  }
-
-  &.pdpSizeBtnOos {
-    color: var(--color-zinc-300);
-    cursor: not-allowed;
-    position: relative;
-    overflow: hidden;
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom right,
-        transparent calc(50% - 0.5px),
-        var(--color-zinc-200) calc(50% - 0.5px),
-        var(--color-zinc-200) calc(50% + 0.5px),
-        transparent calc(50% + 0.5px)
-      );
-    }
-  }
-}
-
-/* CTA Row */
-.pdpCtaRow {
-  margin-bottom: 1rem;
-}
-
-.pdpChooseSizeBtn {
-  width: 100%;
-  padding: 1rem;
-  background: var(--color-zinc-100);
-  color: var(--color-zinc-400);
-  border: 1px solid var(--color-zinc-200);
-  border-radius: 0.25rem;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: not-allowed;
-  font-family: inherit;
-}
-
-.pdpAddToCartBtn {
-  width: 100%;
-  padding: 1rem;
-  background-color: var(--color-zinc-900);
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background-color 150ms ease;
-
-  &:hover {
-    background-color: var(--color-zinc-800);
-  }
-}
-
-.pdpAddToCartIcon {
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-/* Promo Banner */
-.pdpPromoBanner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #501122;
-  color: white;
-  padding: 0.875rem 1.25rem;
-  margin-bottom: 0.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.pdpPromoText {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.pdpPromoSignUp {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  font-family: inherit;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-/* Accordions */
-.pdpAccordion {
-  border-top: 1px solid var(--color-zinc-200);
-
-  &.pdpAccordionLast {
-    border-bottom: 1px solid var(--color-zinc-200);
-  }
-}
-
-.pdpAccordionHeader {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  gap: 1rem;
-}
-
-.pdpAccordionLabel {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-zinc-900);
-}
-
-.pdpAccordionIcon {
-  font-size: 1.125rem;
-  color: var(--color-zinc-500);
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.pdpAccordionRatingSummary {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.pdpAccordionRatingValue {
-  font-size: 0.8125rem;
-  color: var(--color-zinc-500);
-}
-
-.pdpAccordionContent {
-  padding: 0 0 1rem;
-  font-size: 0.875rem;
-  color: var(--color-zinc-600);
-  line-height: 1.65;
 }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Check } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { AddToBagIcon } from '../../icons/AddToBagIcon/AddToBagIcon';
 
-export const AddToCartButton = ({ product, className, showText = false, iconClass, trackProductClick, showFeedback = false }) => {
+export const AddToCartButton = ({ product, quantity = 1, className, showText = false, iconClass, trackProductClick, showFeedback = false, size = 24 }) => {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
 
@@ -29,7 +30,7 @@ export const AddToCartButton = ({ product, className, showText = false, iconClas
       image, 
       category, 
       subcategory 
-    });
+    }, quantity);
 
     if (showFeedback) {
       setAdded(true);
@@ -44,7 +45,10 @@ export const AddToCartButton = ({ product, className, showText = false, iconClas
       aria-label={added ? 'Added to cart' : 'Add to cart'}
       disabled={added}
     >
-      {added ? <Check className={iconClass} /> : <ShoppingBag className={iconClass} />}
+      {added ? 
+        <Check className={iconClass} /> : 
+        <AddToBagIcon size={size} className={iconClass} />
+      }
       {showText && <span>{added ? ' Added to cart' : ' Add to Cart'}</span>}
     </button>
   );
