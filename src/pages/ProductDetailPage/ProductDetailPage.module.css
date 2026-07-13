@@ -123,29 +123,20 @@
 
       .pdpTitle {
         flex: 1;
-        font-size: 1.625rem;
+        font-size: 48px;
         font-weight: 700;
         color: var(--color-zinc-900);
         line-height: 1.2;
+        font-family: var(--font-display);
 
-        @media (min-width: 1024px) {
+        @media (max-width: 1024px) {
           font-size: 1.875rem;
         }
       }
 
       .pdpWishlistBtn {
-        background: none;
-        border: none;
-        padding: 0.125rem;
-        cursor: pointer;
         flex-shrink: 0;
         margin-top: 0.375rem;
-
-        .pdpWishlistIcon {
-          width: 1.375rem;
-          height: 1.375rem;
-          color: var(--color-zinc-900);
-        }
       }
     }
 
@@ -169,37 +160,38 @@
       }
     }
 
+    /* Stars (shared — used in rating row and reviews accordion) */
+    .pdpStars {
+      display: flex;
+      align-items: center;
+      gap: 0.125rem;
+    }
+
+    .pdpStar {
+      width: 1rem;
+      height: 1rem;
+
+      &.pdpStarSm {
+        width: 0.8125rem;
+        height: 0.8125rem;
+      }
+
+      &.pdpStarFilled {
+        fill: var(--color-yellow-400);
+        color: var(--color-yellow-400);
+      }
+
+      &.pdpStarEmpty {
+        color: var(--color-zinc-200);
+      }
+    }
+
     /* Rating */
     .pdpRatingRow {
       display: flex;
       align-items: center;
       gap: 0.625rem;
       margin-bottom: 1.5rem;
-
-      .pdpStars {
-        display: flex;
-        align-items: center;
-        gap: 0.125rem;
-
-        .pdpStar {
-          width: 1rem;
-          height: 1rem;
-
-          &.pdpStarSm {
-            width: 0.8125rem;
-            height: 0.8125rem;
-          }
-
-          &.pdpStarFilled {
-            fill: var(--color-yellow-400);
-            color: var(--color-yellow-400);
-          }
-
-          &.pdpStarEmpty {
-            color: var(--color-zinc-200);
-          }
-        }
-      }
 
       .pdpRatingText {
         font-size: 0.8125rem;
@@ -439,6 +431,16 @@
         border-bottom: 1px solid var(--color-zinc-200);
       }
 
+      &.pdpAccordionReviews {
+        .pdpAccordionHeader {
+          cursor: default;
+          .pdpAccordionLabel {
+            font-weight: 400;
+            cursor: default;
+          }
+        }
+      }
+
       .pdpAccordionHeader {
         width: 100%;
         display: flex;
@@ -470,6 +472,7 @@
           display: flex;
           align-items: center;
           gap: 0.5rem;
+          cursor: default;
 
           .pdpAccordionRatingValue {
             font-size: 0.8125rem;

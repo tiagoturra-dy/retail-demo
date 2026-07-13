@@ -1,0 +1,23 @@
+.wishlistBtn {
+  background: none;
+  border: none;
+  padding: 0.125rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-zinc-900);
+  transition: transform 0.2s, color 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+    color: var(--color-crimson);
+  }
+}
+
+.wishlistIcon {
+  width: 1.375rem;
+  height: 1.375rem;
+  stroke-width: 1.8;
+}

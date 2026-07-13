@@ -3,10 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import { catalogService } from '../../services/catalogService';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
-import { useWishlist } from '../../context/WishlistContext';
-import { Star, Heart } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { personalizationService } from '../../services/personalizationService';
 import { AddToCartButton } from '../../components/AddToCartButton/AddToCartButton';
+import { AddToWishlistButton } from '../../components/AddToWishlistButton/AddToWishlistButton';
 import styles from './ProductDetailPage.module.css';
 import { Helper } from '../../helpers/helper';
 import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
@@ -18,7 +18,6 @@ export const ProductDetailPage = () => {
   const { productId } = useParams();
   const { cart } = useCart();
   const { formatPrice } = useCurrency();
-  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
@@ -46,21 +45,6 @@ export const ProductDetailPage = () => {
     };
     fetchProduct();
   }, [productId]);
-
-  const handleAddToWishlist = () => {
-    const sku = product.sku;
-    if (isInWishlist(sku)) {
-      removeFromWishlist(sku);
-    } else {
-      addToWishlist({ ...product, id: sku });
-      try {
-        DY.API('event', {
-          name: 'Add to Wishlist',
-          properties: { dyType: 'add-to-wishlist-v1', productId: sku },
-        });
-      } catch {}
-    }
-  };
 
   const toggleAccordion = (key) => setOpenAccordion(prev => prev === key ? null : key);
 
@@ -152,12 +136,7 @@ export const ProductDetailPage = () => {
           {/* Title + Wishlist */}
           <div className={styles.pdpTitleRow}>
             <h1 className={styles.pdpTitle}>{product.name}</h1>
-            <button className={styles.pdpWishlistBtn} onClick={handleAddToWishlist} aria-label="Add to wishlist">
-              <Heart
-                className={styles.pdpWishlistIcon}
-                style={isInWishlist(product.sku) ? { color: 'var(--color-crimson)', fill: 'var(--color-crimson)' } : undefined}
-              />
-            </button>
+            <AddToWishlistButton product={product} className={styles.pdpWishlistBtn} />
           </div>
 
           {/* Price */}
@@ -210,7 +189,7 @@ export const ProductDetailPage = () => {
           ))}
 
           {/* Reviews accordion */}
-          <div className={`${styles.pdpAccordion} ${styles.pdpAccordionLast}`}>
+          <div className={`${styles.pdpAccordion} ${styles.pdpAccordionLast} ${styles.pdpAccordionReviews}`}>
             <div className={styles.pdpAccordionHeader}>
               <span className={styles.pdpAccordionLabel}>REVIEWS [{reviews}]</span>
               <div className={styles.pdpAccordionRatingSummary}>
