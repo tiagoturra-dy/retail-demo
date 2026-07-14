@@ -106,7 +106,7 @@ export const CategoriesSection = () => {
                     return (
                       <div key={section.title} className={styles.subcategorySection}>
                         <Link 
-                          to={`/category/${category.name}?sub=${section.title}`}
+                          to={`/category/${category.name}?sub=${encodeURIComponent(section.title)}`}
                           className={styles.subcategoryTitle}
                           onClick={() => setHoveredCategory(null)}
                         >
@@ -116,7 +116,7 @@ export const CategoriesSection = () => {
                           {visibleItems.map((item) => (
                             <Link 
                               key={item}
-                              to={`/category/${category.name}?sub=${section.title}&item=${item}`}
+                              to={`/category/${category.name}?sub=${encodeURIComponent(section.title)}&item=${encodeURIComponent(item)}`}
                               className={styles.subcategoryItem}
                               onClick={() => setHoveredCategory(null)}
                             >
