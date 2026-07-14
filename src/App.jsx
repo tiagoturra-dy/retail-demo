@@ -30,10 +30,25 @@ import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
 import { BlogArticlePage } from './pages/BlogArticlePage/BlogArticlePage';
 import { MuseProvider, useMuse } from './context/MuseContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { useCart } from './context/CartContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect } from 'react';
 
 // Exposes openMuse globally so external scripts/banners can trigger it:
+// window.__addToCart({ id: '123', name: 'Product', price: 49.99 }, 2)
+const CartGlobalBridge = () => {
+  const { addToCart } = useCart();
+
+  useEffect(() => {
+    window.__addToCart = (product, quantity = 1) => addToCart(product, quantity);
+    return () => {
+      delete window.__addToCart;
+    };
+  }, [addToCart]);
+
+  return null;
+};
+
 // window.__openMuse({ query: 'summer dresses' })
 // window.__openMuse({ live: true })
 const MuseGlobalBridge = () => {
@@ -82,6 +97,7 @@ export default function App() {
           <CartProvider>
             <WishlistProvider>
             <MuseProvider>
+              <CartGlobalBridge />
               <MuseGlobalBridge />
               <Router>
               <ScrollToTop />
