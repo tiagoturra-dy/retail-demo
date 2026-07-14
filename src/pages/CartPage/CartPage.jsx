@@ -85,7 +85,7 @@ export const CartPage = () => {
         <button className={styles.clearAllBtn} onClick={() => setClearAllPending(true)}>Clear all</button>
       </div>
 
-      <div className={styles.cartGrid}>
+      <div className={`${styles.cartGrid} dy-cart-grid`}>
         {/* Cart Items */}
         <div className={`dy-cart-items ${styles.cartItemsList}`}>
           <AnimatePresence>
