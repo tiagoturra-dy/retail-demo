@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recs Carousel</title>
+  <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #fff;
+      --black: #000;
+      --zinc-100: #f4f4f5;
+      --zinc-200: #e4e4e7;
+      --zinc-400: #a1a1aa;
+      --zinc-500: #71717a;
+      --zinc-900: #18181b;
+      --font-headline: Georgia, 'Times New Roman', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: #f3f4f6;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Section ───────────────────────────────── */
+    .recs-section {
+      background: var(--white);
+      overflow: hidden;
+      padding: 2.5rem;
+      border-radius: 0.75rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ────────────────────────────────── */
+    .recs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+    }
+
+    .recs-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .recs-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      font-family: var(--font-headline);
+      color: var(--black);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .recs-subtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--zinc-500);
+      line-height: 1.5;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .nav-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: var(--zinc-100);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--zinc-900);
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: var(--zinc-900);
+      color: var(--white);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    .nav-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Carousel ──────────────────────────────── */
+    .carousel-viewport {
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      backface-visibility: hidden;
+      touch-action: pan-y;
+      gap: 10px;
+    }
+
+    .carousel-item {
+      flex: 0 0 20%;
+      min-width: 0;
+    }
+
+    @media (max-width: 1600px) { .carousel-item { flex: 0 0 280px; } }
+    @media (max-width: 768px)  { .carousel-item { flex: 0 0 50%; } .recs-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; } .recs-title { font-size: 2rem; } }
+    @media (max-width: 480px)  { .carousel-item { flex: 0 0 100%; } }
+
+    /* ── Product card ──────────────────────────── */
+    .product-card {
+      background: var(--white);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border: 1px solid var(--zinc-200);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .product-image-wrap {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: var(--zinc-100);
+    }
+
+    .product-image-wrap a {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .product-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s ease;
+    }
+
+    .product-card:hover .product-image-wrap img {
+      transform: scale(1.03);
+    }
+
+    .product-info {
+      padding: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-brand {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--zinc-400);
+    }
+
+    .product-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--zinc-900);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-name a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .product-name a:hover {
+      text-decoration: underline;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--zinc-500);
+    }
+
+    .product-rating svg {
+      width: 12px;
+      height: 12px;
+      fill: #facc15;
+      stroke: #facc15;
+      stroke-width: 1;
+    }
+
+    .product-price {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--zinc-900);
+      margin-top: 0.15rem;
+    }
+
+    .add-to-cart-btn {
+      width: 2rem;
+      height: 2rem;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--zinc-900);
+      color: var(--white);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+      margin-top: 0.25rem;
+    }
+
+    .add-to-cart-btn:hover {
+      background: #3f3f46;
+      transform: scale(1.08);
+    }
+
+    .add-to-cart-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Empty state ───────────────────────────── */
+    .recs-empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--zinc-400);
+      font-size: 0.95rem;
+    }
+
+    /* ── Demo controls (remove in production) ── */
+    .demo-controls {
+      max-width: 1400px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .demo-btn {
+      padding: 0.45rem 1rem;
+      border-radius: 0.375rem;
+      border: 1px solid var(--zinc-200);
+      background: var(--white);
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .demo-btn:hover { background: var(--zinc-100); }
+  </style>
+</head>
+<body>
+
+  <!-- Demo controls — remove in production template -->
+  <div class="demo-controls">
+    <button class="demo-btn" onclick="loadDemo()">Load demo data</button>
+    <button class="demo-btn" onclick="recsCarousel.destroy()">Destroy</button>
+  </div>
+
+  <!-- Carousel root — this is what you embed in the template -->
+  <div id="recs-carousel-root"></div>
+
+  <script>
+    /**
+     * RecsCarousel — standalone vanilla JS carousel for DY recommendations.
+     *
+     * Usage:
+     *   recsCarousel.init(recommendationsPayload, targetElement?, options?)
+     *
+     * recommendationsPayload shape (DY standard):
+     *   {
+     *     choices: [{
+     *       decisionId: string,
+     *       variations: [{
+     *         id: string,
+     *         payload: {
+     *           data: {
+     *             custom: { title: string, subtitle: string },
+     *             slots: [{ productData: { sku, name, brand, price, image_url, ... } }]
+     *           }
+     *         }
+     *       }]
+     *     }]
+     *   }
+     *
+     * Options:
+     *   {
+     *     currency: 'USD',          // currency code
+     *     locale: 'en-US',          // locale for price formatting
+     *     productBaseUrl: '/product/', // prefix for product links
+     *     imageBaseUrl: '',          // prefix for image src
+     *     onAddToCart: fn(product),  // called when Add to Cart is clicked
+     *     onProductClick: fn(product) // called when product link is clicked
+     *   }
+     */
+    const recsCarousel = (() => {
+      let _embla = null;
+      let _root = null;
+
+      const defaults = {
+        currency: 'USD',
+        locale: 'en-US',
+        productBaseUrl: '/product/',
+        imageBaseUrl: '',
+        onAddToCart: null,
+        onProductClick: null,
+      };
+
+      function formatPrice(amount, opts) {
+        return new Intl.NumberFormat(opts.locale, {
+          style: 'currency',
+          currency: opts.currency,
+        }).format(amount);
+      }
+
+      function getImageSrc(imageUrl, opts) {
+        if (!imageUrl) return '';
+        if (imageUrl.startsWith('http')) return imageUrl;
+        return opts.imageBaseUrl + imageUrl;
+      }
+
+      function extractProducts(recommendations) {
+        if (!recommendations?.choices) return [];
+        return recommendations.choices.flatMap(choice =>
+          choice.variations.flatMap(variation =>
+            variation.payload.data.slots.map(slot => ({
+              ...slot,
+              ...slot.productData,
+              decisionId: choice.decisionId,
+              variationId: variation.id,
+            }))
+          )
+        );
+      }
+
+      function getTitle(recommendations) {
+        return recommendations?.choices?.[0]?.variations?.[0]?.payload?.data?.custom?.title
+          || 'Products To Explore';
+      }
+
+      function getSubtitle(recommendations) {
+        return recommendations?.choices?.[0]?.variations?.[0]?.payload?.data?.custom?.subtitle
+          || 'Based on what customers are shopping';
+      }
+
+      function starSVG() {
+        return `<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+      }
+
+      function chevronLeftSVG() {
+        return `<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>`;
+      }
+
+      function chevronRightSVG() {
+        return `<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`;
+      }
+
+      function bagSVG() {
+        return `<svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
+      }
+
+      function renderCard(product, opts) {
+        const price = product.price ? formatPrice(product.price, opts) : '';
+        const imgSrc = getImageSrc(product.image_url || product.image, opts);
+        const productUrl = opts.productBaseUrl + (product.sku || product.id || '');
+        const rating = parseFloat(product['type:number:rating'] || (3.5 + Math.random() * 1.5)).toFixed(1);
+        const reviews = product['type:number:reviews'] || Math.floor(20 + Math.random() * 480);
+
+        return `
+          <div class="product-card" data-sku="${product.sku || product.id || ''}">
+            <div class="product-image-wrap">
+              <a href="${productUrl}" class="product-link">
+                <img src="${imgSrc}" alt="${product.name || ''}" loading="lazy" />
+              </a>
+            </div>
+            <div class="product-info">
+              <div class="product-details">
+                ${product.brand ? `<p class="product-brand">${product.brand}</p>` : ''}
+                <p class="product-name">
+                  <a href="${productUrl}" class="product-link">${product.name || ''}</a>
+                </p>
+                <div class="product-rating">
+                  ${starSVG()}
+                  <span>${rating} (${reviews})</span>
+                </div>
+                <p class="product-price">${price}</p>
+              </div>
+              <button class="add-to-cart-btn" aria-label="Add to cart" data-sku="${product.sku || product.id || ''}">
+                ${bagSVG()}
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      function bindEvents(section, products, opts) {
+        // Product link clicks
+        section.querySelectorAll('.product-link').forEach(link => {
+          link.addEventListener('click', e => {
+            const card = e.currentTarget.closest('.product-card');
+            const sku = card?.dataset.sku;
+            const product = products.find(p => String(p.sku || p.id) === sku);
+            if (product && opts.onProductClick) opts.onProductClick(product);
+          });
+        });
+
+        // Add to cart clicks
+        section.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            const sku = e.currentTarget.dataset.sku;
+            const product = products.find(p => String(p.sku || p.id) === sku);
+            if (!product) return;
+
+            // Use window.__addToCart if available
+            if (typeof window.__addToCart === 'function') {
+              window.__addToCart(product, 1);
+            }
+            if (opts.onAddToCart) opts.onAddToCart(product);
+
+            // Visual feedback
+            const btn = e.currentTarget;
+            btn.style.background = '#22c55e';
+            setTimeout(() => { btn.style.background = ''; }, 900);
+          });
+        });
+      }
+
+      function init(recommendations, targetEl, userOpts) {
+        const opts = Object.assign({}, defaults, userOpts);
+        _root = targetEl || document.getElementById('recs-carousel-root');
+        if (!_root) return;
+
+        const products = extractProducts(recommendations);
+
+        if (products.length === 0) {
+          _root.innerHTML = `<div class="recs-section"><p class="recs-empty">No recommendations available.</p></div>`;
+          return;
+        }
+
+        const title = getTitle(recommendations);
+        const subtitle = getSubtitle(recommendations);
+
+        _root.innerHTML = `
+          <section class="recs-section">
+            <div class="recs-header">
+              <div class="recs-header-left">
+                <h2 class="recs-title">${title}</h2>
+                ${subtitle ? `<p class="recs-subtitle">${subtitle}</p>` : ''}
+              </div>
+              <div class="nav-buttons">
+                <button class="nav-btn" id="recs-prev" aria-label="Previous">${chevronLeftSVG()}</button>
+                <button class="nav-btn" id="recs-next" aria-label="Next">${chevronRightSVG()}</button>
+              </div>
+            </div>
+            <div class="carousel-viewport" id="recs-viewport">
+              <div class="carousel-track">
+                ${products.map(p => `<div class="carousel-item">${renderCard(p, opts)}</div>`).join('')}
+              </div>
+            </div>
+          </section>
+        `;
+
+        bindEvents(_root, products, opts);
+
+        // Init Embla
+        if (typeof EmblaCarousel !== 'undefined') {
+          const viewport = _root.querySelector('#recs-viewport');
+          _embla = EmblaCarousel(viewport, {
+            loop: true,
+            align: 'start',
+            skipSnaps: false,
+            dragFree: false,
+          });
+          _root.querySelector('#recs-prev').addEventListener('click', () => _embla.scrollPrev());
+          _root.querySelector('#recs-next').addEventListener('click', () => _embla.scrollNext());
+        }
+      }
+
+      function destroy() {
+        if (_embla) { _embla.destroy(); _embla = null; }
+        if (_root) _root.innerHTML = '';
+      }
+
+      return { init, destroy };
+    })();
+
+    /* ── Demo ────────────────────────────────── */
+    function loadDemo() {
+      const demoPayload = {
+        choices: [{
+          decisionId: 'demo-decision-1',
+          variations: [{
+            id: 'var-1',
+            payload: {
+              data: {
+                custom: {
+                  title: 'You Might Also Like',
+                  subtitle: 'Handpicked just for you',
+                },
+                slots: [
+                  { productData: { sku: '1001', name: 'Classic Linen Shirt', brand: 'Blueberry', price: 89.99, image_url: 'https://placehold.co/400x533?text=Shirt', 'type:number:rating': 4.5, 'type:number:reviews': 312 } },
+                  { productData: { sku: '1002', name: 'Slim Chino Trousers', brand: 'Blueberry', price: 119.00, image_url: 'https://placehold.co/400x533?text=Trousers', 'type:number:rating': 4.2, 'type:number:reviews': 198 } },
+                  { productData: { sku: '1003', name: 'Merino Crew Sweater', brand: 'Blueberry', price: 145.00, image_url: 'https://placehold.co/400x533?text=Sweater', 'type:number:rating': 4.8, 'type:number:reviews': 421 } },
+                  { productData: { sku: '1004', name: 'Canvas Tote Bag', brand: 'Blueberry', price: 49.99, image_url: 'https://placehold.co/400x533?text=Bag', 'type:number:rating': 4.0, 'type:number:reviews': 87 } },
+                  { productData: { sku: '1005', name: 'Leather Belt', brand: 'Blueberry', price: 65.00, image_url: 'https://placehold.co/400x533?text=Belt', 'type:number:rating': 4.6, 'type:number:reviews': 155 } },
+                  { productData: { sku: '1006', name: 'Knit Cardigan', brand: 'Blueberry', price: 135.00, image_url: 'https://placehold.co/400x533?text=Cardigan', 'type:number:rating': 4.3, 'type:number:reviews': 260 } },
+                ]
+              }
+            }
+          }]
+        }]
+      };
+
+      recsCarousel.init(demoPayload, null, {
+        currency: 'USD',
+        locale: 'en-US',
+        productBaseUrl: '/product/',
+        onAddToCart: (p) => console.log('[Demo] Add to cart:', p.name),
+        onProductClick: (p) => console.log('[Demo] Product clicked:', p.name),
+      });
+    }
+  </script>
+</body>
+</html>
