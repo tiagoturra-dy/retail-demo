@@ -209,6 +209,8 @@ export const CartPage = () => {
         </div>
       </div>
 
+      <div className={'dy-cart-placeholder'}></div>
+
       {/* Recommendations */}
       {recommendations?.choices?.some(choice => choice.name === 'cart_recs1') &&
         recommendations?.choices?.filter(choice => choice.name === 'cart_recs1').map(choice => (
