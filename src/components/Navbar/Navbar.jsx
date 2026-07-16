@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Search, Menu, X, LogOut, LayoutDashboard, BotMessageSquare, IdCard } from 'lucide-react';
+import { User, Search, Menu, X, LogOut, LayoutDashboard, BotMessageSquare, IdCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -9,6 +9,7 @@ import { useMuse } from '../../context/MuseContext';
 import { BlueberryLogo } from '../../icons/BlueberryLogo/BlueberryLogo';
 import styles from './Navbar.module.css';
 import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
+import { BagIcon } from '../../icons/BagIcon/BagIcon';
 
 export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ export const Navbar = ({ logoText }) => {
             )}
             
             <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`} data-dy-nav-icon="cart">
-              <ShoppingBag className={`dy-nav-icon ${s.actionIcon}`} />
+              <BagIcon className={`dy-nav-icon ${s.actionIcon}`} />
               {totalItems > 0 && (
                 <span className={`${s.cartBadge} cart-badge`} cart-total-items={totalItems || 0} cart-subtotal={subtotal}>{totalItems}</span>
               )}
