@@ -151,65 +151,21 @@ export const CATEGORIES = [
         "items": ["Fragrance & Perfumes"]
       },
       {
-        "title": "Gifts",
-        "items": ["Birthday Gifts", "Gifts for Her", "Gifts for Him", "Gifts for Husband", "Gifts for Mom", "Gifts for Wife", "Graduation Gifts", "Groomsmen Gifts", "Wedding Gifts"]
-      },
-      {
-        "title": "Home",
-        "items": ["Home"]
-      },
-      {
         "title": "Home Decor",
         "items": ["Accent Furniture & Rugs", "Books", "Bowls, Vases & Trays", "Candles & Diffusers", "Decorative Pillows", "Games & Entertainment", "Home Accents", "Home Decor", "Picture Frames", "Plants and Flowers", "Wall Decor & Mirrors"]
-      },
-      {
-        "title": "Home Storage & Jewelry Boxes",
-        "items": ["Home Storage & Jewelry Boxes"]
-      },
-      {
-        "title": "Household Cleaning & Laundry",
-        "items": ["Household Cleaning & Laundry"]
-      },
-      {
-        "title": "Household Tech",
-        "items": ["Household Tech"]
       },
       {
         "title": "Kitchen",
         "items": ["Coffee & Tea", "Kitchen", "Kitchen Appliances", "Kitchen Tools & Accessories", "Knives"]
       },
       {
-        "title": "Lighting",
-        "items": ["Chandeliers", "Pendant Lights", "Table Lamps", "Wall Sconces"]
-      },
-      {
         "title": "Luggage & Travel Gear",
         "items": ["Carry-ons", "Checked Luggage", "Duffle Bags", "Luggage & Travel Gear", "Travel Accessories"]
-      },
-      {
-        "title": "Office & Stationery",
-        "items": ["Office & Stationery"]
-      },
-      {
-        "title": "Outdoor Living",
-        "items": ["Outdoor Living"]
-      },
-      {
-        "title": "Pet Accessories",
-        "items": ["Pet Accessories"]
       },
       {
         "title": "Serveware",
         "items": ["Serving Bowls, Trays and Platters", "Serving Utensils & Accessories"]
       },
-      {
-        "title": "Summer Living",
-        "items": ["Summer Living"]
-      },
-      {
-        "title": "The Holiday Shop",
-        "items": ["Holiday Hosting"]
-      }
     ],
     "banner": { "entryId": "81234474-383c-4098-9ebf-8c5b5b4a034e", "contentType": "category_banner" }
   }
