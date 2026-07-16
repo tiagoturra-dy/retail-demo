@@ -32,7 +32,7 @@ import { MuseProvider, useMuse } from './context/MuseContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { useCart } from './context/CartContext';
 import Clarity from '@microsoft/clarity';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 // Exposes openMuse globally so external scripts/banners can trigger it:
 // window.__addToCart({ id: '123', name: 'Product', price: 49.99 }, 2)
@@ -68,14 +68,24 @@ const MuseGlobalBridge = () => {
 const MuseRoute = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { openMuse } = useMuse();
+  const { openMuse, isMuseOpen } = useMuse();
+  const hasOpenedRef = useRef(false);
 
   useEffect(() => {
     const q = searchParams.get('q');
     const live = searchParams.get('live') === '1';
     openMuse({ query: q || undefined, live });
-    navigate('/', { replace: true });
   }, []);
+
+  useEffect(() => {
+    if (!hasOpenedRef.current) {
+      if (isMuseOpen) hasOpenedRef.current = true;
+      return;
+    }
+    if (!isMuseOpen) {
+      navigate('/', { replace: true });
+    }
+  }, [isMuseOpen]);
 
   return null;
 };
