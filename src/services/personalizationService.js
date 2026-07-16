@@ -46,6 +46,7 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' 
         returnAnalyticsMetadata: false,
         isImplicitImpressionMode: true,
         isImplicitClientData: false,
+        rejectSession: Helper.isBot(browserData.userAgent),
       }
       break
   }

@@ -133,6 +133,9 @@ export const Helper = {
         return 'desktop'
     }
   },
+  isBot: (ua = '') => {
+    return /bot|crawl|spider|slurp|mediapartners|googlebot|bingbot|yandex|baiduspider|duckduckbot|facebookexternalhit|linkedinbot|twitterbot|semrushbot|ahrefsbot/i.test(ua)
+  },
   getBrowserData: async () => {
     const ua = navigator.userAgent
 
