@@ -202,10 +202,10 @@ export const personalizationService = {
 
     return {
       decisionId: data?.choices?.[0]?.decisionId,
-      variationId: data?.choices?.[0]?.variations?.[0].id,
+      variationId: data?.choices?.[0]?.variations?.[0]?.id,
       answer: museData?.assistant,
       widgets:
-        museData?.widgets.map((widget) => {
+        museData?.widgets?.map((widget) => {
           const slots = widget.slots.map((s) => ({
             ...s.productData,
             sku: s.sku,
