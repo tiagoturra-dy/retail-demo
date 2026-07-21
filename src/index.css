@@ -24,8 +24,8 @@
 @layer theme {
   :root, :host {
     --font-master: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Playfair Display', 'Playfair', serif;
-    --font-logo: 'Adorn-S', 'Montserrat', sans-serif;
+    --font-display: var(--font-master);
+    --font-logo: var(--font-master);
     --font-sans: var(--font-master);
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
