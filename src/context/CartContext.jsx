@@ -78,7 +78,15 @@ export const CartProvider = ({ children }) => {
   const shippingFee = subtotal >= SHIPPING_THRESHOLD || subtotal === 0 ? 0 : FLAT_SHIPPING_FEE;
   let totalPrice = Number((subtotal + shippingFee).toFixed(2));
 
-  window.getCartTotal = () => { return totalPrice }
+  window.__getCartTotal = () => totalPrice;
+
+  window.__getCartInfo = () => ({
+    items: cart.map(({ id, name, price, quantity }) => ({ id, name, price, quantity })),
+    quantity: totalItems,
+    price: cart.reduce((sum, item) => sum + item.price, 0),
+    subtotal,
+    total: totalPrice,
+  });
 
   return (
     <CartContext.Provider
