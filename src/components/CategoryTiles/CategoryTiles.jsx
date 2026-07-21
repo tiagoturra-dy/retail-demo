@@ -14,7 +14,7 @@ const hPositionMap = {
   right: 'flex-end',
 };
 
-const CategoryTile = ({ data }) => {
+const CategoryTile = ({ data, order }) => {
   const { image, title, subtitle, buttons, layout } = data;
 
   const color = layout?.color || '#ffffff';
@@ -26,7 +26,10 @@ const CategoryTile = ({ data }) => {
   const cta = buttons?.[0]?.cta;
 
   return (
-    <Link to={href} className={styles.tile}>
+    <Link to={href} 
+          className={`${styles.tile} dy-category-tile`} 
+          data-dy-order-text={title.replace(/(?:'s )?collection/i, '').trim()}
+          data-order={order}>
       <img src={image} alt={title} className={styles.image} />
       <div className={styles.overlay} />
       <div
@@ -52,10 +55,10 @@ export const CategoryTiles = ({ choice }) => {
   if (!tiles.length) return null;
 
   return (
-    <section className={styles.section}>
-      <div className={styles.grid}>
+    <section className={`${styles.section}`}>
+      <div className={`${styles.grid} dy-category-tile-grid`}>
         {tiles.map((tile, idx) => (
-          <CategoryTile key={idx} data={tile} />
+          <CategoryTile key={idx} data={tile} order={idx + 1} />
         ))}
       </div>
     </section>
