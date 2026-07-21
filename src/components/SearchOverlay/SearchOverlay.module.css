@@ -209,9 +209,9 @@
     padding: 0;
     background-color: transparent;
     border-radius: 0;
-    font-size: 1.35rem;
+    font-size: 14px;
     line-height: 1.2;
-    font-weight: 400;
+    font-weight: 200;
     text-align: left;
     color: #6f6f6f;
     border: none;
@@ -241,6 +241,7 @@
     border: none;
     cursor: pointer;
     transition: color 0.2s;
+    text-align: left;
 
     &:hover {
       color: var(--color-black);
@@ -261,6 +262,12 @@
     @media (min-width: 768px) {
       grid-column: auto;
     }
+  }
+
+  .searchImageSearchSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .searchResultsList {
