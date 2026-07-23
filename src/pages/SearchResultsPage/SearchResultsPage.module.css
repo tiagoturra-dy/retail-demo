@@ -4,6 +4,45 @@
   padding: 0;
 }
 
+.mobileSearchBar {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  position: sticky;
+  top: 5rem;
+  z-index: 40;
+  background: var(--color-white);
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #f9f9f9;
+  }
+
+  @media (max-width: 1023px) {
+    display: flex;
+  }
+}
+
+.mobileSearchBarIcon {
+  width: 1rem;
+  height: 1rem;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.mobileSearchBarQuery {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--color-black);
+  font-family: var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 .searchHeader {
   margin-bottom: 3rem;
   display: flex;

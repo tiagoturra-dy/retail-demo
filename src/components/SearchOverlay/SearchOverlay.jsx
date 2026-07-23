@@ -33,7 +33,7 @@ const constants = {
   museSearchFallbackText: 'Try our Experience Search instead',
 };
 
-export const SearchOverlay = ({ isOpen, onClose }) => {
+export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = false, onOpen }) => {
   const navigate = useNavigate();
   const { openMuse } = useMuse();
   const { lang } = useCurrency();
@@ -103,11 +103,12 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
         const rect = nav.getBoundingClientRect();
         setNavBottom(`${rect.bottom}px`);
       }
+      if (initialQuery) setQuery(initialQuery);
       setTimeout(() => inputRef.current?.focus(), 100);
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
-      setQuery('');
+      if (!embedded) setQuery('');
     }
 
     const handleEsc = (e) => {
@@ -118,7 +119,11 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
       window.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, initialQuery, embedded]);
+
+  useEffect(() => {
+    if (embedded && !isOpen) setQuery(initialQuery);
+  }, [embedded, initialQuery, isOpen]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -228,8 +233,39 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
   const isMuse = query.length >= 3 && isMuseQuery(query);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
+    <>
+      {embedded && !isOpen && (
+        <div className={styles.embeddedWrapper}>
+          <div className={styles.searchInputWrapper}>
+            <Search className={styles.searchInputIcon} />
+            <form onSubmit={(e) => { e.preventDefault(); onOpen?.(); }} className={styles.searchForm}>
+              <input
+                type="text"
+                value={query}
+                readOnly
+                onFocus={() => onOpen?.()}
+                placeholder={constants.searchPlaceholder}
+                className={styles.searchInput}
+              />
+              <span className={styles.searchInputLine} />
+            </form>
+            <MicButton
+              onTranscript={(t) => { setQuery(t); onOpen?.(); }}
+              lang="en-US"
+              tooltip={constants.voiceTooltip}
+              className={styles.mic}
+            />
+            <LiveMicButton
+              lang={lang}
+              tooltip={`Live conversation (${langLabel})`}
+              onNavigate={onClose}
+              className={styles.liveMic}
+            />
+          </div>
+        </div>
+      )}
+      <AnimatePresence>
+        {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -367,5 +403,6 @@ export const SearchOverlay = ({ isOpen, onClose }) => {
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   );
 };

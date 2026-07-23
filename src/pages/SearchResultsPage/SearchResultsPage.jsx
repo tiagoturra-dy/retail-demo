@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import { parseFiltersFromParams, buildParamsWithFilters } from '../../helpers/filterUrlHelper';
 import { searchService } from '../../services/searchService';
 import { ListingPage } from '../../components/ListingPage/ListingPage';
@@ -121,6 +122,15 @@ export const SearchResultsPage = () => {
 
   return (
     <div className={styles.searchResultsContainer}>
+      <div
+        className={styles.mobileSearchBar}
+        onClick={() => window.dispatchEvent(new CustomEvent('open-search-overlay'))}
+        role="button"
+        aria-label="Edit search"
+      >
+        <Search className={styles.mobileSearchBarIcon} />
+        <span className={styles.mobileSearchBarQuery}>{query || 'Search...'}</span>
+      </div>
       <ListingPage
         title="Search Results"
         subtitle={loading ? 'Searching...' : `Showing results for <q>${query}</q>`}

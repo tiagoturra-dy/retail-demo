@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, Search, Menu, X, LogOut, LayoutDashboard, BotMessageSquare, IdCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../../context/CartContext';
@@ -17,7 +17,12 @@ export const Navbar = ({ logoText }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems, lastAdded, clearLastAdded, subtotal } = useCart();
   const { user, logout } = useAuth();
+  const location = useLocation();
   const { openMuse } = useMuse();
+  const isSearchPage = location.pathname === '/search';
+  const searchInitialQuery = isSearchPage
+    ? new URLSearchParams(location.search).get('q') || ''
+    : '';
 
   // Auto-dismiss popup after 4 seconds
   useEffect(() => {
@@ -54,6 +59,15 @@ export const Navbar = ({ logoText }) => {
             <BlueberryLogo />
           </Link>
 
+          {/* Search — embedded input on /search, full overlay elsewhere */}
+          <SearchOverlay
+            embedded={isSearchPage}
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            onOpen={() => setIsSearchOpen(true)}
+            initialQuery={searchInitialQuery}
+          />
+
           {/* Icons & Search */}
           <div className={`dy-nav-icons ${s.navbarActions}`}>
 
@@ -61,9 +75,11 @@ export const Navbar = ({ logoText }) => {
               <MuseIcon className={`dy-nav-icon ${s.actionIcon}`} color="currentColor" />
             </button>
 
-            <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
-              <Search className={`dy-nav-icon ${s.actionIcon}`} />
-            </button>
+            {!isSearchPage && (
+              <button onClick={() => setIsSearchOpen(true)} className={s.actionBtn} data-dy-nav-icon="search">
+                <Search className={`dy-nav-icon ${s.actionIcon}`} />
+              </button>
+            )}
 
             {user && user.role === 'admin' && (
               <Link to="/admin" className={`${s.actionBtn} ${s.desktopOnly}`} title="Admin Dashboard" data-dy-nav-icon="admin">
@@ -192,8 +208,6 @@ export const Navbar = ({ logoText }) => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </nav>
   );
 };
