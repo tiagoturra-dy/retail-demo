@@ -170,10 +170,7 @@ export const ProductDetailPage = () => {
           </div>
 
           {/* Promo Banner */}
-          <div className={styles.pdpPromoBanner}>
-            <span className={styles.pdpPromoText}>10% OFF FOR NEW CUSTOMERS</span>
-            <button className={styles.pdpPromoSignUp}>SIGN UP NOW</button>
-          </div>
+          <div className={'dy-pdp-promo-banner'}></div>
 
           {/* Accordions */}
           {accordions.map(({ key, label, content }) => (

@@ -385,44 +385,6 @@
       }
     }
 
-    /* Promo Banner */
-    .pdpPromoBanner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #501122;
-      color: white;
-      padding: 0.875rem 1.25rem;
-      margin-bottom: 0.5rem;
-      gap: 1rem;
-      flex-wrap: wrap;
-
-      .pdpPromoText {
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .pdpPromoSignUp {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 0.6875rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        cursor: pointer;
-        text-decoration: underline;
-        padding: 0;
-        font-family: inherit;
-
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-    }
-
     /* Accordions */
     .pdpAccordion {
       border-top: 1px solid var(--color-zinc-200);
