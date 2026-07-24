@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { requestNotificationPermission } from '../../services/notificationService';
 import { personalizationService } from '../../services/personalizationService';
 import { contentStackService } from '../../services/contentStackService';
 import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
@@ -77,6 +78,16 @@ export const Home = () => {
     };
     fetchData();
   }, [cart]);
+
+  useEffect(() => {
+    const STORAGE_KEY = 'fcm_permission_requested';
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      requestNotificationPermission().then(token => {
+        if (token) localStorage.setItem('fcm_token', token);
+      });
+      localStorage.setItem(STORAGE_KEY, '1');
+    }
+  }, []);
 
   const transformCSBanner = (data) => {
     if (!data) return null

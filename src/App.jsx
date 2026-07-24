@@ -33,6 +33,28 @@ import { WishlistProvider } from './context/WishlistContext';
 import { useCart } from './context/CartContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect, useRef } from 'react';
+import { GoogleAnalytics } from './components/GoogleAnalytics/GoogleAnalytics';
+
+// window.__resetPushPermission()
+// Clears FCM localStorage keys, unregisters the service worker, and deletes the Firebase messaging IndexedDB.
+// After calling this, reloading the page will re-prompt for notification permission and generate a new token.
+async function resetPushPermission() {
+  localStorage.removeItem('fcm_permission_requested');
+  localStorage.removeItem('fcm_token');
+
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(r => r.unregister()));
+  }
+
+  if ('indexedDB' in window) {
+    indexedDB.deleteDatabase('firebase-messaging-database');
+  }
+
+  console.log('[Push] Reset complete. Reload the page to re-prompt.');
+}
+
+window.__resetPushPermission = resetPushPermission;
 
 // Exposes openMuse globally so external scripts/banners can trigger it:
 // window.__addToCart({ id: '123', name: 'Product', price: 49.99 }, 2)
@@ -111,6 +133,7 @@ export default function App() {
               <MuseGlobalBridge />
               <Router>
               <ScrollToTop />
+              <GoogleAnalytics />
               <DYManager />
               <div className="min-h-screen bg-white font-sans text-zinc-900">
                 <Navbar logoText={LOGO_TEXT} />

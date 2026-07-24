@@ -379,6 +379,85 @@ app.get('*', (req, res) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
 
+// DY Web Push opt-in
+app.post('/api/webpush/opt-in', async (req, res) => {
+  try {
+    const { dyid, token } = req.body;
+    const body = JSON.stringify({
+      associatedDevice: { dyid: dyid || '' },
+      identifier: { type: 'pushID', value: token },
+    });
+    const response = await fetch('https://direct-collect.dy-api.com/v2/userdata/channels/web-push/opt-in', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'dy-api-key': process.env.DY_API_KEY,
+      },
+      body,
+    });
+    const data = await response.json().catch(() => ({}));
+    res.status(response.status).json(data);
+  } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+});
+
+// DY Web Push opt-out
+app.post('/api/webpush/opt-out', async (req, res) => {
+  try {
+    const { dyid, token } = req.body;
+    const body = JSON.stringify({
+      associatedDevice: { dyid: dyid || '' },
+      identifier: { type: 'pushID', value: token },
+    });
+    const response = await fetch('https://direct-collect.dy-api.com/v2/userdata/channels/web-push/opt-out', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'dy-api-key': process.env.DY_API_KEY,
+      },
+      body,
+    });
+    const data = await response.json().catch(() => ({}));
+    res.status(response.status).json(data);
+  } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+});
+
+// DY Web Push PN_CLICK engagement
+app.post('/api/webpush/pn-click', async (req, res) => {
+  try {
+    const { tracking } = req.body;
+    const body = JSON.stringify({
+      type: 'PN_CLICK',
+      trackingData: {
+        rri: tracking.rri,
+        sectionID: tracking.sectionID,
+        reqTs: tracking.reqTs,
+        userID: tracking.userID,
+        version: tracking.version,
+        events: tracking.events,
+      },
+    });
+    const response = await fetch('https://direct-collect.dy-api.com/v2/userdata/engagements', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'dy-api-key': process.env.DY_API_KEY,
+      },
+      body,
+    });
+    const data = await response.json().catch(() => ({}));
+    res.status(response.status).json(data);
+  } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+});
+
 if (process.env.NODE_ENV !== 'production') {
   const PORT = 5000;
   app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
