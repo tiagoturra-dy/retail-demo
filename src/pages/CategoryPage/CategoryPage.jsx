@@ -53,18 +53,15 @@ export const CategoryPage = () => {
         values
       }));
 
-    // Add category filter using the lowest level available: item > sub > categoryName
-    const effectiveCategory = item || subcategory || categoryName;
-    if (effectiveCategory && effectiveCategory !== 'all') {
-      const catFilter = apiFilters.find(f => f.field === 'categories');
-      if (catFilter) {
-        if (!catFilter.values.includes(effectiveCategory)) {
-          catFilter.values.push(effectiveCategory);
-        }
-      } else {
-        apiFilters.push({ field: 'categories', values: [effectiveCategory] });
-      }
-    }
+    // Build category filters with AND logic: one filter object per level
+    const categoryLevels = [
+      categoryName !== 'all' ? categoryName : null,
+      item || subcategory || null
+    ].filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i);
+
+    categoryLevels.forEach(level => {
+      apiFilters.push({ field: 'categories', values: [level] });
+    });
 
     const apiSort = {
       field: sortBy.split('-')[0],
