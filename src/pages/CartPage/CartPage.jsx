@@ -10,6 +10,7 @@ import styles from './CartPage.module.css';
 import { ConfirmationModal } from '../../components/ConfirmationModal/ConfirmationModal';
 import { personalizationService } from '../../services/personalizationService';
 import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
+import { gaViewCart, gaBeginCheckout, gaRemoveFromCart } from '../../lib/gaEvents';
 
 export const CartPage = () => {
   const navigate = useNavigate();
@@ -40,7 +41,14 @@ export const CartPage = () => {
 
   const taxes = parseFloat((subtotal * 0.02).toFixed(2));
 
+  useEffect(() => {
+    if (cart.length > 0) {
+      gaViewCart(cart, subtotal + shippingFee + taxes);
+    }
+  }, []);
+
   const handleCheckout = () => {
+    gaBeginCheckout(cart, subtotal + shippingFee + taxes);
     navigate('/checkout');
   };
 
@@ -48,6 +56,7 @@ export const CartPage = () => {
 
   const handleConfirmRemove = () => {
     if (itemToRemove) {
+      gaRemoveFromCart(itemToRemove, itemToRemove.quantity);
       removeFromCart(itemToRemove.id);
       setItemToRemove(null);
     }

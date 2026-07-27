@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShoppingBag, Check } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { AddToBagIcon } from '../../icons/AddToBagIcon/AddToBagIcon';
+import { gaAddToCart } from '../../lib/gaEvents';
 
 export const AddToCartButton = ({ product, quantity = 1, className, showText = false, iconClass, trackProductClick, showFeedback = false, size = 24 }) => {
   const { addToCart } = useCart();
@@ -24,13 +25,9 @@ export const AddToCartButton = ({ product, quantity = 1, className, showText = f
     const category = data.categories ? data.categories[0] : data.category;
     const subcategory = data.categories ? data.categories[1] || data.categories[0] : data.subcategory;
 
-    addToCart({ 
-      id, 
-      ...data, 
-      image, 
-      category, 
-      subcategory 
-    }, quantity);
+    const cartProduct = { id, ...data, image, category, subcategory };
+    addToCart(cartProduct, quantity);
+    gaAddToCart(cartProduct, quantity);
 
     if (showFeedback) {
       setAdded(true);

@@ -6,6 +6,7 @@ import { searchService } from '../../services/searchService';
 import { ListingPage } from '../../components/ListingPage/ListingPage';
 import { useCart } from '../../context/CartContext';
 import styles from './SearchResultsPage.module.css';
+import { gaSearch } from '../../lib/gaEvents';
 
 export const SearchResultsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,6 +84,7 @@ export const SearchResultsPage = () => {
     }
     
     setLoading(false);
+    if (query) gaSearch(query);
   }, [query, selectedFilters, sortBy, currentPage]);
 
   useEffect(() => {

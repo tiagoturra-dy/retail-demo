@@ -10,6 +10,7 @@ import { AddToWishlistButton } from '../../components/AddToWishlistButton/AddToW
 import styles from './ProductDetailPage.module.css';
 import { Helper } from '../../helpers/helper';
 import { RecsCarousel } from '../../components/RecsCarousel/RecsCarousel';
+import { gaViewItem } from '../../lib/gaEvents';
 
 export const ProductDetailPage = () => {
   const productRating = Helper.getRandomRating();
@@ -41,6 +42,7 @@ export const ProductDetailPage = () => {
       setLoading(true);
       const data = await catalogService.getProductById(productId);
       setProduct(data);
+      if (data) gaViewItem(data);
       setLoading(false);
     };
     fetchProduct();

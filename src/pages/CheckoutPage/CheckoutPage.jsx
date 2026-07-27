@@ -8,6 +8,7 @@ import { checkoutService } from '../../services/checkoutService';
 import { Helper } from '../../helpers/helper';
 import { MastercardClickToPayLogo } from '../../icons/MastercardClickToPayLogo/MastercardClickToPayLogo';
 import styles from './CheckoutPage.module.css';
+import { gaPurchase } from '../../lib/gaEvents';
 
 const DEFAULT_ADDRESS = {
   name: 'John Smith',
@@ -49,6 +50,7 @@ export const CheckoutPage = () => {
     const result = await checkoutService.processCheckout({ cart, total });
     setIsProcessing(false);
     if (result.success) {
+      gaPurchase({ orderId: result.orderId, cart, total, tax: taxes, shipping: shippingFee });
       clearCart();
       navigate('/thank-you', { state: { orderId: result.orderId } });
     }
