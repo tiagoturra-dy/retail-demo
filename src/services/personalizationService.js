@@ -267,4 +267,34 @@ export const personalizationService = {
 
     return { success: false }
   },
+  trackMuseEvent: async ({ name, properties = {}, cart = [] }) => {
+    console.log(`[Dynamic Yield] Triggering Muse event: ${name}`, properties)
+
+    let body = await buildBaseBody({ cart })
+
+    body.events = [
+      {
+        name,
+        properties,
+      }
+    ]
+
+    console.debug('Muse Event Body:', body)
+
+    const response = await fetch(`/api/event`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-Charset': 'utf-8',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bodyData: JSON.stringify(body) }),
+    })
+
+    if (response.ok) {
+      return { success: true }
+    }
+
+    return { success: false }
+  },
 }

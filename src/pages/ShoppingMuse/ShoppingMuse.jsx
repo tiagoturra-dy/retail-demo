@@ -449,6 +449,9 @@ export const ShoppingMuse = () => {
   // Lock body scroll when panel is open
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
+    if (isMuseOpen) {
+      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { dyType: 'muse-chat-open-v1' }, cart });
+    }
     return () => { document.body.style.overflow = ''; };
   }, [isMuseOpen]);
 
@@ -517,6 +520,8 @@ export const ShoppingMuse = () => {
     setInput('');
     setIsLoading(true);
 
+    personalizationService.trackMuseEvent({ name: 'Muse Message Sent', properties: { dyType: 'muse-message-sent-v1', message: displayText || text }, cart });
+
     try {
       const response = await personalizationService.getMuseResponse({
         query: text,
@@ -530,6 +535,10 @@ export const ShoppingMuse = () => {
         widgets: response.widgets || [],
         timestamp: new Date()
       };
+
+      if (response.widgets && response.widgets.length > 0) {
+        personalizationService.trackMuseEvent({ name: 'Muse Engagement', properties: { dyType: 'muse-engagement-v1', widgetCount: response.widgets.length }, cart });
+      }
 
       setMessages(prev => [...prev, botMessage]);
       if (isLiveMicRef.current) speakBotMessage(botMessage.text, botMessage.id);
@@ -666,7 +675,12 @@ export const ShoppingMuse = () => {
                   {msg.widgets && msg.widgets.length > 0 && ttsState?.msgId !== msg.id && (
                     <div className={styles.widgetsContainer}>
                       {msg.widgets.map((widget, wIdx) => (
-                        <MuseWidgetBlock key={wIdx} widget={widget} onNavigate={closeMuse} />
+                        <MuseWidgetBlock key={wIdx} widget={widget} onNavigate={(product) => {
+                          if (product) {
+                            personalizationService.trackMuseEvent({ name: 'Muse Product Click', properties: { dyType: 'muse-product-click-v1', productId: String(product.sku || product.id || ''), productName: product.name || '' }, cart });
+                          }
+                          closeMuse();
+                        }} />
                       ))}
                     </div>
                   )}

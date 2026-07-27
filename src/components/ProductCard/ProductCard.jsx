@@ -21,7 +21,7 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
     } else {
       console.warn('No decisionId found for product:', product.name);
     }
-    if (onNavigate) onNavigate();
+    if (onNavigate) onNavigate(product);
   };
 
   return (
