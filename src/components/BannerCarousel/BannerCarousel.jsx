@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { PromoBanner } from '../PromoBanner/PromoBanner';
 import styles from './BannerCarousel.module.css';
+import { gaDYVariationImpression } from '../../lib/gaEvents';
 
 export const BannerCarousel = ({ choice = {}, additionalClass = '', autoPlay = false, interval = 10000, transitionSpeed = 25, type = 'hero' }) => {
   if (!choice || !choice.variations || choice.variations.length === 0) return null;
@@ -36,6 +37,13 @@ export const BannerCarousel = ({ choice = {}, additionalClass = '', autoPlay = f
     }, interval);
     return () => clearInterval(timer);
   }, [autoPlay, interval, emblaApi, variations.length]);
+
+  useEffect(() => {
+    if (!choice?.variations?.length) return;
+    choice.variations.forEach((variation) => {
+      gaDYVariationImpression(choice, variation);
+    });
+  }, [choice]);
 
   const buildContentStructure = (choice, index) => {
     const variation = choice.variations[index];

@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ProductCard } from '../ProductCard/ProductCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './RecsCarousel.module.css';
+import { gaDYVariationImpression } from '../../lib/gaEvents';
 
 export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -44,6 +45,15 @@ export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
   }, [recommendations]);
   const subtitle = useMemo(() => {
     return recommendations?.choices?.[0]?.variations?.[0]?.payload.data.custom?.subtitle || 'Based on what customers are shopping';
+  }, [recommendations]);
+
+  useEffect(() => {
+    if (!recommendations?.choices) return;
+    recommendations.choices.forEach((choice) => {
+      choice.variations.forEach((variation) => {
+        gaDYVariationImpression(choice, variation);
+      });
+    });
   }, [recommendations]);
 
   if (allProducts.length === 0) return null;

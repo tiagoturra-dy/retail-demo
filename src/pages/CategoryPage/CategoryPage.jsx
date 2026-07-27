@@ -8,6 +8,7 @@ import { ListingPage } from '../../components/ListingPage/ListingPage';
 import { useCart } from '../../context/CartContext';
 import { CATEGORIES } from '../../helpers/categoryConstants';
 import styles from './CategoryPage.module.css';
+import { gaDYVariationImpression } from '../../lib/gaEvents';
 
 export const CategoryPage = () => {
   const { categoryName } = useParams();
@@ -83,8 +84,9 @@ export const CategoryPage = () => {
     console.log('Category response', response)
     
     if (response && response.choices && response.choices.length > 0) {
-      const variation = response.choices[0].variations[0];
-      const decisionId = response.choices[0].decisionId;
+      const choice = response.choices[0];
+      const variation = choice.variations[0];
+      const decisionId = choice.decisionId;
       const data = variation.payload.data;
 
       const processedProducts = (data.slots || []).map(slot => ({
@@ -98,6 +100,7 @@ export const CategoryPage = () => {
       setFacets(data.facets || []);
       setTotalResults(data.totalNumResults || 0);
       setImageFilters((data.custom?.imageFilters || []).filter(f => f.image && f.name));
+      gaDYVariationImpression(choice, variation);
     } else {
       setProducts([]);
       setFacets([]);

@@ -76,3 +76,35 @@ export const gaSearch = (searchTerm) => {
     search_term: searchTerm,
   });
 };
+
+/**
+ * Fires a DY variation impression event.
+ * Only fires when all 6 custom dimension values are present.
+ * Reads from variation.analyticsMetadata if available.
+ * @param {object} choice   - choices[0] from the DY API response
+ * @param {object} variation - choices[0].variations[0]
+ */
+export const gaDYVariationImpression = (choice, variation) => {
+  if (!choice || !variation) return;
+
+  const meta = variation.analyticsMetadata || {};
+
+  const campaignName = meta.campaignName || undefined;
+  const campaignID = meta.campaignId != null ? String(meta.campaignId) : undefined;
+  const experienceName = meta.experienceName || choice.name || undefined;
+  const experienceID = meta.experienceId != null ? String(meta.experienceId) : (choice.id != null ? String(choice.id) : undefined);
+  const variationName = meta.variationName || undefined;
+  const variationID = meta.variationId != null ? String(meta.variationId) : (variation.id != null ? String(variation.id) : undefined);
+
+  // Only fire when all 6 values are present
+  if (!campaignName || !campaignID || !experienceName || !experienceID || !variationName || !variationID) return;
+
+  fireEvent('event', 'dy_variation_impression', {
+    campaignName,
+    campaignID,
+    experienceName,
+    experienceID,
+    variationName,
+    variationID,
+  });
+};

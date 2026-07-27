@@ -324,8 +324,12 @@ export const ShoppingMuse = () => {
     if (museVersion !== 'v2' || !isMuseOpen) return;
     personalizationService.getRecommendations({ selectors: ['MuseHomeRecs'] })
       .then(data => {
-        const rawSlots = data?.choices?.[0]?.variations?.[0]?.payload?.data?.slots || [];
-        const slots = rawSlots.map(slot => ({ ...slot, ...slot.productData }));
+        const choice = data?.choices?.[0];
+        const variation = choice?.variations?.[0];
+        const decisionId = choice?.decisionId;
+        const variationId = variation?.id;
+        const rawSlots = variation?.payload?.data?.slots || [];
+        const slots = rawSlots.map(slot => ({ ...slot, ...slot.productData, decisionId, variationId }));
         setWelcomeProducts(slots);
       })
       .catch(() => {});

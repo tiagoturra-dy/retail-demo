@@ -16,6 +16,7 @@ import { isMuseQuery } from '../../helpers/aiTriggerConstants';
 import { LiveMicButton } from '../LiveMicButton/LiveMicButton';
 import { useMuse } from '../../context/MuseContext';
 import { MuseStripBanner } from '../MuseStripBanner/MuseStripBanner';
+import { gaDYVariationImpression } from '../../lib/gaEvents';
 
 const constants = {
   searchPlaceholder: 'Type to search...',
@@ -142,8 +143,9 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
           ]);
 
           if (products && products.choices && products.choices.length > 0) {
-            const variation = products.choices[0].variations[0];
-            const decisionId = products.choices[0].decisionId;
+            const choice = products.choices[0];
+            const variation = choice.variations[0];
+            const decisionId = choice.decisionId;
             const data = variation.payload.data;
 
             const processedResults = (data.slots || []).map(slot => ({
@@ -153,6 +155,7 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
               variationId: variation.id
             }));
             setResults(processedResults);
+            gaDYVariationImpression(choice, variation);
           } else {
             setResults([]);
           }

@@ -43,7 +43,7 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' 
     default:
       body['options'] = {
         isImplicitPageview,
-        returnAnalyticsMetadata: false,
+        returnAnalyticsMetadata: true,
         isImplicitImpressionMode: true,
         isImplicitClientData: false,
         rejectSession: Helper.isBot(browserData.userAgent),
@@ -114,6 +114,8 @@ export const personalizationService = {
       },
     ]
 
+    console.log('[Engage] Sending to /api/engage:', JSON.stringify(body));
+
     try {
       const response = await fetch(`/api/engage`, {
         method: 'POST',
@@ -125,17 +127,19 @@ export const personalizationService = {
         body: JSON.stringify({ bodyData: JSON.stringify(body) }),
       })
 
+      console.log('[Engage] Response status:', response.status);
+
       if (!response.ok) {
         throw new Error('Failed to track engagement')
       }
 
       if (response.ok) {
         const data = await response.text()
-        console.debug('Engagement Tracked', data)
+        console.debug('[Engage] Tracked successfully:', data)
         return true
       }
     } catch (error) {
-      console.error('Error tracking engagement:', error)
+      console.error('[Engage] Error tracking engagement:', error)
     }
   },
   getPersonalizedBanners: async ({ selectors = null, groups = null, cart = [], isImplicitPageview = false } = {}) => {
@@ -206,10 +210,14 @@ export const personalizationService = {
       answer: museData?.assistant,
       widgets:
         museData?.widgets?.map((widget) => {
+          const decisionId = data?.choices?.[0]?.decisionId;
+          const variationId = data?.choices?.[0]?.variations?.[0]?.id;
           const slots = widget.slots.map((s) => ({
             ...s.productData,
             sku: s.sku,
             slotId: s.slotId,
+            decisionId,
+            variationId,
           }))
 
           return {

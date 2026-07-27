@@ -6,7 +6,7 @@ import { searchService } from '../../services/searchService';
 import { ListingPage } from '../../components/ListingPage/ListingPage';
 import { useCart } from '../../context/CartContext';
 import styles from './SearchResultsPage.module.css';
-import { gaSearch } from '../../lib/gaEvents';
+import { gaSearch, gaDYVariationImpression } from '../../lib/gaEvents';
 
 export const SearchResultsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,8 +61,9 @@ export const SearchResultsPage = () => {
     });
     
     if (response && response.choices && response.choices.length > 0) {
-      const variation = response.choices[0].variations[0];
-      const decisionId = response.choices[0].decisionId;
+      const choice = response.choices[0];
+      const variation = choice.variations[0];
+      const decisionId = choice.decisionId;
       const data = variation.payload.data;
 
       const processedResults = (data.slots || []).map(slot => ({
@@ -76,6 +77,7 @@ export const SearchResultsPage = () => {
       setFacets(data.facets || []);
       setImageFilters((data.imageFilters || []).filter(f => f.image && f.name));
       setTotalResults(data.totalNumResults || 0);
+      gaDYVariationImpression(choice, variation);
     } else {
       setResults([]);
       setFacets([]);

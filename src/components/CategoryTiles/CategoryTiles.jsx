@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './CategoryTiles.module.css';
+import { gaDYVariationImpression } from '../../lib/gaEvents';
 
 const vPositionMap = {
   top: 'flex-start',
@@ -46,11 +47,16 @@ const CategoryTile = ({ data, order }) => {
 };
 
 export const CategoryTiles = ({ choice }) => {
-  if (!choice?.variations?.length) return null;
+  const tiles = choice?.variations
+    ? choice.variations.map(v => v.payload?.data).filter(Boolean)
+    : [];
 
-  const tiles = choice.variations
-    .map(v => v.payload?.data)
-    .filter(Boolean);
+  useEffect(() => {
+    if (!choice?.variations?.length) return;
+    choice.variations.forEach((variation) => {
+      gaDYVariationImpression(choice, variation);
+    });
+  }, [choice]);
 
   if (!tiles.length) return null;
 

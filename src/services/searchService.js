@@ -36,7 +36,7 @@ const buildBaseBody = async ({type = 'search', cart = [], isImplicitKeywordSearc
       body.context.channel = 'WEB'
 
       body.options = {
-        returnAnalyticsMetadata: false,
+        returnAnalyticsMetadata: true,
         isImplicitClientData: true,
         isImplicitKeywordSearchEvent
       }
