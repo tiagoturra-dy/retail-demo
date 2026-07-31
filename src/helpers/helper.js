@@ -148,11 +148,10 @@ export const Helper = {
     // 3. Get Browser Name (Simple Logic)
     let browser = 'Unknown'
     if (ua.includes('Firefox')) browser = 'Firefox'
-    else if (ua.includes('SamsungBrowser')) browser = 'Samsung Browser'
-    else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera'
-    else if (ua.includes('Edge') || ua.includes('Edg')) browser = 'Edge'
     else if (ua.includes('Chrome')) browser = 'Chrome'
+    else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera'
     else if (ua.includes('Safari')) browser = 'Safari'
+    else browser = 'Other'
 
     return {
       userAgent,
