@@ -99,7 +99,7 @@ export const gaDYVariationImpression = (choice, variation) => {
   // Only fire when all 6 values are present
   if (!campaignName || !campaignID || !experienceName || !experienceID || !variationName || !variationID) return;
 
-  fireEvent('event', 'dy_variation_impression', {
+  fireEvent('event', 'DY Variation Impression', {
     campaignName,
     campaignID,
     experienceName,
