@@ -44,6 +44,7 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
   const [initialSuggestions, setInitialSuggestions] = useState([]);
   const [results, setResults] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [recsTitle, setRecsTitle] = useState(null);
   const [recentSearches, setRecentSearches] = useState([]);
   const inputRef = useRef(null);
   const [navBottom, setNavBottom] = useState('5rem');
@@ -75,14 +76,17 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
         
         if (recs?.choices) {
           const recProducts = recs.choices.flatMap(choice =>
-            choice.variations.flatMap(variation =>
-              (variation.payload.data.slots || []).map(slot => ({
+            choice.variations.flatMap(variation => {
+              const data = variation.payload.data;
+              console.log('Variation data for Overlay:', data);
+              if (data.custom?.title) setRecsTitle(data.custom.title);
+              return (data.slots || []).map(slot => ({
                 ...slot,
                 ...slot.productData,
                 decisionId: choice.decisionId,
                 variationId: variation.id
-              }))
-            )
+              }));
+            })
           ).filter(product => product.sku);
           console.log('Processed recommendations:', recProducts);
           setRecommendations(recProducts);
@@ -360,7 +364,7 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
                 {/* Suggestion / Results Preview Column */}
                 <div className={styles.searchResultsCol}>
                   <h3 className={styles.searchSectionTitle}>
-                    {isMuse ? constants.askAssistantTitle : query.length >= 3 ? constants.searchResultsTitle : constants.recommendedTitle}
+                    {isMuse ? constants.askAssistantTitle : query.length >= 3 ? constants.searchResultsTitle : (recsTitle ?? constants.recommendedTitle)}
                   </h3>
                   <div className={styles.searchResultsList}>
                     {results.length > 0 ? (
