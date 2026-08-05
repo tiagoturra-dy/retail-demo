@@ -15,6 +15,7 @@ export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [overlayInitialQuery, setOverlayInitialQuery] = useState('');
   const { totalItems, lastAdded, clearLastAdded, subtotal } = useCart();
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -40,7 +41,10 @@ export const Navbar = ({ logoText }) => {
   };
 
   useEffect(() => {
-    const handleOpenSearch = () => setIsSearchOpen(true);
+    const handleOpenSearch = (e) => {
+      if (e.detail?.query) setOverlayInitialQuery(e.detail.query);
+      setIsSearchOpen(true);
+    };
     window.addEventListener('open-search-overlay', handleOpenSearch);
     return () => window.removeEventListener('open-search-overlay', handleOpenSearch);
   }, []);
@@ -61,11 +65,11 @@ export const Navbar = ({ logoText }) => {
 
           {/* Search — embedded input on /search, full overlay elsewhere */}
           <SearchOverlay
-            embedded={isSearchPage}
+            embedded={isSearchPage && !isSearchOpen}
             isOpen={isSearchOpen}
-            onClose={() => setIsSearchOpen(false)}
+            onClose={() => { setIsSearchOpen(false); setOverlayInitialQuery(''); }}
             onOpen={() => setIsSearchOpen(true)}
-            initialQuery={searchInitialQuery}
+            initialQuery={isSearchOpen ? overlayInitialQuery : searchInitialQuery}
           />
 
           {/* Icons & Search */}

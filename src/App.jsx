@@ -71,6 +71,20 @@ const CartGlobalBridge = () => {
   return null;
 };
 
+// window.__openSearch('summer dresses')
+const SearchGlobalBridge = () => {
+  useEffect(() => {
+    window.__openSearch = (query = '') => {
+      window.dispatchEvent(new CustomEvent('open-search-overlay', { detail: { query } }));
+    };
+    return () => {
+      delete window.__openSearch;
+    };
+  }, []);
+
+  return null;
+};
+
 // window.__openMuse({ query: 'summer dresses' })
 // window.__openMuse({ live: true })
 const MuseGlobalBridge = () => {
@@ -131,6 +145,7 @@ export default function App() {
             <MuseProvider>
               <CartGlobalBridge />
               <MuseGlobalBridge />
+              <SearchGlobalBridge />
               <Router>
               <ScrollToTop />
               <GoogleAnalytics />
