@@ -25,12 +25,26 @@ export const Navbar = ({ logoText }) => {
     ? new URLSearchParams(location.search).get('q') || ''
     : '';
 
-  // Auto-dismiss popup after 4 seconds
+  const popupHovered = useRef(false);
+  const popupTimerRef = useRef(null);
+
+  // Auto-dismiss popup after 5 seconds, paused while hovering
   useEffect(() => {
     if (!lastAdded) return;
-    const t = setTimeout(clearLastAdded, 4000);
-    return () => clearTimeout(t);
+    popupHovered.current = false;
+    popupTimerRef.current = setTimeout(clearLastAdded, 5000);
+    return () => clearTimeout(popupTimerRef.current);
   }, [lastAdded]);
+
+  const handlePopupMouseEnter = () => {
+    popupHovered.current = true;
+    clearTimeout(popupTimerRef.current);
+  };
+
+  const handlePopupMouseLeave = () => {
+    popupHovered.current = false;
+    popupTimerRef.current = setTimeout(clearLastAdded, 5000);
+  };
 
   // Safety check for styles
   const s = styles || {};
@@ -118,16 +132,18 @@ export const Navbar = ({ logoText }) => {
             <AnimatePresence>
               {lastAdded && (
                 <motion.div
-                  className={s.addedToBagPopup}
+                  className={`${s.addedToBagPopup} dy-added-to-bag-popup`}
                   initial={{ opacity: 0, y: -8, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.97 }}
                   transition={{ duration: 0.18 }}
+                  onMouseEnter={handlePopupMouseEnter}
+                  onMouseLeave={handlePopupMouseLeave}
                 >
                   <div className={s.popupHeader}>
                     <span className={s.popupTitle}>Added To Bag</span>
                   </div>
-                  <div className={s.popupItem}>
+                  <div className={`dy-added-to-bag-popup-item ${s.popupItem}`}>
                     <img
                       src={lastAdded.image_url || lastAdded.image}
                       alt={lastAdded.name}
@@ -143,7 +159,7 @@ export const Navbar = ({ logoText }) => {
                       <p className={s.popupItemPrice}>${lastAdded.price?.toFixed(2)}</p>
                     </div>
                   </div>
-                  <div className={s.popupActions}>
+                  <div className={`dy-added-to-bag-popup-actions ${s.popupActions}`}>
                     <Link to="/cart" className={s.popupGoToBag} onClick={clearLastAdded}>GO TO BAG</Link>
                     <Link to="/checkout" className={s.popupCheckout} onClick={clearLastAdded}>CHECKOUT</Link>
                   </div>
