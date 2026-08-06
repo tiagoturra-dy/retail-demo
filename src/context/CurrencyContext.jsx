@@ -17,10 +17,10 @@ export const CurrencyProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, lang);
     window.getCurrencySymbol = () => currency; // Expose a global function for testing purposes
-    window.__formatPrice = (price) => formatPrice(price);
+    window.__formatPrice = (price, type) => formatPrice(price, type);
   }, [lang, currency]);
 
-  const formatPrice = (price) => {
+  const formatPrice = (price, type = 'currency') => {
     if (price === undefined || price === null) return '';
     
     let numericPrice = price;
@@ -30,6 +30,10 @@ export const CurrencyProvider = ({ children }) => {
     }
     
     if (isNaN(numericPrice)) return String(price);
+
+    if (type === 'points') {
+      return new Intl.NumberFormat(lang, { maximumFractionDigits: 0 }).format(numericPrice);
+    }
     
     return new Intl.NumberFormat(lang, {
       style: 'currency',
