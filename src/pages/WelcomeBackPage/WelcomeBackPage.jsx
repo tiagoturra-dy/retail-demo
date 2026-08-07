@@ -77,14 +77,14 @@ export const WelcomeBackPage = () => {
             Continue Shopping <ArrowRight className={styles.btnIcon} />
           </Link>
         </div>
-        
-        <div className={`dy-for-you`}></div>
-        <div className={`dy-recent-viewed`}></div>
-        <div className={`dy-recent-purchased`}></div>
-        <div className={`dy-cross-sell`}></div>
-        <div className={`dy-replenishment`}></div>
-        <div className={`dy-content`}></div>
-        <div className={`dy-benefits`}></div>
+
+        <div className={`${styles.dyPlaceholder} dy-for-you`}></div>
+        <div className={`${styles.dyPlaceholder} dy-recent-viewed`}></div>
+        <div className={`${styles.dyPlaceholder} dy-recent-purchased`}></div>
+        <div className={`${styles.dyPlaceholder} dy-cross-sell`}></div>
+        <div className={`${styles.dyPlaceholder} dy-replenishment`}></div>
+        <div className={`${styles.dyPlaceholder} dy-content`}></div>
+        <div className={`${styles.dyPlaceholder} dy-benefits`}></div>
       </motion.div>
 
     </div>
