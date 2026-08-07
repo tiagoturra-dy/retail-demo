@@ -4,195 +4,204 @@
   align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
-}
 
-.welcomeContent {
-  max-width: 40rem;
-  width: 100%;
-}
+  .welcomeContent {
+    /* max-width: 40rem; */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 
-.welcomeHeader {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
+    .welcomeHeader {
+      text-align: center;
+      margin-bottom: 2.5rem;
 
-.welcomeTitle {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  margin-top: 0;
-}
+      .welcomeTitle {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        margin-top: 0;
+      }
 
-.welcomeSubtitle {
-  color: var(--color-zinc-500);
-  margin: 0;
-}
+      .welcomeSubtitle {
+        color: var(--color-zinc-500);
+        margin: 0;
+      }
+    }
 
-.loyaltyCard {
-  background-color: var(--color-zinc-900);
-  color: var(--color-white);
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
+    .loyaltyCard {
+      max-width: 1000px;
+      width: 100%;
+      background-color: var(--color-zinc-900);
+      color: var(--color-white);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
 
-.loyaltyHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-}
+      .loyaltyHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
 
-.loyaltyBadge {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-}
+        .loyaltyBadge {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background-color: rgba(255, 255, 255, 0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 9999px;
 
-.loyaltyIcon {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #fbbf24;
-}
+          .loyaltyIcon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--color-warning);
+          }
 
-.loyaltyStatus {
-  font-weight: 700;
-  font-size: 0.875rem;
-}
+          .loyaltyStatus {
+            font-weight: 700;
+            font-size: 0.875rem;
+          }
+        }
 
-.pointsDisplay {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
+        .pointsDisplay {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
 
-.pointsIcon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: #fbbf24;
-  margin-bottom: 0.25rem;
-}
+          .pointsIcon {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: var(--color-warning);
+            margin-bottom: 0.25rem;
+            path {
+              fill: var(--color-warning);
+            }
+          }
 
-.pointsValue {
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1;
-}
+          .pointsValue {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1;
+          }
 
-.pointsLabel {
-  font-size: 0.75rem;
-  color: var(--color-zinc-400);
-  text-transform: uppercase;
-  margin-top: 0.25rem;
-}
+          .pointsLabel {
+            font-size: 0.75rem;
+            color: var(--color-zinc-400);
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+          }
+        }
+      }
 
-.loyaltyProgressContainer {
-  width: 100%;
-}
+      .loyaltyProgressContainer {
+        width: 100%;
 
-.loyaltyProgressBar {
-  width: 100%;
-  height: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-bottom: 0.75rem;
-}
+        .loyaltyProgressBar {
+          width: 100%;
+          height: 0.5rem;
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 9999px;
+          overflow: hidden;
+          margin-bottom: 0.75rem;
 
-.loyaltyProgressFill {
-  height: 100%;
-  background-color: #fbbf24;
-  border-radius: 9999px;
-}
+          .loyaltyProgressFill {
+            height: 100%;
+            background-color: var(--color-warning);
+            border-radius: 9999px;
+          }
+        }
 
-.loyaltyProgressText {
-  font-size: 0.875rem;
-  color: var(--color-zinc-400);
-  margin: 0;
-}
+        .loyaltyProgressText {
+          font-size: 0.875rem;
+          color: var(--color-zinc-400);
+          margin: 0;
+        }
+      }
+    }
 
-.accountChipsGrid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 2.5rem;
+    .accountChipsGrid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
 
-  @media (min-width: 640px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+      @media (min-width: 640px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .accountChip {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background-color: var(--color-white);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-zinc-100);
+
+        .chipIconWrapper {
+          width: 3rem;
+          height: 3rem;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+          .chipIcon {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: var(--color-zinc-900);
+          }
+        }
+
+        .chipContent {
+          display: flex;
+          flex-direction: column;
+
+          .chipTitle {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            color: var(--color-zinc-900);
+          }
+
+          .chipDesc {
+            font-size: 0.875rem;
+            color: var(--color-zinc-500);
+            margin: 0;
+          }
+        }
+      }
+    }
+
+    .welcomeActions {
+      display: flex;
+      justify-content: center;
+
+      .continueShoppingBtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: var(--color-zinc-900);
+        color: var(--color-white);
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: var(--color-zinc-800);
+        }
+
+        .btnIcon {
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+    }
   }
-}
-
-.accountChip {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background-color: var(--color-white);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-zinc-100);
-}
-
-.chipIconWrapper {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.chipIcon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-zinc-900);
-}
-
-.chipContent {
-  display: flex;
-  flex-direction: column;
-}
-
-.chipTitle {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 0.25rem 0;
-  color: var(--color-zinc-900);
-}
-
-.chipDesc {
-  font-size: 0.875rem;
-  color: var(--color-zinc-500);
-  margin: 0;
-}
-
-.welcomeActions {
-  display: flex;
-  justify-content: center;
-}
-
-.continueShoppingBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: var(--color-zinc-900);
-  color: var(--color-white);
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: var(--color-zinc-800);
-  }
-}
-
-.btnIcon {
-  width: 1rem;
-  height: 1rem;
 }

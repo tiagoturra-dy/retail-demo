@@ -3,10 +3,12 @@ import { Navigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Award, Star, Package, User, ArrowRight, MapPinned } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import styles from './WelcomeBackPage.module.css';
 
 export const WelcomeBackPage = () => {
   const { user } = useAuth();
+  const { formatPrice } = useCurrency();
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -36,7 +38,7 @@ export const WelcomeBackPage = () => {
             </div>
             <div className={styles.pointsDisplay}>
               <Star className={styles.pointsIcon} />
-              <span className={styles.pointsValue}>{user.LoyaltyPoints}</span>
+              <span className={styles.pointsValue}>{formatPrice(user.LoyaltyPoints, 'points')}</span>
               <span className={styles.pointsLabel}>Points</span>
             </div>
           </div>
@@ -76,6 +78,14 @@ export const WelcomeBackPage = () => {
           </Link>
         </div>
       </motion.div>
+
+      <div className={`dy-for-you`}></div>
+      <div className={`dy-recent-viewed`}></div>
+      <div className={`dy-recent-purchased`}></div>
+      <div className={`dy-cross-sell`}></div>
+      <div className={`dy-replenishment`}></div>
+      <div className={`dy-content`}></div>
+      <div className={`dy-benefits`}></div>
     </div>
   );
 };
