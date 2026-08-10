@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Award, Star, Package, User, ArrowRight, MapPinned } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { LOYALTY_TIERS } from '../../helpers/users';
 import styles from './WelcomeBackPage.module.css';
 
 export const WelcomeBackPage = () => {
@@ -17,6 +18,38 @@ export const WelcomeBackPage = () => {
   if (user.role === 'admin') {
     return <Navigate to="/admin" replace />;
   }
+
+  const TIER_ORDER = ['Bronze', 'Silver', 'Gold', 'Platinum'];
+  const currentPoints = parseInt(user.LoyaltyPoints, 10);
+  const currentTierIndex = TIER_ORDER.indexOf(user.LoyaltyLevel);
+  const isTopTier = currentTierIndex === TIER_ORDER.length - 1;
+  const nextTier = isTopTier ? null : TIER_ORDER[currentTierIndex + 1];
+  const progressPercent = isTopTier
+    ? 100
+    : Math.min(
+        100,
+        Math.round(
+          ((currentPoints - LOYALTY_TIERS[user.LoyaltyLevel].min) /
+            (LOYALTY_TIERS[nextTier].min - LOYALTY_TIERS[user.LoyaltyLevel].min)) *
+            100
+        )
+      );
+  const pointsToNext = isTopTier ? 0 : Math.max(0, LOYALTY_TIERS[nextTier].min - currentPoints);
+
+  // window.__getLoyaltyInfo()
+  useEffect(() => {
+    window.__getLoyaltyInfo = () => ({
+      loyaltyLevel: user.LoyaltyLevel,
+      loyaltyPoints: currentPoints,
+      membershipNumber: user.MembershipNumber,
+      nextTier,
+      pointsToNext,
+      progressPercent,
+    });
+    return () => {
+      delete window.__getLoyaltyInfo;
+    };
+  }, [user, currentPoints, nextTier, pointsToNext, progressPercent]);
 
   return (
     <div className={styles.welcomePageContainer}>
@@ -44,8 +77,13 @@ export const WelcomeBackPage = () => {
           </div>
           <div className={styles.loyaltyProgressContainer}>
             <div className={styles.loyaltyProgressBar}>
-              <div className={styles.loyaltyProgressFill} style={{ width: '75%' }}></div>
+              <div className={styles.loyaltyProgressFill} style={{ width: `${progressPercent}%` }}></div>
             </div>
+            <p className={styles.loyaltyProgressText}>
+              {isTopTier
+                ? 'You have reached the highest loyalty tier!'
+                : `${pointsToNext.toLocaleString()} points to ${nextTier}`}
+            </p>
             <p className={styles.loyaltyProgressText}>Membership Number: {user.MembershipNumber}</p>
           </div>
         </div>
