@@ -1,3 +1,5 @@
+import { personalizationService } from '../services/personalizationService.js'
+
 export const MUSE_KEYWORDS = [
   // Question words
   'how', 'for', 'of', 'what', 'why', 'when', 'where', 'who', 'which', 'whose',
@@ -24,6 +26,39 @@ export const MUSE_KEYWORDS = [
   'step by step', 'walk me through', 'help me', 'how much', 'how long', 'how to',
 ];
 
+let _activeKeywords = MUSE_KEYWORDS;
+let _activeRegexTemplate = null;
+
+const FETCH_TIMEOUT_MS = 800;
+
+/**
+ * Fetches AI trigger keywords (and optional regex template) from Dynamic Yield
+ * with a 400ms timeout. Falls back to built-in MUSE_KEYWORDS and regex on failure.
+ */
+export const initMuseKeywords = async () => {
+  try {
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), FETCH_TIMEOUT_MS)
+    );
+    const result = await Promise.race([personalizationService.getAITriggerConstants(), timeout]);
+    console.log('[AITriggerConstants] Fetched from DY:', result);
+
+    if (result?.keywords?.length > 0) {
+      _activeKeywords = result.keywords;
+    }
+    if (result?.regex) {
+      try {
+        new RegExp(result.regex.replace('{query}', 'test'));
+        _activeRegexTemplate = result.regex;
+      } catch {
+        console.warn('[AITriggerConstants] Invalid regex from DY, using default pattern.');
+      }
+    }
+  } catch (e) {
+    console.warn('[AITriggerConstants] Failed to fetch from DY, using defaults.', e.message);
+  }
+};
+
 /**
  * Returns true if the query contains any muse keyword.
  * Multi-word phrases are matched before single words.
@@ -31,9 +66,12 @@ export const MUSE_KEYWORDS = [
 export const isMuseQuery = (query) => {
   const lower = query.toLowerCase();
   // Sort longest first so multi-word phrases are checked before substrings
-  const sorted = [...MUSE_KEYWORDS].sort((a, b) => b.length - a.length);
+  const sorted = [..._activeKeywords].sort((a, b) => b.length - a.length);
   return sorted.some((keyword) => {
     const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return new RegExp(`(?<![a-z])${escaped}`, 'i').test(lower);
+    const pattern = _activeRegexTemplate
+      ? _activeRegexTemplate.replace('{query}', escaped)
+      : `(?<![a-z])${escaped}(?![a-z])`;
+    return new RegExp(pattern, 'i').test(lower);
   });
 };
