@@ -297,4 +297,24 @@ export const personalizationService = {
 
     return { success: false }
   },
+  getAITriggerConstants: async () => {
+    let body = await buildBaseBody({})
+    body.selector = { names: ['AITriggerConstants'] }
+
+    const data = await getPersonalizationData(body)
+
+    data?.cookies?.forEach((cookie) => {
+      if (cookie.name === '_dyid_server') cookie.name = '_dyid'
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
+    })
+
+    const payload = data?.choices?.[0]?.variations?.[0]?.payload?.data
+    if (!payload) return null
+
+    const keywords = payload.aiTriggerConstants
+      ? payload.aiTriggerConstants.split(',').map((k) => k.trim()).filter(Boolean)
+      : null
+
+    return { keywords, regex: payload.regex ?? null }
+  },
 }

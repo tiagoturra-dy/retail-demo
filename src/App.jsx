@@ -34,6 +34,7 @@ import { useCart } from './context/CartContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect, useRef } from 'react';
 import { GoogleAnalytics } from './components/GoogleAnalytics/GoogleAnalytics';
+import { initMuseKeywords } from './helpers/aiTriggerConstants';
 
 // window.__resetPushPermission()
 // Clears FCM localStorage keys, unregisters the service worker, and deletes the Firebase messaging IndexedDB.
@@ -134,6 +135,10 @@ export default function App() {
     if (id && process.env.NODE_ENV === 'production') {
       Clarity.init(id);
     }
+  }, []);
+
+  useEffect(() => {
+    initMuseKeywords();
   }, []);
 
   return (

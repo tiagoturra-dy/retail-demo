@@ -98,7 +98,7 @@ module.exports = {
           from: "public", 
           to: "",
           globOptions: {
-            ignore: ["**/index.html"], 
+            ignore: ["**/index.html", "**/img/**", "**/video/**"], 
           }
         }, // Copies everything from public/ into the root of dist/
       ],

@@ -3,6 +3,11 @@ build/
 dist/
 coverage/
 .DS_Store
+.wrangler
 *.log
 .env*
+.dev.vars*
+
+# Keep
 !.env.example
+!.dev.vars.example
