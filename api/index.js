@@ -345,11 +345,12 @@ app.post('/api/event', async (req, res) => {
 
 app.post('/api/groq', async (req, res) => {
   try {
-    const { messages, model = 'llama-3.3-70b-versatile' } = req.body;
+    const { messages, model } = req.body;
+    const groqModel = model || process.env.GROQ_MODEL;
 
     let payload = {
       messages,
-      model,
+      model: groqModel,
       "temperature": 1,
       "max_completion_tokens": 1024,
       "top_p": 1,
