@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, Search, Menu, X, LogOut, LayoutDashboard, BotMessageSquare, IdCard } from 'lucide-react';
+import { User, Search, Menu, X, LogOut, LayoutDashboard, BotMessageSquare, IdCard, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchOverlay } from '../SearchOverlay/SearchOverlay';
+import { ConfigurationOverlay } from '../ConfigurationOverlay/ConfigurationOverlay';
 import { useMuse } from '../../context/MuseContext';
 import { BlueberryLogo } from '../../icons/BlueberryLogo/BlueberryLogo';
 import styles from './Navbar.module.css';
@@ -15,6 +16,7 @@ export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [overlayInitialQuery, setOverlayInitialQuery] = useState('');
   const { totalItems, lastAdded, clearLastAdded, subtotal } = useCart();
   const { user, logout } = useAuth();
@@ -86,11 +88,21 @@ export const Navbar = ({ logoText }) => {
             initialQuery={isSearchOpen ? overlayInitialQuery : searchInitialQuery}
           />
 
+          {/* Configuration Overlay */}
+          <ConfigurationOverlay
+            isOpen={isConfigOpen}
+            onClose={() => setIsConfigOpen(false)}
+          />
+
           {/* Icons & Search */}
           <div className={`dy-nav-icons ${s.navbarActions}`}>
 
             <button onClick={() => openMuse()} className={`${s.actionBtn} ${s.desktopOnly}`} title="Shopper Assistant" data-dy-nav-icon="muse">
               <MuseIcon className={`dy-nav-icon ${s.actionIcon}`} color="currentColor" />
+            </button>
+
+            <button onClick={() => setIsConfigOpen(true)} className={`${s.actionBtn} ${s.desktopOnly}`} title="Configuration" data-dy-nav-icon="settings">
+              <Settings className={`dy-nav-icon ${s.actionIcon}`} />
             </button>
 
             {!isSearchPage && (
@@ -191,6 +203,11 @@ export const Navbar = ({ logoText }) => {
                 <button onClick={() => { openMuse(); setIsMobileMenuOpen(false); }} className={s.mobileAccountLink}>
                   <MuseIcon className={s.actionIcon} color="currentColor" />
                   <span>Shopper Assistant</span>
+                </button>
+
+                <button onClick={() => { setIsConfigOpen(true); setIsMobileMenuOpen(false); }} className={s.mobileAccountLink}>
+                  <Settings className={s.actionIcon} />
+                  <span>Configuration</span>
                 </button>
 
                 {user && user.role === 'admin' && (

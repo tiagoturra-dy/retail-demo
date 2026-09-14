@@ -35,7 +35,11 @@ export async function requestNotificationPermission() {
 
   try {
     const token = await getToken(messaging, { vapidKey: VAPID_KEY });
-    if (token) await callDyPushEndpoint('opt-in', token);
+    if (token) {
+      // Store token in localStorage for later access
+      localStorage.setItem('fcm_token', token);
+      await callDyPushEndpoint('opt-in', token);
+    }
     return token || null;
   } catch (err) {
     console.error('Failed to get FCM token:', err);

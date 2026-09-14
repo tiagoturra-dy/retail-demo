@@ -384,22 +384,48 @@ app.get('*', (req, res) => {
 app.post('/api/webpush/opt-in', async (req, res) => {
   try {
     const { dyid, token } = req.body;
+    console.log('[WEBPUSH OPT-IN] Request:', { dyid, token });
     const body = JSON.stringify({
       associatedDevice: { dyid: dyid || '' },
       identifier: { type: 'pushID', value: token },
     });
-    const response = await fetch('https://direct-collect.dy-api.com/v2/userdata/channels/web-push/opt-in', {
+    const response = await fetch('https://dy-api.com/v2/userdata/channels/web-push/opt-in', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
         'content-type': 'application/json',
-        'dy-api-key': process.env.DY_API_KEY,
+        'dy-api-key': process.env.DY_SS_API_KEY,
       },
       body,
     });
-    const data = await response.json().catch(() => ({}));
+    const text = await response.text();
+    let data;
+    if (!text) {
+      data = response.ok ? { success: true } : { error: 'Empty response', status: response.status, statusText: response.statusText };
+    } else {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        data = {
+          error: text || 'Failed to parse response',
+          status: response.status,
+          statusText: response.statusText,
+          parseError: parseError.message
+        };
+      }
+    }
+    if (!response.ok && !data.error) {
+      data = {
+        error: 'Server error',
+        status: response.status,
+        statusText: response.statusText,
+        ...data
+      };
+    }
+    console.log('[WEBPUSH OPT-IN] Response:', { status: response.status, data });
     res.status(response.status).json(data);
   } catch (error) {
+    console.error('[WEBPUSH OPT-IN] Error:', error);
     res.status(500).json({ error: JSON.stringify(error) });
   }
 });
@@ -408,20 +434,44 @@ app.post('/api/webpush/opt-in', async (req, res) => {
 app.post('/api/webpush/opt-out', async (req, res) => {
   try {
     const { dyid, token } = req.body;
+    console.log('[WEBPUSH OPT-OUT] Request:', { dyid, token });
     const body = JSON.stringify({
       associatedDevice: { dyid: dyid || '' },
       identifier: { type: 'pushID', value: token },
     });
-    const response = await fetch('https://direct-collect.dy-api.com/v2/userdata/channels/web-push/opt-out', {
+    const response = await fetch('https://dy-api.com/v2/userdata/channels/web-push/opt-out', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
         'content-type': 'application/json',
-        'dy-api-key': process.env.DY_API_KEY,
+        'dy-api-key': process.env.DY_SS_API_KEY,
       },
       body,
     });
-    const data = await response.json().catch(() => ({}));
+    const text = await response.text();
+    let data;
+    if (!text) {
+      data = response.ok ? { success: true } : { error: 'Empty response', status: response.status, statusText: response.statusText };
+    } else {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        data = {
+          error: text || 'Failed to parse response',
+          status: response.status,
+          statusText: response.statusText,
+          parseError: parseError.message
+        };
+      }
+    }
+    if (!response.ok && !data.error) {
+      data = {
+        error: 'Server error',
+        status: response.status,
+        statusText: response.statusText,
+        ...data
+      };
+    }
     res.status(response.status).json(data);
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
@@ -432,6 +482,7 @@ app.post('/api/webpush/opt-out', async (req, res) => {
 app.post('/api/webpush/pn-click', async (req, res) => {
   try {
     const { tracking } = req.body;
+    console.log('[WEBPUSH PN-CLICK] Request:', { tracking });
     const body = JSON.stringify({
       type: 'PN_CLICK',
       trackingData: {
@@ -452,7 +503,30 @@ app.post('/api/webpush/pn-click', async (req, res) => {
       },
       body,
     });
-    const data = await response.json().catch(() => ({}));
+    const text = await response.text();
+    let data;
+    if (!text) {
+      data = response.ok ? { success: true } : { error: 'Empty response', status: response.status, statusText: response.statusText };
+    } else {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        data = {
+          error: text || 'Failed to parse response',
+          status: response.status,
+          statusText: response.statusText,
+          parseError: parseError.message
+        };
+      }
+    }
+    if (!response.ok && !data.error) {
+      data = {
+        error: 'Server error',
+        status: response.status,
+        statusText: response.statusText,
+        ...data
+      };
+    }
     res.status(response.status).json(data);
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
