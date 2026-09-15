@@ -384,7 +384,6 @@ app.get('*', (req, res) => {
 app.post('/api/webpush/opt-in', async (req, res) => {
   try {
     const { dyid, token } = req.body;
-    console.log('[WEBPUSH OPT-IN] Request:', { dyid, token });
     const body = JSON.stringify({
       associatedDevice: { dyid: dyid || '' },
       identifier: { type: 'pushID', value: token },
@@ -422,7 +421,6 @@ app.post('/api/webpush/opt-in', async (req, res) => {
         ...data
       };
     }
-    console.log('[WEBPUSH OPT-IN] Response:', { status: response.status, data });
     res.status(response.status).json(data);
   } catch (error) {
     console.error('[WEBPUSH OPT-IN] Error:', error);
@@ -434,7 +432,6 @@ app.post('/api/webpush/opt-in', async (req, res) => {
 app.post('/api/webpush/opt-out', async (req, res) => {
   try {
     const { dyid, token } = req.body;
-    console.log('[WEBPUSH OPT-OUT] Request:', { dyid, token });
     const body = JSON.stringify({
       associatedDevice: { dyid: dyid || '' },
       identifier: { type: 'pushID', value: token },
@@ -529,6 +526,112 @@ app.post('/api/webpush/pn-click', async (req, res) => {
     }
     res.status(response.status).json(data);
   } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+});
+
+// DY Email opt-in
+app.post('/api/email/opt-in', async (req, res) => {
+  try {
+    const { email, dyid } = req.body;
+    const body = JSON.stringify({
+      associatedDevice: { dyid: dyid || '' },
+      identifier: {
+        type: 'email',
+        value: email,
+      },
+    });
+    console.log('[EMAIL OPT-IN] Request:', body);
+    const response = await fetch('https://dy-api.com/v2/userdata/channels/email/opt-in', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'dy-api-key': process.env.DY_SS_API_KEY,
+      },
+      body,
+    });
+    const text = await response.text();
+    let data;
+    if (!text) {
+      data = response.ok ? { success: true } : { error: 'Empty response', status: response.status, statusText: response.statusText };
+    } else {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        data = {
+          error: text || 'Failed to parse response',
+          status: response.status,
+          statusText: response.statusText,
+          parseError: parseError.message
+        };
+      }
+    }
+    if (!response.ok && !data.error) {
+      data = {
+        error: 'Server error',
+        status: response.status,
+        statusText: response.statusText,
+        ...data
+      };
+    }
+    console.log('[EMAIL OPT-IN] Response:', { status: response.status, data });
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('[EMAIL OPT-IN] Error:', error);
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+});
+
+// DY Email opt-out
+app.post('/api/email/opt-out', async (req, res) => {
+  try {
+    const { email, dyid } = req.body;
+    console.log('[EMAIL OPT-OUT] Request:', { email, dyid });
+    const body = JSON.stringify({
+      associatedDevice: { dyid: dyid || '' },
+      identifier: {
+        type: 'email',
+        value: email,
+      },
+    });
+    const response = await fetch('https://dy-api.com/v2/userdata/channels/email/opt-out', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'dy-api-key': process.env.DY_SS_API_KEY,
+      },
+      body,
+    });
+    const text = await response.text();
+    let data;
+    if (!text) {
+      data = response.ok ? { success: true } : { error: 'Empty response', status: response.status, statusText: response.statusText };
+    } else {
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        data = {
+          error: text || 'Failed to parse response',
+          status: response.status,
+          statusText: response.statusText,
+          parseError: parseError.message
+        };
+      }
+    }
+    if (!response.ok && !data.error) {
+      data = {
+        error: 'Server error',
+        status: response.status,
+        statusText: response.statusText,
+        ...data
+      };
+    }
+    console.log('[EMAIL OPT-OUT] Response:', { status: response.status, data });
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('[EMAIL OPT-OUT] Error:', error);
     res.status(500).json({ error: JSON.stringify(error) });
   }
 });

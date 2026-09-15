@@ -8,6 +8,7 @@ const DEFAULT_SEARCH_TERMS = ['summer dresses', 'running shoes', 'wireless earbu
 
 export const ConfigurationOverlay = ({ isOpen, onClose }) => {
   const [searchTerms, setSearchTerms] = useState('');
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
@@ -56,6 +57,38 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('WebPush opt-in error:', error);
+      showMessage('Error: ' + error.message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleWebPushOptOut = async () => {
+    setIsLoading(true);
+    try {
+      const dyid = Helper.getStoredValue('_dyid');
+      
+      // Get FCM token from localStorage
+      const token = localStorage.getItem('fcm_token');
+      if (!token) {
+        showMessage('No notification token available.', 'error');
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/webpush/opt-out', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ dyid: dyid || '', token }),
+      });
+
+      if (response.ok) {
+        showMessage('Successfully opted out of web push notifications');
+      } else {
+        showMessage('Failed to opt out of web push', 'error');
+      }
+    } catch (error) {
+      console.error('WebPush opt-out error:', error);
       showMessage('Error: ' + error.message, 'error');
     } finally {
       setIsLoading(false);
@@ -136,6 +169,64 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
     setSearchTerms(DEFAULT_SEARCH_TERMS.join('\n'));
   };
 
+  const handleEmailOptIn = async () => {
+    if (!email || !email.includes('@')) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const dyid = Helper.getStoredValue('_dyid');
+      const response = await fetch('/api/email/opt-in', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, dyid: dyid || '' }),
+      });
+
+      if (response.ok) {
+        showMessage('Successfully opted in to email communications');
+        setEmail('');
+      } else {
+        showMessage('Failed to opt in to email', 'error');
+      }
+    } catch (error) {
+      console.error('Email opt-in error:', error);
+      showMessage('Error: ' + error.message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailOptOut = async () => {
+    if (!email || !email.includes('@')) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const dyid = Helper.getStoredValue('_dyid');
+      const response = await fetch('/api/email/opt-out', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, dyid: dyid || '' }),
+      });
+
+      if (response.ok) {
+        showMessage('Successfully opted out of email communications');
+        setEmail('');
+      } else {
+        showMessage('Failed to opt out of email', 'error');
+      }
+    } catch (error) {
+      console.error('Email opt-out error:', error);
+      showMessage('Error: ' + error.message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -194,13 +285,53 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
                 <p className={styles.sectionDescription}>
                   Opt-in to receive push notifications about new products and offers
                 </p>
-                <button
-                  onClick={handleWebPushOptIn}
-                  disabled={isLoading}
-                  className={`${styles.btn} ${styles.btnWarning}`}
-                >
-                  {isLoading ? 'Processing...' : 'Opt-in to Web Push'}
-                </button>
+                <div className={styles.sectionActions}>
+                  <button
+                    onClick={handleWebPushOptIn}
+                    disabled={isLoading}
+                    className={`${styles.btn} ${styles.btnWarning}`}
+                  >
+                    {isLoading ? 'Processing...' : 'Opt-in'}
+                  </button>
+                  <button
+                    onClick={handleWebPushOptOut}
+                    disabled={isLoading}
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                  >
+                    {isLoading ? 'Processing...' : 'Opt-out'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Email Opt-in/Opt-out Section */}
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Email Communications</h3>
+                <p className={styles.sectionDescription}>
+                  Manage your email preferences for promotions and updates
+                </p>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={styles.emailInput}
+                  placeholder="Enter your email address"
+                />
+                <div className={styles.sectionActions}>
+                  <button
+                    onClick={handleEmailOptIn}
+                    disabled={isLoading}
+                    className={`${styles.btn} ${styles.btnWarning}`}
+                  >
+                    {isLoading ? 'Processing...' : 'Opt-in'}
+                  </button>
+                  <button
+                    onClick={handleEmailOptOut}
+                    disabled={isLoading}
+                    className={`${styles.btn} ${styles.btnSecondary}`}
+                  >
+                    {isLoading ? 'Processing...' : 'Opt-out'}
+                  </button>
+                </div>
               </div>
 
               {/* Clear Cookies Section */}
@@ -228,10 +359,10 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
                   onChange={(e) => setSearchTerms(e.target.value)}
                   className={styles.textarea}
                   placeholder="Enter search terms, one per line"
-                  rows={6}
+                  rows={12}
                   maxLength={500}
                 />
-                <div className={styles.sectionActions}>
+                <div className={`${styles.sectionActions} ${styles.searchTermsActions}`}>
                   <button
                     onClick={handleSaveSearchTerms}
                     className={`${styles.btn} ${styles.btnWarning}`}
