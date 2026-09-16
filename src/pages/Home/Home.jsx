@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { requestNotificationPermission } from '../../services/notificationService';
 import { personalizationService } from '../../services/personalizationService';
 import { contentStackService } from '../../services/contentStackService';
@@ -14,6 +14,7 @@ import { Helper } from '../../helpers/helper';
 
 export const Home = () => {
   const { cart } = useCart();
+  const location = useLocation();
   const [recommendations, setRecommendations] = useState([]);
   const [heroBanner, setHeroBanner] = useState(null);
   const [dyBanner, setDyBanner] = useState(null);
@@ -77,7 +78,7 @@ export const Home = () => {
       setSocialImagesData(socialImagesData);
     };
     fetchData();
-  }, [cart]);
+  }, [cart, location]);
 
   useEffect(() => {
     const STORAGE_KEY = 'fcm_permission_requested';
