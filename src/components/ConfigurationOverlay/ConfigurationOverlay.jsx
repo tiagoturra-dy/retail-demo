@@ -12,6 +12,7 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [useLegacyIntegration, setUseLegacyIntegration] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,6 +29,19 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
     setMessageType(type);
     if (duration) {
       setTimeout(() => setMessage(''), duration);
+    }
+  };
+
+  const callDYEventAPI = (email) => {
+    if (window.DY && typeof window.DY.API === 'function') {
+      window.DY.API('event', {
+        name: 'Message Opt In',
+        properties: {
+          dyType: 'message-optin-v1',
+          cuidType: 'email',
+          plainTextEmail: email
+        }
+      });
     }
   };
 
@@ -177,18 +191,26 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
 
     setIsLoading(true);
     try {
-      const dyid = Helper.getStoredValue('_dyid');
-      const response = await fetch('/api/email/opt-in', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email, dyid: dyid || '' }),
-      });
-
-      if (response.ok) {
+      if (useLegacyIntegration) {
+        // Call DY.API instead of backend endpoint
+        callDYEventAPI(email);
         showMessage('Successfully opted in to email communications');
         setEmail('');
       } else {
-        showMessage('Failed to opt in to email', 'error');
+        // Current flow
+        const dyid = Helper.getStoredValue('_dyid');
+        const response = await fetch('/api/email/opt-in', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ email, dyid: dyid || '' }),
+        });
+
+        if (response.ok) {
+          showMessage('Successfully opted in to email communications');
+          setEmail('');
+        } else {
+          showMessage('Failed to opt in to email', 'error');
+        }
       }
     } catch (error) {
       console.error('Email opt-in error:', error);
@@ -309,6 +331,15 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
                 <p className={styles.sectionDescription}>
                   Manage your email preferences for promotions and updates
                 </p>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={useLegacyIntegration}
+                    onChange={(e) => setUseLegacyIntegration(e.target.checked)}
+                    disabled={isLoading}
+                  />
+                  Use Legacy Event Integration
+                </label>
                 <input
                   type="email"
                   value={email}
