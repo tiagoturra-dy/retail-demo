@@ -1,6 +1,6 @@
 import { Helper } from '../helpers/helper.js'
 
-const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' }) => {
+const buildBaseBody = async ({ cart = [], isImplicitPageview = false, isImplicitImpressionMode = true, type = '' }) => {
   const dyid = Helper.getStoredValue('_dyid')
   const dyid_server = Helper.getStoredValue('_dyid_server')
   const dyjsession = Helper.getStoredValue('_dyjsession')
@@ -44,7 +44,7 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, type = '' 
       body['options'] = {
         isImplicitPageview,
         returnAnalyticsMetadata: true,
-        isImplicitImpressionMode: true,
+        isImplicitImpressionMode,
         isImplicitClientData: false,
         rejectSession: Helper.isBot(browserData.userAgent),
       }
@@ -81,6 +81,7 @@ const getPersonalizationData = async (body) => {
 }
 
 export const personalizationService = {
+  buildBaseBody,
   getRecommendations: async ({ selectors = null, groups = null, cart = [], isImplicitPageview = false }) => {
     console.log('Fetching recommendations for:', selectors, groups)
 
