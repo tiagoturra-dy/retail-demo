@@ -111,7 +111,7 @@ export const personalizationService = {
       {
         type: 'CLICK',
         decisionId,
-        variations: [variationId],
+        variationIds: [variationId],
       },
     ]
 
