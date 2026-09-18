@@ -74,6 +74,25 @@ const initializeDYid = async () => {
   }
 };
 
+// Fire-and-forget request to object detection API
+const initializeObjectDetector = () => {
+  const apiKey = process.env.DY_OBJECT_DETECTOR_KEY;
+  
+  if (!apiKey) {
+    console.warn('[Object Detector] API key not configured');
+    return;
+  }
+
+  fetch('https://yoloe-api-52467501600.us-central1.run.app/', {
+    method: 'GET',
+    headers: {
+      'X-API-Key': apiKey
+    }
+  }).catch(error => {
+    console.error('[Object Detector] Initialization request failed:', error.message);
+  });
+};
+
 // Load DY scripts after dyid initialization
 const loadDYScripts = () => {
   console.log('[DY Scripts] Loading Dynamic Yield scripts...');
@@ -104,6 +123,9 @@ if (!Helper.isBot(navigator.userAgent)) {
     
     // Load DY scripts after dyid is primed
     loadDYScripts();
+    
+    // Fire-and-forget object detector initialization
+    initializeObjectDetector();
     
     createRoot(document.getElementById('root')).render(
       // <StrictMode>
