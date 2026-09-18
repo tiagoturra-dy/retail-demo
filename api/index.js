@@ -380,7 +380,7 @@ app.get('/api/detect', async (req, res) => {
     const response = await fetch('https://yoloe-api-52467501600.us-central1.run.app/', {
       method: 'GET',
       headers: {
-        'X-API-Key': process.env.YOLOE_API_KEY
+        'X-API-Key': process.env.DY_OBJECT_DETECTOR_KEY
       }
     });
     res.status(response.status).json({ status: 'ok', upstreamStatus: response.status });
@@ -391,16 +391,33 @@ app.get('/api/detect', async (req, res) => {
 
 app.post('/api/detect', async (req, res) => {
   try {
+    if (!process.env.DY_OBJECT_DETECTOR_KEY) {
+      console.error('[/api/detect] DY_OBJECT_DETECTOR_KEY not configured');
+      return res.status(500).json({ error: 'API key not configured' });
+    }
+
+    const headers = {
+      'X-API-Key': process.env.DY_OBJECT_DETECTOR_KEY
+    };
+
+    // Don't override Content-Type for FormData - let it be auto-set with boundary
+    // Only set if body is JSON string
+    if (typeof req.body === 'string') {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    console.log('[/api/detect] Forwarding POST request with headers:', Object.keys(headers));
+
     const response = await fetch(
       'https://yoloe-api-52467501600.us-central1.run.app/detect',
       {
         method: 'POST',
-        headers: {
-          'X-API-Key': process.env.YOLOE_API_KEY
-        },
+        headers,
         body: req.body
       }
     );
+
+    console.log('[/api/detect] Upstream response status:', response.status);
 
     const responseContentType = response.headers.get('content-type');
     if (response.ok && responseContentType && responseContentType.includes('application/json')) {
@@ -408,9 +425,11 @@ app.post('/api/detect', async (req, res) => {
       res.json(data);
     } else {
       const text = await response.text();
+      console.error('[/api/detect] Upstream error response:', { status: response.status, text: text.substring(0, 200) });
       res.status(response.status).send(text || 'No content from API');
     }
   } catch (error) {
+    console.error('[/api/detect] Error:', error.message);
     res.status(500).json({ error: JSON.stringify(error) });
   }
 })
