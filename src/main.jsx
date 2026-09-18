@@ -76,18 +76,8 @@ const initializeDYid = async () => {
 
 // Fire-and-forget request to object detection API
 const initializeObjectDetector = () => {
-  const apiKey = process.env.DY_OBJECT_DETECTOR_KEY;
-  
-  if (!apiKey) {
-    console.warn('[Object Detector] API key not configured');
-    return;
-  }
-
-  fetch('https://yoloe-api-52467501600.us-central1.run.app/', {
-    method: 'GET',
-    headers: {
-      'X-API-Key': apiKey
-    }
+  fetch('/api/detect', {
+    method: 'GET'
   }).catch(error => {
     console.error('[Object Detector] Initialization request failed:', error.message);
   });

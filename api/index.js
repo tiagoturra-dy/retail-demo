@@ -9,6 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(express.json());
+app.use(express.raw({ type: 'multipart/form-data', limit: '50mb' }));
 
 // DY personalization API 
 app.post('/api/choose', async (req, res) => {
@@ -367,6 +368,48 @@ app.post('/api/groq', async (req, res) => {
     }
 
     res.json({ choices: [{ message: { content } }] });
+  } catch (error) {
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+})
+
+// Yoloe image detection API proxy
+app.get('/api/detect', async (req, res) => {
+  // GET: Health check / warmup (fire-and-forget)
+  try {
+    const response = await fetch('https://yoloe-api-52467501600.us-central1.run.app/', {
+      method: 'GET',
+      headers: {
+        'X-API-Key': process.env.YOLOE_API_KEY
+      }
+    });
+    res.status(response.status).json({ status: 'ok', upstreamStatus: response.status });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+app.post('/api/detect', async (req, res) => {
+  try {
+    const response = await fetch(
+      'https://yoloe-api-52467501600.us-central1.run.app/detect',
+      {
+        method: 'POST',
+        headers: {
+          'X-API-Key': process.env.YOLOE_API_KEY
+        },
+        body: req.body
+      }
+    );
+
+    const responseContentType = response.headers.get('content-type');
+    if (response.ok && responseContentType && responseContentType.includes('application/json')) {
+      const data = await response.json();
+      res.json(data);
+    } else {
+      const text = await response.text();
+      res.status(response.status).send(text || 'No content from API');
+    }
   } catch (error) {
     res.status(500).json({ error: JSON.stringify(error) });
   }
