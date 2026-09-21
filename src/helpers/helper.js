@@ -158,5 +158,12 @@ export const Helper = {
       type,
       browser,
     }
+  },
+  getDyApiPreviewToken: () => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get('dyApiPreview')
+  },
+  isInDyApiPreviewMode: () => {
+    return !!Helper.getDyApiPreviewToken()
   }
 }

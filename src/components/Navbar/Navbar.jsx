@@ -11,6 +11,7 @@ import { BlueberryLogo } from '../../icons/BlueberryLogo/BlueberryLogo';
 import styles from './Navbar.module.css';
 import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
 import { BagIcon } from '../../icons/BagIcon/BagIcon';
+import { Helper } from '../../helpers/helper';
 
 export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ export const Navbar = ({ logoText }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [overlayInitialQuery, setOverlayInitialQuery] = useState('');
+  const [previewPosition, setPreviewPosition] = useState(null);
+  const [isDraggingPreview, setIsDraggingPreview] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const previewNotificationRef = useRef(null);
   const { totalItems, lastAdded, clearLastAdded, subtotal } = useCart();
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -56,6 +61,52 @@ export const Navbar = ({ logoText }) => {
     window.location.href = '/';
   };
 
+  const handleExitPreview = () => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('dyApiPreview');
+    const newUrl = params.toString() 
+      ? `${window.location.pathname}?${params.toString()}`
+      : window.location.pathname;
+    window.location.href = newUrl;
+  };
+
+  const handlePreviewMouseDown = (e) => {
+    if (e.target.closest('button')) return;
+    const rect = previewNotificationRef.current?.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - (rect?.left || 0),
+      y: e.clientY - (rect?.top || 0)
+    });
+    setIsDraggingPreview(true);
+  };
+
+  useEffect(() => {
+    if (!isDraggingPreview) return;
+
+    const handleMouseMove = (e) => {
+      const rect = previewNotificationRef.current?.getBoundingClientRect();
+      const width = rect?.width || 0;
+      const height = rect?.height || 0;
+      const maxLeft = window.innerWidth - width - 8;
+      const maxTop = window.innerHeight - height - 8;
+      setPreviewPosition({
+        left: Math.min(Math.max(8, e.clientX - dragOffset.x), maxLeft),
+        top: Math.min(Math.max(8, e.clientY - dragOffset.y), maxTop)
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingPreview(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingPreview, dragOffset]);
+
   useEffect(() => {
     const handleOpenSearch = (e) => {
       if (e.detail?.query) setOverlayInitialQuery(e.detail.query);
@@ -66,7 +117,36 @@ export const Navbar = ({ logoText }) => {
   }, []);
 
   return (
-    <nav className={`${s.navbar} dy-nav`}>
+    <>
+      {/* Preview Mode Floating Notification */}
+      {Helper.isInDyApiPreviewMode() && (
+        <div
+          ref={previewNotificationRef}
+          className={`${styles.previewNotification} dy-preview-notif ${isDraggingPreview ? styles.dragging : ''}`}
+          style={previewPosition ? {
+            left: `${previewPosition.left}px`,
+            top: `${previewPosition.top}px`,
+            right: 'auto'
+          } : undefined}
+          onMouseDown={handlePreviewMouseDown}
+        >
+          <div className={styles.previewNotificationHeader}>
+            <span className={styles.previewNotificationIcon} aria-hidden="true">DY</span>
+            <span className={styles.previewNotificationHeading}>Dynamic Yield Preview</span>
+          </div>
+          <p className={styles.previewNotificationText}>
+            You're viewing campaign token <strong>{Helper.getDyApiPreviewToken()?.slice(0, 8)}...</strong>
+          </p>
+          <button
+            className={styles.previewNotificationClose}
+            onClick={handleExitPreview}
+            title="Exit preview mode"
+          >
+            Exit preview
+          </button>
+        </div>
+      )}
+      <nav className={`${s.navbar} dy-nav`}>
       <div className={s.navbarContainer}>
         <div className={s.navbarInner}>
           {/* Hamburger — left on mobile */}
@@ -245,6 +325,7 @@ export const Navbar = ({ logoText }) => {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+      </nav>
+    </>
   );
 };

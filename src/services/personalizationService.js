@@ -64,6 +64,16 @@ const buildBaseBody = async ({ cart = [], isImplicitPageview = false, isImplicit
   return body
 }
 
+const addPreviewToSelector = (body) => {
+  const previewToken = Helper.getDyApiPreviewToken()
+  if (previewToken && body.selector) {
+    body.selector.preview = {
+      ids: [previewToken]
+    }
+  }
+  return body
+}
+
 const getPersonalizationData = async (body) => {
   const response = await fetch(`/api/choose`, {
     method: 'POST',
@@ -88,6 +98,7 @@ export const personalizationService = {
     let body = await buildBaseBody({ cart, isImplicitPageview })
     if (selectors) body.selector = { names: selectors }
     if (groups) body.selector = { groups }
+    addPreviewToSelector(body)
     console.debug('Personazliation Request Body:', body)
 
     const recs = await getPersonalizationData(body)
@@ -149,6 +160,7 @@ export const personalizationService = {
     let body = await buildBaseBody({ cart })
     if (selectors) body.selector = { names: selectors }
     if (groups) body.selector = { groups }
+    addPreviewToSelector(body)
     console.debug('Banner Request Body:', body)
 
     const response = await getPersonalizationData(body)
@@ -176,6 +188,7 @@ export const personalizationService = {
     body.selector = {
       name: 'Shopping Muse',
     }
+    addPreviewToSelector(body)
     console.debug('Muse Request Body:', body)
 
     const response = await fetch(`/api/muse`, {
