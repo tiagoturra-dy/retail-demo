@@ -176,7 +176,7 @@ export const ProductDetailPage = () => {
 
           {/* Accordions */}
           {accordions.map(({ key, label, content }) => (
-            <div key={key} className={styles.pdpAccordion}>
+            <div key={key} className={`${styles.pdpAccordion} dyAccordion-${key}`}>
               <button className={styles.pdpAccordionHeader} onClick={() => toggleAccordion(key)}>
                 <span className={styles.pdpAccordionLabel}>{label}</span>
                 <span className={styles.pdpAccordionIcon}>{openAccordion === key ? '−' : '+'}</span>
@@ -188,7 +188,7 @@ export const ProductDetailPage = () => {
           ))}
 
           {/* Reviews accordion */}
-          <div className={`${styles.pdpAccordion} ${styles.pdpAccordionLast} ${styles.pdpAccordionReviews}`}>
+          <div className={`${styles.pdpAccordion} ${styles.pdpAccordionLast} ${styles.pdpAccordionReviews} dyAccordion-reviews`}>
             <div className={styles.pdpAccordionHeader}>
               <span className={styles.pdpAccordionLabel}>REVIEWS [{reviews}]</span>
               <div className={styles.pdpAccordionRatingSummary}>
