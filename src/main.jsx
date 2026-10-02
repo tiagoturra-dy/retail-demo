@@ -115,7 +115,7 @@ if (!Helper.isBot(navigator.userAgent)) {
     loadDYScripts();
     
     // Fire-and-forget object detector initialization
-    initializeObjectDetector();
+    // initializeObjectDetector();
     
     createRoot(document.getElementById('root')).render(
       // <StrictMode>
