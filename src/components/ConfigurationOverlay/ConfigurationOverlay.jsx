@@ -111,15 +111,9 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
 
   const handleClearCookiesAndSession = () => {
     try {
-      // Clear specific cookies and session storage
-      Helper.removeStoredValue('_dyid');
-      Helper.removeStoredValue('_dyjsession');
-      Helper.removeStoredValue('_dyMuseChatId');
-
-      // Also clear from sessionStorage if present
-      sessionStorage.removeItem('_dyid');
-      sessionStorage.removeItem('_dyjsession');
-      sessionStorage.removeItem('_dyMuseChatId');
+      if (typeof window.__clearSessionData === 'function') {
+        window.__clearSessionData();
+      }
 
       showMessage('Cookies and session cleared. Reloading page...');
       

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { nanoid } from 'nano-id';
 import { Helper } from '../helpers/helper';
 
 const CartContext = createContext(undefined);
@@ -13,10 +14,18 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [lastAdded, setLastAdded] = useState(null);
+  const [cartId, setCartId] = useState(() => {
+    const savedCartId = localStorage.getItem('retail_cart_id');
+    return savedCartId || nanoid();
+  });
 
   useEffect(() => {
     localStorage.setItem('retail_cart', JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    localStorage.setItem('retail_cart_id', cartId);
+  }, [cartId]);
 
   const addToCart = (product, quantity = 1) => {
     setCart((prev) => {
@@ -72,6 +81,11 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => setCart([]);
   const clearLastAdded = () => setLastAdded(null);
+  const clearCartId = () => {
+    const newCartId = nanoid();
+    setCartId(newCartId);
+    localStorage.setItem('retail_cart_id', newCartId);
+  };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   let subtotal = Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
@@ -81,12 +95,27 @@ export const CartProvider = ({ children }) => {
   window.__getCartTotal = () => totalPrice;
 
   window.__getCartInfo = () => ({
+    cartId,
     items: cart.map(({ id, name, price, quantity }) => ({ id, name, price, quantity })),
     quantity: totalItems,
     price: cart.reduce((sum, item) => sum + item.price, 0),
     subtotal,
     total: totalPrice,
   });
+
+  window.__clearSessionData = () => {
+    // Clear DY cookies and session storage
+    Helper.removeStoredValue('_dyid');
+    Helper.removeStoredValue('_dyjsession');
+    Helper.removeStoredValue('_dyMuseChatId');
+
+    sessionStorage.removeItem('_dyid');
+    sessionStorage.removeItem('_dyjsession');
+    sessionStorage.removeItem('_dyMuseChatId');
+
+    // Clear cart ID
+    clearCartId();
+  };
 
   return (
     <CartContext.Provider
@@ -98,6 +127,8 @@ export const CartProvider = ({ children }) => {
         clearCart,
         lastAdded,
         clearLastAdded,
+        clearCartId,
+        cartId,
         totalItems,
         subtotal,
         totalPrice,
