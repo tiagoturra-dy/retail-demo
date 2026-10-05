@@ -11,6 +11,20 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.raw({ type: 'multipart/form-data', limit: '50mb' }));
 
+// CORS middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
+
 // DY personalization API 
 app.post('/api/choose', async (req, res) => {
   try {
