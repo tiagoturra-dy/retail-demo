@@ -108,7 +108,7 @@ export const CartPage = () => {
                 className={`${styles.cartItem} dy-cart-item`}
               >
                 <Link to={`/product/${item.id}`} className={styles.cartItemImageLink}>
-                  <img src={Helper.getProductImage(item.image)} alt={item.name} className={styles.cartItemImage} />
+                  <img src={Helper.getProductImage(item.image_url)} alt={item.name} className={styles.cartItemImage} />
                 </Link>
 
                 <div className={styles.cartItemDetails}>

@@ -4,6 +4,18 @@ import { Helper } from '../helpers/helper.js';
 
 const AuthContext = createContext();
 
+// Get API base URL (backend server, not React dev server)
+const getApiBaseUrl = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    // In production, API is on same host/port (proxied or deployed together)
+    return '';
+  } else {
+    // In development, API is on backend server port 5000
+    return 'http://localhost:5000';
+  }
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -47,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     // Clear cart from server
     const cartId = localStorage.getItem('retail_cart_id');
     if (cartId) {
-      fetch(`/api/carts/${cartId}`, {
+      fetch(`${getApiBaseUrl()}/api/carts/${cartId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

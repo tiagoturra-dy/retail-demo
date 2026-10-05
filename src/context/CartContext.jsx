@@ -1,8 +1,21 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import nanoid from 'nano-id';
 import { Helper } from '../helpers/helper';
+import { useCartWebSocket } from '../hooks/useCartWebSocket';
 
 const CartContext = createContext(undefined);
+
+// Get API base URL (backend server, not React dev server)
+const getApiBaseUrl = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    // In production, API is on same host/port (proxied or deployed together)
+    return '';
+  } else {
+    // In development, API is on backend server port 5000
+    return 'http://localhost:5000';
+  }
+};
 
 export const CartProvider = ({ children }) => {
   // Configurable shipping constants
@@ -19,6 +32,9 @@ export const CartProvider = ({ children }) => {
     return savedCartId || nanoid();
   });
 
+  // Track if cart update came from WebSocket to prevent sync loops
+  const isWebSocketUpdateRef = useRef(false);
+
   const clearCartId = () => {
     clearCartFromServer(cartId);
     const newCartId = nanoid();
@@ -29,18 +45,15 @@ export const CartProvider = ({ children }) => {
 
   const syncCartToApi = async (cartItems = cart, currentCartId = cartId) => {
     try {
+      // Always send current cart state - empty array means empty cart, non-empty has all items
       const lineItems = cartItems.map((item) => ({
         item: {
           id: String(item.id)
         },
-        quantity: item.quantity,
-        price: {
-          amount: item.price.toFixed(2),
-          currency: 'USD'
-        }
+        quantity: item.quantity
       }));
 
-      const response = await fetch(`/api/carts/${currentCartId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/carts/${currentCartId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +78,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCartFromServer = async (currentCartId = cartId) => {
     try {
-      const response = await fetch(`/api/carts/${currentCartId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/carts/${currentCartId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -87,6 +100,44 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const syncCartFromServer = async (currentCartId = cartId) => {
+    try {
+      const response = await fetch(`${getApiBaseUrl()}/api/carts/${currentCartId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
+        }
+      });
+
+      if (!response.ok) {
+        console.error('[syncCartFromServer] Failed to fetch cart:', response.status);
+        return null;
+      }
+
+      const serverCart = await response.json();
+      console.log('[syncCartFromServer] Cart fetched from server:', serverCart);
+
+      // Merge server cart into client state
+      if (serverCart.line_items && Array.isArray(serverCart.line_items)) {
+        const mergedCart = serverCart.line_items.map(lineItem => ({
+          id: lineItem.item.id,
+          quantity: lineItem.quantity,
+          price: parseFloat(lineItem.price.amount),
+          name: lineItem.item.name || 'Product',
+          image_url: lineItem.item.image_url || '',
+          brand: lineItem.item.brand || ''
+        }));
+        setCart(mergedCart);
+      }
+
+      return serverCart;
+    } catch (error) {
+      console.error('[syncCartFromServer] Error fetching cart:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('retail_cart', JSON.stringify(cart));
   }, [cart]);
@@ -97,11 +148,39 @@ export const CartProvider = ({ children }) => {
   }, [cartId]);
 
   useEffect(() => {
-    // Auto-sync cart to API when cart changes
-    if (cart.length > 0) {
+    // Auto-sync cart to API when cart changes (but NOT from WebSocket updates)
+    if (!isWebSocketUpdateRef.current) {
       syncCartToApi(cart, cartId);
     }
+    // Reset flag after check
+    isWebSocketUpdateRef.current = false;
   }, [cart, cartId]);
+
+  useEffect(() => {
+    // Sync cart from server on mount (in case external systems updated it)
+    syncCartFromServer(cartId);
+  }, [cartId]);
+
+  // Handle WebSocket cart updates
+  const handleWebSocketCartUpdate = (serverCart) => {
+    if (serverCart.line_items && Array.isArray(serverCart.line_items)) {
+      const mergedCart = serverCart.line_items.map(lineItem => ({
+        id: lineItem.item.id,
+        quantity: lineItem.quantity,
+        price: parseFloat(lineItem.price.amount),
+        name: lineItem.item.name || 'Product',
+        image_url: lineItem.item.image_url || '',
+        brand: lineItem.item.brand || ''
+      }));
+      // Mark this as a WebSocket update to prevent sync loop
+      isWebSocketUpdateRef.current = true;
+      setCart(mergedCart);
+      console.log('[CartContext] Cart updated via WebSocket:', mergedCart);
+    }
+  };
+
+  // Setup WebSocket connection
+  useCartWebSocket(cartId, handleWebSocketCartUpdate);
 
   const addToCart = (product, quantity = 1) => {
     setCart((prev) => {
@@ -142,7 +221,17 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+    // Send quantity: -1 (server will decrement, remove if result <= 0)
+    setCart((prev) => {
+      const updated = prev.map((item) => 
+        item.id === productId ? { ...item, quantity: -1 } : item
+      );
+      // Schedule cleanup of qty 0 items after sync response
+      const cleanup = setTimeout(() => {
+        setCart((current) => current.filter((item) => item.quantity > 0));
+      }, 200);
+      return updated;
+    });
   };
 
   const updateQuantity = (productId, quantity) => {
@@ -167,7 +256,7 @@ export const CartProvider = ({ children }) => {
 
   window.__getCartInfo = () => ({
     cartId,
-    items: cart.map(({ id, name, price, quantity }) => ({ id, name, price, quantity })),
+    items: cart.map(({ id, name, price, quantity, image_url, brand }) => ({ id, name, price, quantity, image_url, brand })),
     quantity: totalItems,
     price: cart.reduce((sum, item) => sum + item.price, 0),
     subtotal,
@@ -175,6 +264,8 @@ export const CartProvider = ({ children }) => {
   });
 
   window.__syncCartToApi = syncCartToApi;
+
+  window.__syncCartFromServer = syncCartFromServer;
 
   window.__getCartApi = () => ({
     cart_id: cartId,
@@ -220,6 +311,7 @@ export const CartProvider = ({ children }) => {
         clearLastAdded,
         clearCartId,
         clearCartFromServer,
+        syncCartFromServer,
         cartId,
         totalItems,
         subtotal,

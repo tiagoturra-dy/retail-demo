@@ -3,10 +3,15 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Groq } from 'groq-sdk';
+import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// WebSocket subscriptions by cartId
+const cartSubscriptions = new Map();
 
 app.use(express.json());
 app.use(express.raw({ type: 'multipart/form-data', limit: '50mb' }));
@@ -99,6 +104,13 @@ app.post('/api/search', async (req, res) => {
     const { bodyData } = req.body
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
+    // Log search request if it has SKU filter
+    const hasSkuFilter = bodyData?.query?.filters?.some(f => f.field === 'sku');
+    if (hasSkuFilter) {
+      const skuFilter = bodyData.query.filters.find(f => f.field === 'sku');
+      console.log('[/api/search] SKU search request:', { skus: skuFilter.values });
+    }
+
     const response = await fetch(
       `https://direct.dy-api.com/v2/serve/user/search`, 
       {
@@ -114,9 +126,14 @@ app.post('/api/search', async (req, res) => {
       }
     );
 
+    console.log('[/api/search] DY API response status:', response.status);
+
     const responseContentType = response.headers.get("content-type");
     if (response.ok && responseContentType && responseContentType.includes("application/json")) {
       const data = await response.json();
+      if (hasSkuFilter) {
+        console.log('[/api/search] DY API returned products:', { count: data.products?.length || 0 });
+      }
       res.json(data);
     } else {
       const text = await response.text(); 
@@ -467,6 +484,105 @@ app.get('/api/carts/health', (req, res) => {
 // In-memory cart store (in production, this would connect to your e-commerce platform)
 const cartStore = {};
 
+// Helper function to fetch product details by SKU from DY API
+const fetchProductBySku = async (sku) => {
+  try {
+    const bodyData = {
+      user: {
+        active_consent_accepted: true,
+      },
+      context: {
+        page: {
+          locale: "en_US",
+          type: "OTHER",
+          data: [""],
+          location: "http://localhost:5000"
+        },
+        device: {
+          userAgent: "API Client",
+          type: "desktop",
+          browser: "other",
+          dateTime: new Date().toISOString(),
+        },
+        channel: 'WEB'
+      },
+      session: { dy: '' },
+      selector: {
+        name: "Semantic Search"
+      },
+      query: {
+        enableSpellCheck: false,
+        text: "",
+        pagination: { "numItems": 1, "offset": 0 },
+        filters: [{ field: "sku", values: [sku] }]
+      },
+      options: {
+        returnAnalyticsMetadata: true,
+        isImplicitClientData: true,
+        isImplicitKeywordSearchEvent: false
+      }
+    };
+
+    const dataToSend = JSON.stringify(bodyData);
+
+    const response = await fetch(`https://direct.dy-api.com/v2/serve/user/search`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/json',
+        'dy-api-key': process.env.DY_API_KEY,
+        'Content-Length': Buffer.byteLength(dataToSend)
+      },
+      body: dataToSend
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Navigate nested structure: choices[0].variations[0].payload.data.slots
+      const slots = data.choices?.[0]?.variations?.[0]?.payload?.data?.slots;
+      
+      if (slots && slots.length > 0) {
+        const product = slots[0];
+        return {
+          id: product.sku,
+          name: product.productData?.name || product.productData?.title || 'Product',
+          sku: product.sku,
+          price: parseFloat(product.productData?.price) || 0,
+          image_url: product.productData?.image_url || product.productData?.imageUrl || '',
+          brand: product.productData?.brand || ''
+        };
+      }
+    } else {
+      const errorText = await response.text();
+      console.error(`[fetchProductBySku] Search failed for SKU ${sku}:`, { status: response.status, error: errorText });
+    }
+    console.warn(`[fetchProductBySku] No product found for SKU: ${sku}`);
+    return null;
+  } catch (error) {
+    console.error(`[fetchProductBySku] Error fetching product for SKU ${sku}:`, error);
+    return null;
+  }
+};
+
+// Helper function to broadcast cart updates to all subscribed clients
+const broadcastCartUpdate = (cartId, cart) => {
+  const subscribers = cartSubscriptions.get(cartId);
+  if (subscribers && subscribers.size > 0) {
+    const message = JSON.stringify({
+      type: 'CART_UPDATE',
+      cartId,
+      data: cart
+    });
+    subscribers.forEach(ws => {
+      if (ws.readyState === 1) { // WebSocket.OPEN
+        ws.send(message);
+      }
+    });
+  }
+};
+
 // Get cart endpoint
 app.get('/api/carts/:id', (req, res) => {
   try {
@@ -478,16 +594,13 @@ app.get('/api/carts/:id', (req, res) => {
       return res.status(401).json({ error: 'Invalid API key' });
     }
 
-    // Retrieve cart from store
+    // Retrieve cart from store, or return empty cart if doesn't exist
     const cart = cartStore[id];
-    if (!cart) {
-      return res.status(404).json({ error: 'Cart not found' });
-    }
-
+    
     res.json({
-      cart_id: cart.cart_id,
-      line_items: cart.line_items,
-      total_estimate: cart.total_estimate
+      cart_id: id,
+      line_items: cart ? cart.line_items : [],
+      total_estimate: cart ? cart.total_estimate : { subtotal: '0.00', tax: '0.00', total: '0.00' }
     });
   } catch (error) {
     console.error('[GET /api/carts/:id] Error:', error);
@@ -495,8 +608,8 @@ app.get('/api/carts/:id', (req, res) => {
   }
 });
 
-// Update cart endpoint
-app.put('/api/carts/:id', (req, res) => {
+// Update cart endpoint - accepts item.id (SKU) and quantity, fetches product details automatically
+app.put('/api/carts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { line_items } = req.body;
@@ -511,25 +624,113 @@ app.put('/api/carts/:id', (req, res) => {
       return res.status(400).json({ error: 'Invalid request: line_items must be an array' });
     }
 
-    // Process line items - in production, validate against inventory
-    const processedLineItems = line_items.map((item, index) => ({
-      id: `line_${index + 1}`,
-      item: {
-        id: item.item.id
-      },
-      quantity: item.quantity,
-      price: item.price || { amount: '0.00', currency: 'USD' }
-    }));
+    // Validate line items have item.id and quantity
+    for (const item of line_items) {
+      if (!item.item?.id || item.quantity === undefined) {
+        return res.status(400).json({ error: 'Each line item must have item.id (SKU) and quantity' });
+      }
+    }
 
-    // Calculate total estimate
-    const totalAmount = processedLineItems.reduce((sum, item) => {
-      const itemPrice = parseFloat(item.price.amount || '0');
-      return sum + (itemPrice * item.quantity);
-    }, 0);
+    // Get existing cart to merge with new items
+    const existingCart = cartStore[id];
+    const mergedLineItems = existingCart ? [...existingCart.line_items] : [];
+    
+    // Process incoming items: add, update, remove, or decrement
+    let totalAmount = 0;
+
+    for (let i = 0; i < line_items.length; i++) {
+      const item = line_items[i];
+      const sku = item.item.id;
+      
+      // Check if this SKU already exists in cart
+      const existingIndex = mergedLineItems.findIndex(li => li.item.id === sku);
+      
+      // Handle removal: quantity 0 means delete
+      if (item.quantity === 0) {
+        if (existingIndex >= 0) {
+          mergedLineItems.splice(existingIndex, 1);
+        }
+        continue;
+      }
+      
+      // Handle decrement: negative quantity subtracts from existing
+      let finalQuantity = item.quantity;
+      if (item.quantity < 0) {
+        if (existingIndex >= 0) {
+          // Subtract from existing quantity
+          finalQuantity = mergedLineItems[existingIndex].quantity + item.quantity;
+        } else {
+          // Can't decrement non-existent item, skip
+          console.warn(`[PUT /api/carts/:id] Cannot decrement non-existent SKU: ${sku}`);
+          continue;
+        }
+      }
+      
+      // Remove if resulting quantity <= 0
+      if (finalQuantity <= 0) {
+        if (existingIndex >= 0) {
+          mergedLineItems.splice(existingIndex, 1);
+        }
+        continue;
+      }
+      
+      // Fetch full product details using DY Search API
+      const productDetails = await fetchProductBySku(sku);
+      
+      if (!productDetails) {
+        console.warn(`[PUT /api/carts/:id] Could not fetch details for SKU: ${sku}`);
+        // Still add/update in cart but with basic info
+        const newItem = {
+          id: existingIndex >= 0 ? mergedLineItems[existingIndex].id : `line_${Date.now()}_${i}`,
+          item: {
+            id: sku
+          },
+          quantity: finalQuantity,
+          price: { amount: '0.00', currency: 'USD' }
+        };
+        
+        if (existingIndex >= 0) {
+          mergedLineItems[existingIndex] = newItem;
+        } else {
+          mergedLineItems.push(newItem);
+        }
+      } else {
+        const itemPrice = productDetails.price;
+        const newItem = {
+          id: existingIndex >= 0 ? mergedLineItems[existingIndex].id : `line_${Date.now()}_${i}`,
+          item: {
+            id: productDetails.id,
+            sku: productDetails.sku,
+            name: productDetails.name,
+            image_url: productDetails.image_url,
+            brand: productDetails.brand
+          },
+          quantity: finalQuantity,
+          price: { amount: itemPrice.toFixed(2), currency: 'USD' }
+        };
+        
+        if (existingIndex >= 0) {
+          mergedLineItems[existingIndex] = newItem;
+        } else {
+          mergedLineItems.push(newItem);
+        }
+        totalAmount += itemPrice * finalQuantity;
+      }
+    }
+
+    // Calculate total including all items in merged cart
+    mergedLineItems.forEach(lineItem => {
+      // Skip items that were just processed (already counted)
+      if (line_items.find(li => li.item.id === lineItem.item.id && li.quantity !== 0)) {
+        return;
+      }
+      const price = parseFloat(lineItem.price.amount);
+      totalAmount += price * lineItem.quantity;
+    });
 
     const updatedCart = {
       cart_id: id,
-      line_items: processedLineItems,
+      line_items: mergedLineItems,
       total_estimate: {
         amount: totalAmount.toFixed(2),
         currency: 'USD'
@@ -539,7 +740,8 @@ app.put('/api/carts/:id', (req, res) => {
     // Store the updated cart
     cartStore[id] = updatedCart;
 
-    console.log('[PUT /api/carts/:id] Cart updated:', { id, itemCount: processedLineItems.length });
+    // Broadcast update to all subscribed clients
+    broadcastCartUpdate(id, updatedCart);
 
     res.json({
       ...updatedCart
@@ -840,7 +1042,68 @@ app.post('/api/email/opt-out', async (req, res) => {
 
 if (process.env.NODE_ENV !== 'production') {
   const PORT = 5000;
-  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+  
+  // Create HTTP server
+  const server = createServer(app);
+  
+  // Create WebSocket server
+  const wss = new WebSocketServer({ server });
+  
+  // Handle WebSocket connections
+  wss.on('connection', (ws) => {
+    console.log('[WebSocket] New client connected');
+    
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message);
+        
+        if (data.type === 'SUBSCRIBE') {
+          const { cartId } = data;
+          if (!cartSubscriptions.has(cartId)) {
+            cartSubscriptions.set(cartId, new Set());
+          }
+          cartSubscriptions.get(cartId).add(ws);
+          console.log(`[WebSocket] Client subscribed to cartId: ${cartId}. Total subscribers: ${cartSubscriptions.get(cartId).size}`);
+          
+          // Send confirmation
+          ws.send(JSON.stringify({
+            type: 'SUBSCRIBED',
+            cartId,
+            message: 'Successfully subscribed to cart updates'
+          }));
+        } else if (data.type === 'UNSUBSCRIBE') {
+          const { cartId } = data;
+          if (cartSubscriptions.has(cartId)) {
+            cartSubscriptions.get(cartId).delete(ws);
+            console.log(`[WebSocket] Client unsubscribed from cartId: ${cartId}`);
+            
+            if (cartSubscriptions.get(cartId).size === 0) {
+              cartSubscriptions.delete(cartId);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[WebSocket] Error processing message:', error);
+      }
+    });
+    
+    ws.on('close', () => {
+      console.log('[WebSocket] Client disconnected');
+      // Remove this client from all subscriptions
+      cartSubscriptions.forEach((subscribers, cartId) => {
+        subscribers.delete(ws);
+        if (subscribers.size === 0) {
+          cartSubscriptions.delete(cartId);
+        }
+      });
+    });
+    
+    ws.on('error', (error) => {
+      console.error('[WebSocket] Connection error:', error);
+    });
+  });
+  
+  server.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 }
 
 export default app;
