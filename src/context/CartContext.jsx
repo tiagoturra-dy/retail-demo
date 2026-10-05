@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { customAlphabet } from 'nano-id';
+import nanoid from 'nano-id';
 import { Helper } from '../helpers/helper';
 
 const CartContext = createContext(undefined);
-const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 12);
 
 export const CartProvider = ({ children }) => {
   // Configurable shipping constants
