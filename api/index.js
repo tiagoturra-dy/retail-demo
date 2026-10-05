@@ -459,6 +459,11 @@ app.get('/api/carts', (req, res) => {
   res.status(200).json({ health: { status: 'ok' } });
 });
 
+// Cart API health endpoint (explicit path)
+app.get('/api/carts/health', (req, res) => {
+  res.status(200).json({ health: { status: 'ok' } });
+});
+
 // In-memory cart store (in production, this would connect to your e-commerce platform)
 const cartStore = {};
 
