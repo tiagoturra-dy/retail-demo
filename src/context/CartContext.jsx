@@ -20,6 +20,7 @@ export const CartProvider = ({ children }) => {
   });
 
   const clearCartId = () => {
+    clearCartFromServer(cartId);
     const newCartId = nanoid();
     setCartId(newCartId);
     localStorage.setItem('retail_cart_id', newCartId);
@@ -58,6 +59,30 @@ export const CartProvider = ({ children }) => {
       return syncedCart;
     } catch (error) {
       console.error('[syncCartToApi] Error syncing cart:', error);
+      return null;
+    }
+  };
+
+  const clearCartFromServer = async (currentCartId = cartId) => {
+    try {
+      const response = await fetch(`/api/carts/${currentCartId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
+        }
+      });
+
+      if (!response.ok) {
+        console.error('[clearCartFromServer] Failed to clear cart:', response.status);
+        return null;
+      }
+
+      const result = await response.json();
+      console.log('[clearCartFromServer] Cart cleared successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('[clearCartFromServer] Error clearing cart:', error);
       return null;
     }
   };
@@ -194,6 +219,7 @@ export const CartProvider = ({ children }) => {
         lastAdded,
         clearLastAdded,
         clearCartId,
+        clearCartFromServer,
         cartId,
         totalItems,
         subtotal,

@@ -550,6 +550,30 @@ app.put('/api/carts/:id', (req, res) => {
   }
 });
 
+// Delete cart endpoint (clear cart data when session ends or user logs out)
+app.delete('/api/carts/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate API key if configured
+    const apiKey = req.get('x-api-key');
+    if (process.env.CART_API_KEY && apiKey !== process.env.CART_API_KEY) {
+      return res.status(401).json({ error: 'Invalid API key' });
+    }
+
+    // Delete cart from store
+    if (cartStore[id]) {
+      delete cartStore[id];
+      console.log('[DELETE /api/carts/:id] Cart cleared:', { id });
+    }
+
+    res.json({ success: true, message: 'Cart cleared' });
+  } catch (error) {
+    console.error('[DELETE /api/carts/:id] Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Serve the Webpack 'dist' folder (Production)
 app.use(express.static(path.join(__dirname, 'dist')));
 

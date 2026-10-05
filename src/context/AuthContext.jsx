@@ -43,6 +43,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('authUser');
     Helper.removeStoredValue('_dyjsession');
+    
+    // Clear cart from server
+    const cartId = localStorage.getItem('retail_cart_id');
+    if (cartId) {
+      fetch(`/api/carts/${cartId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
+        }
+      }).catch(error => console.error('[logout] Error clearing cart:', error));
+    }
   };
 
   const isAdmin = user?.role === 'admin';
