@@ -440,6 +440,11 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
+// Cart API health endpoint
+app.get('/api/carts', (req, res) => {
+  res.status(200).json({ health: { status: 'ok' } });
+});
+
 // In-memory cart store (in production, this would connect to your e-commerce platform)
 const cartStore = {};
 
@@ -517,7 +522,9 @@ app.put('/api/carts/:id', (req, res) => {
 
     console.log('[PUT /api/carts/:id] Cart updated:', { id, itemCount: processedLineItems.length });
 
-    res.json(updatedCart);
+    res.json({
+      ...updatedCart
+    });
   } catch (error) {
     console.error('[PUT /api/carts/:id] Error:', error);
     res.status(500).json({ error: 'Internal server error' });
