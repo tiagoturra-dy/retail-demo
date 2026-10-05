@@ -435,6 +435,95 @@ app.post('/api/detect', async (req, res) => {
   }
 })
 
+// Health check endpoint for cart management API
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+// In-memory cart store (in production, this would connect to your e-commerce platform)
+const cartStore = {};
+
+// Get cart endpoint
+app.get('/api/carts/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate API key if configured
+    const apiKey = req.get('x-api-key');
+    if (process.env.CART_API_KEY && apiKey !== process.env.CART_API_KEY) {
+      return res.status(401).json({ error: 'Invalid API key' });
+    }
+
+    // Retrieve cart from store
+    const cart = cartStore[id];
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+
+    res.json({
+      cart_id: cart.cart_id,
+      line_items: cart.line_items,
+      total_estimate: cart.total_estimate
+    });
+  } catch (error) {
+    console.error('[GET /api/carts/:id] Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update cart endpoint
+app.put('/api/carts/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { line_items } = req.body;
+
+    // Validate API key if configured
+    const apiKey = req.get('x-api-key');
+    if (process.env.CART_API_KEY && apiKey !== process.env.CART_API_KEY) {
+      return res.status(401).json({ error: 'Invalid API key' });
+    }
+
+    if (!line_items || !Array.isArray(line_items)) {
+      return res.status(400).json({ error: 'Invalid request: line_items must be an array' });
+    }
+
+    // Process line items - in production, validate against inventory
+    const processedLineItems = line_items.map((item, index) => ({
+      id: `line_${index + 1}`,
+      item: {
+        id: item.item.id
+      },
+      quantity: item.quantity,
+      price: item.price || { amount: '0.00', currency: 'USD' }
+    }));
+
+    // Calculate total estimate
+    const totalAmount = processedLineItems.reduce((sum, item) => {
+      const itemPrice = parseFloat(item.price.amount || '0');
+      return sum + (itemPrice * item.quantity);
+    }, 0);
+
+    const updatedCart = {
+      cart_id: id,
+      line_items: processedLineItems,
+      total_estimate: {
+        amount: totalAmount.toFixed(2),
+        currency: 'USD'
+      }
+    };
+
+    // Store the updated cart
+    cartStore[id] = updatedCart;
+
+    console.log('[PUT /api/carts/:id] Cart updated:', { id, itemCount: processedLineItems.length });
+
+    res.json(updatedCart);
+  } catch (error) {
+    console.error('[PUT /api/carts/:id] Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Serve the Webpack 'dist' folder (Production)
 app.use(express.static(path.join(__dirname, 'dist')));
 

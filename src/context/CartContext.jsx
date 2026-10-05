@@ -19,13 +19,64 @@ export const CartProvider = ({ children }) => {
     return savedCartId || nanoid();
   });
 
+  const clearCartId = () => {
+    const newCartId = nanoid();
+    setCartId(newCartId);
+    localStorage.setItem('retail_cart_id', newCartId);
+    sessionStorage.setItem('cart_id', newCartId);
+  };
+
+  const syncCartToApi = async (cartItems = cart, currentCartId = cartId) => {
+    try {
+      const lineItems = cartItems.map((item) => ({
+        item: {
+          id: String(item.id)
+        },
+        quantity: item.quantity,
+        price: {
+          amount: item.price.toFixed(2),
+          currency: 'USD'
+        }
+      }));
+
+      const response = await fetch(`/api/carts/${currentCartId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
+        },
+        body: JSON.stringify({ line_items: lineItems })
+      });
+
+      if (!response.ok) {
+        console.error('[syncCartToApi] Failed to sync cart:', response.status);
+        return null;
+      }
+
+      const syncedCart = await response.json();
+      console.log('[syncCartToApi] Cart synced successfully:', syncedCart);
+      return syncedCart;
+    } catch (error) {
+      console.error('[syncCartToApi] Error syncing cart:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('retail_cart', JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
     localStorage.setItem('retail_cart_id', cartId);
+    sessionStorage.setItem('cart_id', cartId);
   }, [cartId]);
+
+  useEffect(() => {
+    // Auto-sync cart to API when cart changes
+    if (cart.length > 0) {
+      syncCartToApi(cart, cartId);
+    }
+  }, [cart, cartId]);
 
   const addToCart = (product, quantity = 1) => {
     setCart((prev) => {
@@ -81,11 +132,6 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => setCart([]);
   const clearLastAdded = () => setLastAdded(null);
-  const clearCartId = () => {
-    const newCartId = nanoid();
-    setCartId(newCartId);
-    localStorage.setItem('retail_cart_id', newCartId);
-  };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   let subtotal = Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
@@ -101,6 +147,26 @@ export const CartProvider = ({ children }) => {
     price: cart.reduce((sum, item) => sum + item.price, 0),
     subtotal,
     total: totalPrice,
+  });
+
+  window.__syncCartToApi = syncCartToApi;
+
+  window.__getCartApi = () => ({
+    cart_id: cartId,
+    line_items: cart.map((item) => ({
+      item: {
+        id: String(item.id)
+      },
+      quantity: item.quantity,
+      price: {
+        amount: item.price.toFixed(2),
+        currency: 'USD'
+      }
+    })),
+    total_estimate: {
+      amount: totalPrice.toFixed(2),
+      currency: 'USD'
+    }
   });
 
   window.__clearSessionData = () => {
