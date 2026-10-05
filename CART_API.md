@@ -10,7 +10,7 @@ The cart management API provides endpoints to externally manage shopping carts i
 
 ### Health Check
 
-**Endpoint:** `GET /health`
+**Endpoint:** `GET /api/health`
 
 **Purpose:** Verify service connectivity
 
@@ -265,7 +265,7 @@ const updatedCart = await updateResponse.json();
 ### cURL
 ```bash
 # Health check
-curl -X GET http://localhost:5000/health
+curl -X GET http://localhost:5000/api/health
 
 # Get cart
 curl -X GET http://localhost:5000/api/carts/cart_12345 \

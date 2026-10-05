@@ -436,7 +436,7 @@ app.post('/api/detect', async (req, res) => {
 })
 
 // Health check endpoint for cart management API
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
