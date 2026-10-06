@@ -29,7 +29,12 @@ export const CartProvider = ({ children }) => {
   const [lastAdded, setLastAdded] = useState(null);
   const [cartId, setCartId] = useState(() => {
     const savedCartId = localStorage.getItem('retail_cart_id');
-    return savedCartId || nanoid();
+    const id = savedCartId || nanoid();
+    // Persist immediately
+    localStorage.setItem('retail_cart_id', id);
+    sessionStorage.setItem('cart_id', id);
+    console.log('[CartContext] Initialized cartId:', id);
+    return id;
   });
 
   // Track if cart update came from WebSocket or server sync to prevent sync loops

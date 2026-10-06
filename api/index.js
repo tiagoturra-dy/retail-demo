@@ -334,6 +334,8 @@ app.post('/api/muse/v2', async (req, res) => {
     
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
+    console.log('[/api/muse/v2] Request with cartId:', cartId);
+
     const response = await fetch(
       `https://direct.dy-api.com/v2/serve/user/agent`, 
       {
@@ -364,9 +366,11 @@ app.post('/api/muse/v2', async (req, res) => {
         }
       };
       
+      console.log('[/api/muse/v2] Response sent successfully');
       res.json(enhancedData);
     } else {
       const text = await response.text(); 
+      console.error('[/api/muse/v2] DY API error:', response.status, text);
       res.status(response.status).send(text || "No content from API");
     }
     
@@ -659,11 +663,7 @@ app.get('/api/carts/:id', (req, res) => {
   try {
     const { id } = req.params;
     
-    // Validate API key if configured
-    const apiKey = req.get('x-api-key');
-    if (process.env.CART_API_KEY && apiKey !== process.env.CART_API_KEY) {
-      return res.status(401).json({ error: 'Invalid API key' });
-    }
+    console.log('[GET /api/carts/:id] Fetching cart:', id);
 
     // Retrieve cart from store, or return empty cart if doesn't exist
     const cart = cartStore[id];
@@ -686,19 +686,21 @@ app.put('/api/carts/:id', async (req, res) => {
     const { id } = req.params;
     const { line_items } = req.body;
 
-    // Validate API key if configured
-    const apiKey = req.get('x-api-key');
-    if (process.env.CART_API_KEY && apiKey !== process.env.CART_API_KEY) {
-      return res.status(401).json({ error: 'Invalid API key' });
-    }
+    console.log('[PUT /api/carts/:id] Request received from:', req.get('origin') || 'unknown', {
+      cartId: id,
+      lineItemsCount: line_items?.length || 0,
+      lineItems: line_items
+    });
 
     if (!line_items || !Array.isArray(line_items)) {
+      console.error('[PUT /api/carts/:id] Invalid line_items:', line_items);
       return res.status(400).json({ error: 'Invalid request: line_items must be an array' });
     }
 
     // Validate line items have item.id and quantity
     for (const item of line_items) {
       if (!item.item?.id || item.quantity === undefined) {
+        console.error('[PUT /api/carts/:id] Invalid line item:', item);
         return res.status(400).json({ error: 'Each line item must have item.id (SKU) and quantity' });
       }
     }
@@ -813,8 +815,23 @@ app.put('/api/carts/:id', async (req, res) => {
     cartStore[id] = updatedCart;
     logCartSync('UPDATE', id, { items: mergedLineItems.length, total: updatedCart.total_estimate.amount });
 
+    console.log('[PUT /api/carts/:id] Cart stored, subscribers count:', cartSubscriptions.get(id)?.size || 0);
+
     // Broadcast update to all subscribed clients
     broadcastCartUpdate(id, updatedCart);
+
+    console.log('[PUT /api/carts/:id] ✅ Response being sent to Muse:', {
+      cartId: id,
+      itemsCount: mergedLineItems.length,
+      itemsDetail: mergedLineItems.map(li => ({
+        id: li.id,
+        sku: li.item.id,
+        quantity: li.quantity,
+        price: li.price
+      })),
+      total: updatedCart.total_estimate.amount,
+      currency: updatedCart.total_estimate.currency
+    });
 
     res.json({
       ...updatedCart
@@ -825,16 +842,30 @@ app.put('/api/carts/:id', async (req, res) => {
   }
 });
 
+// Debug: Get current subscriptions status
+app.get('/api/carts/debug/subscriptions', (req, res) => {
+  const subscriptionStatus = {};
+  cartSubscriptions.forEach((subscribers, cartId) => {
+    subscriptionStatus[cartId] = {
+      subscriberCount: subscribers.size,
+      hasCart: !!cartStore[cartId]
+    };
+  });
+  
+  res.json({
+    allCartIds: Array.from(cartSubscriptions.keys()),
+    subscriptions: subscriptionStatus,
+    totalActiveCartIds: cartSubscriptions.size,
+    allCartsInStore: Object.keys(cartStore)
+  });
+});
+
 // Delete cart endpoint (clear cart data when session ends or user logs out)
 app.delete('/api/carts/:id', (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate API key if configured
-    const apiKey = req.get('x-api-key');
-    if (process.env.CART_API_KEY && apiKey !== process.env.CART_API_KEY) {
-      return res.status(401).json({ error: 'Invalid API key' });
-    }
+    console.log('[DELETE /api/carts/:id] Clearing cart:', id);
 
     // Delete cart from store
     if (cartStore[id]) {
@@ -1133,11 +1164,15 @@ if (process.env.NODE_ENV !== 'production') {
         if (data.type === 'SUBSCRIBE') {
           const { cartId } = data;
           console.log('[WebSocket] SUBSCRIBE request for cartId:', cartId);
+          console.log('[WebSocket] All current subscriptions:', Array.from(cartSubscriptions.keys()));
+          
           if (!cartSubscriptions.has(cartId)) {
             cartSubscriptions.set(cartId, new Set());
+            console.log('[WebSocket] Created new subscription set for cartId:', cartId);
           }
+          
           cartSubscriptions.get(cartId).add(ws);
-          console.log('[WebSocket] Successfully subscribed. Total subscribers for cartId:', cartSubscriptions.get(cartId).size);
+          console.log('[WebSocket] ✅ Successfully subscribed. Total subscribers for cartId:', cartSubscriptions.get(cartId).size);
 
           
           // Send confirmation
