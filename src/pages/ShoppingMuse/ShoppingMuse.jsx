@@ -767,18 +767,27 @@ export const ShoppingMuse = () => {
   );
 };
 
-// Version wrapper - renders either V1 or V2 based on MUSE_VERSION env var
+// Version wrapper - renders either V1 or V2 based on URL param or env var
 export const ShoppingMuseWrapper = () => {
   const { isMuseOpen } = useMuse();
 
   if (!isMuseOpen) return null;
 
-  // Check URL param to force V1 welcome screen
+  // Check URL param first
   const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
+  if (urlVersion === 'v2') {
+    return <ShoppingMuseV2 />;
+  }
   if (urlVersion === 'v1') {
     return <ShoppingMuse />;
   }
 
-  // Default to V2 chat (skip welcome screen)
-  return <ShoppingMuseV2 />;
+  // Fall back to env var
+  const envVersion = process.env.REACT_APP_MUSE_VERSION;
+  if (envVersion === 'v2') {
+    return <ShoppingMuseV2 />;
+  }
+
+  // Default to V1
+  return <ShoppingMuse />;
 };
