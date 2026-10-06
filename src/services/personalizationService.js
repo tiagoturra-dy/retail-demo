@@ -306,21 +306,22 @@ export const personalizationService = {
         const variationId = data?.choices?.[0]?.variations?.[0]?.id
         
         if (block.type === 'recommendation' && block.data) {
-          // Flatten slots from recommendation items
-          const flattenedSlots = block.data.flatMap(item => 
-            (item.slots || []).map(slot => ({
+          // Keep each recommendation item separate with its own slots
+          const processedItems = block.data.map(item => ({
+            ...item,
+            slots: (item.slots || []).map(slot => ({
               ...slot.productData,
               sku: slot.sku,
               slotId: slot.slotId,
               decisionId,
               variationId,
             }))
-          )
+          }))
           
           return {
             type: block.type,
             ...block,
-            data: flattenedSlots
+            data: processedItems
           }
         }
         
@@ -332,10 +333,12 @@ export const personalizationService = {
       
       // Create widgets from recommendation blocks for backward compatibility
       const recommendationBlocks = blocks.filter(b => b.type === 'recommendation')
-      widgets = recommendationBlocks.map((block, idx) => ({
-        title: museData.blocks[idx]?.data?.[0]?.title || 'Recommendations',
-        slots: block.data || []
-      }))
+      widgets = recommendationBlocks.flatMap(block => 
+        (block.data || []).map(item => ({
+          title: item.title || 'Recommendations',
+          slots: item.slots || []
+        }))
+      )
     }
 
     return {
