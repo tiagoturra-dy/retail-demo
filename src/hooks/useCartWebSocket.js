@@ -13,15 +13,22 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
   }, [onCartUpdate]);
 
   const getWebSocketUrl = useCallback(() => {
-    // Connect to backend API server on port 5000 (or same host:port via proxy)
+    // In production, use env var for backend URL; in dev, use localhost:5000
     const isProduction = process.env.NODE_ENV === 'production';
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     
     if (isProduction) {
-      // In production, assume same host/port with proxy
-      return `${protocol}//${window.location.host}`;
+      // Production: use backend URL from env var
+      const backendUrl = process.env.REACT_APP_API_URL;
+      if (!backendUrl) {
+        console.warn('[useCartWebSocket] REACT_APP_API_URL not configured. WebSocket will fail on production.');
+        return null;
+      }
+      // Remove protocol if present, add wss
+      const host = backendUrl.replace(/^https?:\/\//, '').replace(/^wss?:\/\//, '');
+      return `${protocol}//${host}`;
     } else {
-      // In development, connect to backend API server on port 5000
+      // Development: connect to localhost:5000
       return `${protocol}//localhost:5000`;
     }
   }, []);
@@ -33,6 +40,11 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
 
     try {
       const wsUrl = getWebSocketUrl();
+      if (!wsUrl) {
+        console.warn('[useCartWebSocket] WebSocket URL unavailable. Skipping connection.');
+        return;
+      }
+      
       console.log('[useCartWebSocket] Connecting to:', wsUrl);
       
       wsRef.current = new WebSocket(wsUrl);
