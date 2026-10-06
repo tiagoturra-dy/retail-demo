@@ -289,16 +289,24 @@ export const personalizationService = {
       Helper.setStoredValue(CHAT_ID_KEY, museData.chatId)
     }
 
-    // Extract answer from blocks - find the text block
+    // Extract answer from blocks - collect text and markdown blocks
     let answer = ''
     let blocks = []
     let widgets = []
     
     if (museData?.blocks && Array.isArray(museData.blocks)) {
-      const textBlock = museData.blocks.find(b => b.type === 'text')
-      if (textBlock) {
-        answer = textBlock.data || ''
-      }
+      // Collect text and markdown content for the answer
+      const answerParts = []
+      
+      museData.blocks.forEach(block => {
+        if (block.type === 'text' && block.data) {
+          answerParts.push(block.data)
+        } else if (block.type === 'markdown' && block.data?.content) {
+          answerParts.push(block.data.content)
+        }
+      })
+      
+      answer = answerParts.join('\n\n') || ''
       
       // Process all blocks, converting recommendation blocks to widgets format
       blocks = museData.blocks.map(block => {
@@ -322,6 +330,14 @@ export const personalizationService = {
             type: block.type,
             ...block,
             data: processedItems
+          }
+        }
+        
+        // Markdown blocks pass through as-is
+        if (block.type === 'markdown') {
+          return {
+            type: block.type,
+            ...block
           }
         }
         
