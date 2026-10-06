@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, RotateCcw, SendHorizontal, ShoppingCart, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useMuse } from '../../context/MuseContext';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -20,6 +21,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import styles from './ShoppingMuseV2.module.css';
 
 const ENABLE_TYPEWRITER = false;
+const MAX_SELECTED_PRODUCTS = 4;
 
 const CONSTANTS = {
   TITLE: 'Personal Shopper',
@@ -262,6 +264,10 @@ export const ShoppingMuseV2 = () => {
       if (isSelected) {
         return prev.filter(p => (p.id || p.sku) !== productKey);
       } else {
+        // Limit to MAX_SELECTED_PRODUCTS
+        if (prev.length >= MAX_SELECTED_PRODUCTS) {
+          return prev;
+        }
         return [...prev, product];
       }
     });
@@ -527,7 +533,7 @@ export const ShoppingMuseV2 = () => {
                               ref={messages[messages.length - 1]?.id === msg.id ? lastBubbleRef : null}
                             >
                               <div className={styles.messageText}>
-                                <ReactMarkdown>
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                   {ttsState?.msgId === msg.id ? ttsState.visibleText : msg.text}
                                 </ReactMarkdown>
                               </div>

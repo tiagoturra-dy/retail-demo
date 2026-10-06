@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, RotateCcw, X, SendHorizontal, Search, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useMuse } from '../../context/MuseContext';
 import { ShoppingMuseV2 } from './ShoppingMuseV2';
 import { MicButton } from '../../components/MicButton/MicButton';
@@ -670,7 +671,7 @@ export const ShoppingMuse = () => {
                     ref={messages[messages.length - 1]?.id === msg.id ? lastBubbleRef : null}
                   >
                     <div className={styles.messageText}>
-                      <ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {ttsState?.msgId === msg.id ? ttsState.visibleText : msg.text}
                       </ReactMarkdown>
                     </div>
