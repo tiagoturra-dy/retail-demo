@@ -142,13 +142,31 @@ export const CartProvider = ({ children }) => {
           image_url: lineItem.item.image_url || '',
           brand: lineItem.item.brand || ''
         }));
-        // Mark as server sync to prevent auto-syncing back to API
-        isServerSyncRef.current = true;
-        setCart(mergedCart);
-        // Reset flag after state update
-        setTimeout(() => {
-          isServerSyncRef.current = false;
-        }, 0);
+
+        // Only update if cart actually changed to avoid unnecessary re-renders
+        setCart((prevCart) => {
+          const hasChanged = 
+            prevCart.length !== mergedCart.length ||
+            prevCart.some((item, idx) => 
+              !mergedCart[idx] || 
+              item.id !== mergedCart[idx].id ||
+              item.quantity !== mergedCart[idx].quantity ||
+              item.price !== mergedCart[idx].price
+            );
+
+          if (hasChanged) {
+            console.log('[syncCartFromServer] Cart changed, updating state');
+            isServerSyncRef.current = true;
+            // Reset flag after state update
+            setTimeout(() => {
+              isServerSyncRef.current = false;
+            }, 0);
+            return mergedCart;
+          } else {
+            console.log('[syncCartFromServer] Cart unchanged, skipping update');
+            return prevCart;
+          }
+        });
       }
 
       return serverCart;
