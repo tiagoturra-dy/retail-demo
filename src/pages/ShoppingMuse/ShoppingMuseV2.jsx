@@ -595,20 +595,6 @@ export const ShoppingMuseV2 = () => {
                               </div>
                             )}
 
-                            {msg.widgets && msg.widgets.length > 0 && ttsState?.msgId !== msg.id && (
-                              <div className={styles.widgetsContainer}>
-                                {msg.widgets.map((widget, wIdx) => (
-                                  <MuseWidgetBlock
-                                    key={wIdx}
-                                    widget={widget}
-                                    onProductSelect={handleProductSelect}
-                                    selectedProducts={selectedProducts}
-                                    onNavigate={closeMuse}
-                                  />
-                                ))}
-                              </div>
-                            )}
-
                             <span className={styles.timestamp}>
                               {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
