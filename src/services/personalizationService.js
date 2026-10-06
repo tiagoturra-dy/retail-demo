@@ -241,6 +241,111 @@ export const personalizationService = {
         }) || [],
     }
   },
+  getMuseResponseV2: async ({ query, cart = [], isImplicitPageview = false, cartId, selectedProducts = [] }) => {
+    console.log('Fetching Muse V2 response for:', query)
+    const CHAT_ID_KEY = '_dyMuseChatId'
+    const chatId = Helper.getStoredValue(CHAT_ID_KEY)
+
+    let body = await buildBaseBody({ cart, isImplicitPageview, type: 'muse' })
+    body.query = {
+      text: query,
+    }
+    body.options = { productData: { skusOnly: false } }
+
+    if (chatId && chatId !== '') body.query.chatId = chatId
+
+    if (cartId && cartId !== '') body['commerce'] = {cart_id: cartId}
+
+    body.selector = {
+      name: 'Shopping Muse',
+    }
+    addPreviewToSelector(body)
+    console.debug('Muse V2 Request Body:', body)
+
+    const response = await fetch(`/api/muse/v2`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-Charset': 'utf-8',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bodyData: JSON.stringify(body), cartId, selectedProducts }),
+    })
+
+    const data = await response.json()
+    console.debug('DY Muse V2 Results', data)
+
+    // Store chatId if returned in the response
+    // set cookies
+    data?.cookies?.forEach((cookie) => {
+      if(cookie.name === '_dyid_server') cookie.name = '_dyid'
+      Helper.setStoredValue(cookie.name, cookie.value, cookie.maxAge)
+    })
+
+    const museData = data?.choices?.[0]?.variations?.[0]?.payload?.data
+
+    // handle muse chatId for session persistence
+    if (museData && museData.chatId && museData.chatId !== chatId) {
+      Helper.setStoredValue(CHAT_ID_KEY, museData.chatId)
+    }
+
+    // Extract answer from blocks - find the text block
+    let answer = ''
+    let blocks = []
+    let widgets = []
+    
+    if (museData?.blocks && Array.isArray(museData.blocks)) {
+      const textBlock = museData.blocks.find(b => b.type === 'text')
+      if (textBlock) {
+        answer = textBlock.data || ''
+      }
+      
+      // Process all blocks, converting recommendation blocks to widgets format
+      blocks = museData.blocks.map(block => {
+        const decisionId = data?.choices?.[0]?.decisionId
+        const variationId = data?.choices?.[0]?.variations?.[0]?.id
+        
+        if (block.type === 'recommendation' && block.data) {
+          // Flatten slots from recommendation items
+          const flattenedSlots = block.data.flatMap(item => 
+            (item.slots || []).map(slot => ({
+              ...slot.productData,
+              sku: slot.sku,
+              slotId: slot.slotId,
+              decisionId,
+              variationId,
+            }))
+          )
+          
+          return {
+            type: block.type,
+            ...block,
+            data: flattenedSlots
+          }
+        }
+        
+        return {
+          type: block.type,
+          ...block,
+        }
+      })
+      
+      // Create widgets from recommendation blocks for backward compatibility
+      const recommendationBlocks = blocks.filter(b => b.type === 'recommendation')
+      widgets = recommendationBlocks.map((block, idx) => ({
+        title: museData.blocks[idx]?.data?.[0]?.title || 'Recommendations',
+        slots: block.data || []
+      }))
+    }
+
+    return {
+      decisionId: data?.choices?.[0]?.decisionId,
+      variationId: data?.choices?.[0]?.variations?.[0]?.id,
+      answer: answer || 'I\'m sorry, I couldn\'t find a specific answer for that. How else can I help you?',
+      blocks,
+      widgets,
+    }
+  },
   trackPurchase: async ({ orderId, total, cart = [] }) => {
     console.log('[Dynamic Yield] Triggering PURCHASE event for order:', orderId)
 

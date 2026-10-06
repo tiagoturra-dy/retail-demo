@@ -2,8 +2,27 @@ import { createContext, useContext, useState, useCallback } from 'react';
 
 const MuseContext = createContext(null);
 
+// Get muse version from URL param > env var > default to 'v1'
+const getMuseVersion = () => {
+  // Check URL parameter first
+  const params = new URLSearchParams(window.location.search);
+  const urlVersion = params.get('museVersion');
+  if (urlVersion === 'v1' || urlVersion === 'v2') {
+    return urlVersion;
+  }
+  
+  // Fall back to env var
+  const envVersion = process.env.REACT_APP_MUSE_VERSION;
+  if (envVersion === 'v2') {
+    return 'v2';
+  }
+  
+  // Default to v1
+  return 'v1';
+};
+
 const DEFAULT_CONFIG = {
-  version: 'chat',
+  version: 'v1',
   museName: 'Personal Shopper',
   trendingQueries: [],
   disclaimer: {
@@ -17,17 +36,26 @@ const DEFAULT_CONFIG = {
 
 export const MuseProvider = ({ children }) => {
   const [isMuseOpen, setIsMuseOpen] = useState(false);
-  const [pendingQuery, setPendingQuery] = useState(null); // { query: string|null, live: bool } | null
-  const [museConfig, setMuseConfig] = useState(DEFAULT_CONFIG);
+  const [pendingQuery, setPendingQuery] = useState(null);
+  const [museConfig, setMuseConfig] = useState(() => ({
+    ...DEFAULT_CONFIG,
+    version: getMuseVersion(),
+  }));
 
   const openMuse = useCallback((options = {}) => {
     const { query, live, version, museName, trendingQueries, disclaimer } = options;
-    setMuseConfig({
-      version: version || 'chat',
-      museName: museName || 'Personal Shopper',
-      trendingQueries: trendingQueries || [],
-      disclaimer: disclaimer || DEFAULT_CONFIG.disclaimer,
-    });
+    
+    // Re-check URL param every time Muse is opened
+    const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
+    const finalVersion = version || (urlVersion === 'v1' || urlVersion === 'v2' ? urlVersion : undefined);
+    
+    setMuseConfig(prev => ({
+      ...prev,
+      version: finalVersion || prev.version,
+      museName: museName || prev.museName,
+      trendingQueries: trendingQueries || prev.trendingQueries,
+      disclaimer: disclaimer || prev.disclaimer,
+    }));
     setPendingQuery({ query: query || null, live: live || false });
     setIsMuseOpen(true);
   }, []);

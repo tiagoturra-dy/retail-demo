@@ -26,7 +26,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import { AdminDashboardPage } from './pages/AdminDashboardPage/AdminDashboardPage';
 import { MyPage } from './pages/MyPage/MyPage';
 import { ContentProvider } from './context/ContentContext';
-import { ShoppingMuse } from './pages/ShoppingMuse/ShoppingMuse';
+import { ShoppingMuseWrapper } from './pages/ShoppingMuse/ShoppingMuse';
 import { BlogArticlePage } from './pages/BlogArticlePage/BlogArticlePage';
 import { MuseProvider, useMuse } from './context/MuseContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -153,7 +153,7 @@ export default function App() {
               <div className="min-h-screen bg-white font-sans text-zinc-900">
                 <Navbar logoText={LOGO_TEXT} />
                 <CategoriesSection />
-                <ShoppingMuse />
+                <ShoppingMuseWrapper />
                 <main>
                   <AnimatePresence mode="wait">
                     <Routes>

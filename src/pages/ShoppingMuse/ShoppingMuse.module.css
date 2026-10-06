@@ -255,7 +255,125 @@
 
             .messageText {
               margin: 0;
-              white-space: pre-wrap;
+              white-space: normal;
+              display: flow-root;
+
+              p {
+                margin: 0.5rem 0;
+                
+                &:first-child {
+                  margin-top: 0;
+                }
+                
+                &:last-child {
+                  margin-bottom: 0;
+                }
+              }
+
+              strong {
+                font-weight: 600;
+              }
+
+              em {
+                font-style: italic;
+              }
+
+              a {
+                color: var(--color-crimson);
+                text-decoration: underline;
+                cursor: pointer;
+
+                &:hover {
+                  opacity: 0.8;
+                }
+              }
+
+              code {
+                background-color: rgba(0, 0, 0, 0.06);
+                border-radius: 4px;
+                padding: 0.25rem 0.5rem;
+                font-family: 'Monaco', 'Courier New', monospace;
+                font-size: 0.85em;
+              }
+
+              pre {
+                background-color: rgba(0, 0, 0, 0.08);
+                border-radius: 8px;
+                padding: 1rem;
+                overflow-x: auto;
+                margin: 0.5rem 0;
+
+                code {
+                  background-color: transparent;
+                  padding: 0;
+                  border-radius: 0;
+                }
+              }
+
+              ul, ol {
+                margin: 0.5rem 0;
+                padding-left: 1.5rem;
+
+                li {
+                  margin: 0.25rem 0;
+                }
+              }
+
+              blockquote {
+                border-left: 3px solid var(--color-zinc-300);
+                padding-left: 1rem;
+                margin: 0.5rem 0;
+                color: var(--color-zinc-600);
+              }
+
+              hr {
+                border: none;
+                height: 1px;
+                background-color: var(--color-zinc-200);
+                margin: 1rem 0;
+              }
+
+              h1, h2, h3, h4, h5, h6 {
+                margin: 1rem 0 0.5rem 0;
+                font-weight: 600;
+
+                &:first-child {
+                  margin-top: 0;
+                }
+              }
+
+              h1 {
+                font-size: 1.5em;
+              }
+
+              h2 {
+                font-size: 1.25em;
+              }
+
+              h3 {
+                font-size: 1.1em;
+              }
+
+              h4, h5, h6 {
+                font-size: 1em;
+              }
+
+              table {
+                border-collapse: collapse;
+                width: 100%;
+                margin: 0.5rem 0;
+
+                th, td {
+                  border: 1px solid var(--color-zinc-300);
+                  padding: 0.5rem;
+                  text-align: left;
+                }
+
+                th {
+                  background-color: rgba(0, 0, 0, 0.05);
+                  font-weight: 600;
+                }
+              }
             }
           }
 

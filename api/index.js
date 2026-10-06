@@ -106,10 +106,6 @@ app.post('/api/search', async (req, res) => {
 
     // Log search request if it has SKU filter
     const hasSkuFilter = bodyData?.query?.filters?.some(f => f.field === 'sku');
-    if (hasSkuFilter) {
-      const skuFilter = bodyData.query.filters.find(f => f.field === 'sku');
-      console.log('[/api/search] SKU search request:', { skus: skuFilter.values });
-    }
 
     const response = await fetch(
       `https://direct.dy-api.com/v2/serve/user/search`, 
@@ -126,14 +122,9 @@ app.post('/api/search', async (req, res) => {
       }
     );
 
-    console.log('[/api/search] DY API response status:', response.status);
-
     const responseContentType = response.headers.get("content-type");
     if (response.ok && responseContentType && responseContentType.includes("application/json")) {
       const data = await response.json();
-      if (hasSkuFilter) {
-        console.log('[/api/search] DY API returned products:', { count: data.products?.length || 0 });
-      }
       res.json(data);
     } else {
       const text = await response.text(); 
@@ -336,12 +327,61 @@ app.post('/api/muse', async (req, res) => {
   }
 })
 
+// Enhanced Muse V2 endpoint with multi-product selection and cart management
+app.post('/api/muse/v2', async (req, res) => {
+  try {
+    const { bodyData, cartId, selectedProducts } = req.body;
+    
+    const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
+
+    const response = await fetch(
+      `https://direct.dy-api.com/v2/serve/user/agent`, 
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
+          'dy-api-key': process.env.DY_API_KEY,
+          'Content-Length': Buffer.byteLength(dataToSend)
+        },
+        body: dataToSend
+      }
+    );
+
+    const responseContentType = response.headers.get("content-type");
+    if (response.ok && responseContentType && responseContentType.includes("application/json")) {
+      const data = await response.json();
+      
+      // Enhance response with cart and selection info
+      const enhancedData = {
+        ...data,
+        metadata: {
+          version: 'v2',
+          cartId,
+          selectedProductsCount: selectedProducts?.length || 0,
+          timestamp: new Date().toISOString()
+        }
+      };
+      
+      res.json(enhancedData);
+    } else {
+      const text = await response.text(); 
+      res.status(response.status).send(text || "No content from API");
+    }
+    
+  } catch (error) {
+    console.error('[/api/muse/v2] Error:', error);
+    res.status(500).json({ error: JSON.stringify(error) });
+  }
+})
+
 app.post('/api/event', async (req, res) => {
   try {
     const { bodyData } = req.body
     const dataToSend = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
 
-    console.log('[/api/event] Sending to DY:', dataToSend);
+
 
     const response = await fetch(
       `https://direct-collect.dy-api.com/v2/collect/user/event`, 
@@ -358,7 +398,7 @@ app.post('/api/event', async (req, res) => {
       }
     );
 
-    console.log('[/api/event] Upstream response status:', response.status);
+
 
     if (response.ok) {
       // Operation was successful, but there is no body.
@@ -437,8 +477,7 @@ app.post('/api/detect', async (req, res) => {
       headers['Content-Type'] = contentType;
     }
 
-    console.log('[/api/detect] Forwarding POST request. Content-Type:', contentType);
-    console.log('[/api/detect] Body size:', Buffer.byteLength(req.body), 'bytes');
+
 
     const response = await fetch(
       'https://yoloe-api-52467501600.us-central1.run.app/detect',
@@ -449,7 +488,7 @@ app.post('/api/detect', async (req, res) => {
       }
     );
 
-    console.log('[/api/detect] Upstream response status:', response.status);
+
 
     const responseContentType = response.headers.get('content-type');
     if (response.ok && responseContentType && responseContentType.includes('application/json')) {
@@ -766,7 +805,7 @@ app.delete('/api/carts/:id', (req, res) => {
     // Delete cart from store
     if (cartStore[id]) {
       delete cartStore[id];
-      console.log('[DELETE /api/carts/:id] Cart cleared:', { id });
+
     }
 
     res.json({ success: true, message: 'Cart cleared' });
@@ -883,7 +922,7 @@ app.post('/api/webpush/opt-out', async (req, res) => {
 app.post('/api/webpush/pn-click', async (req, res) => {
   try {
     const { tracking } = req.body;
-    console.log('[WEBPUSH PN-CLICK] Request:', { tracking });
+
     const body = JSON.stringify({
       type: 'PN_CLICK',
       trackingData: {
@@ -945,7 +984,7 @@ app.post('/api/email/opt-in', async (req, res) => {
         value: email,
       },
     });
-    console.log('[EMAIL OPT-IN] Request:', body);
+
     const response = await fetch('https://dy-api.com/v2/userdata/channels/email/opt-in', {
       method: 'POST',
       headers: {
@@ -979,7 +1018,7 @@ app.post('/api/email/opt-in', async (req, res) => {
         ...data
       };
     }
-    console.log('[EMAIL OPT-IN] Response:', { status: response.status, data });
+
     res.status(response.status).json(data);
   } catch (error) {
     console.error('[EMAIL OPT-IN] Error:', error);
@@ -991,7 +1030,7 @@ app.post('/api/email/opt-in', async (req, res) => {
 app.post('/api/email/opt-out', async (req, res) => {
   try {
     const { email, dyid } = req.body;
-    console.log('[EMAIL OPT-OUT] Request:', { email, dyid });
+
     const body = JSON.stringify({
       associatedDevice: { dyid: dyid || '' },
       identifier: {
@@ -1032,7 +1071,7 @@ app.post('/api/email/opt-out', async (req, res) => {
         ...data
       };
     }
-    console.log('[EMAIL OPT-OUT] Response:', { status: response.status, data });
+
     res.status(response.status).json(data);
   } catch (error) {
     console.error('[EMAIL OPT-OUT] Error:', error);
@@ -1051,7 +1090,7 @@ if (process.env.NODE_ENV !== 'production') {
   
   // Handle WebSocket connections
   wss.on('connection', (ws) => {
-    console.log('[WebSocket] New client connected');
+
     
     ws.on('message', (message) => {
       try {
@@ -1063,7 +1102,7 @@ if (process.env.NODE_ENV !== 'production') {
             cartSubscriptions.set(cartId, new Set());
           }
           cartSubscriptions.get(cartId).add(ws);
-          console.log(`[WebSocket] Client subscribed to cartId: ${cartId}. Total subscribers: ${cartSubscriptions.get(cartId).size}`);
+
           
           // Send confirmation
           ws.send(JSON.stringify({
@@ -1075,7 +1114,7 @@ if (process.env.NODE_ENV !== 'production') {
           const { cartId } = data;
           if (cartSubscriptions.has(cartId)) {
             cartSubscriptions.get(cartId).delete(ws);
-            console.log(`[WebSocket] Client unsubscribed from cartId: ${cartId}`);
+
             
             if (cartSubscriptions.get(cartId).size === 0) {
               cartSubscriptions.delete(cartId);
@@ -1088,7 +1127,7 @@ if (process.env.NODE_ENV !== 'production') {
     });
     
     ws.on('close', () => {
-      console.log('[WebSocket] Client disconnected');
+
       // Remove this client from all subscriptions
       cartSubscriptions.forEach((subscribers, cartId) => {
         subscribers.delete(ws);

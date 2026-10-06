@@ -1,0 +1,1 @@
+Luxury, craftsmanship, timeless style, product quality, curation, personalization, exclusivity, attention to detail, elevated service, and confident styling recommendations tailored to customer preferences. Also emphasize the idea of "accessible luxury"—making high fashion feel attainable and wearable for every day

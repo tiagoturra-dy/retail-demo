@@ -1,0 +1,221 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #fafafa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  background-color: #fff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.headerCloseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: #666;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.headerCloseButton:hover {
+  background-color: #f0f0f0;
+  color: #1a1a1a;
+}
+
+.tableWrapper {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #1a1a1a;
+  z-index: 10;
+}
+
+.attributeColumn {
+  width: 140px;
+  min-width: 140px;
+  padding: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  background-color: #f5f5f5;
+}
+
+.productColumn {
+  min-width: 200px;
+  padding: 0.75rem;
+}
+
+.productHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.productImage {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.productInfo {
+  width: 100%;
+}
+
+.productName {
+  margin: 0;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.productSku {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.productButton {
+  align-self: flex-start;
+  padding: 0.5rem 1rem;
+  background-color: #0066ff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.productButton:hover {
+  background-color: #0052cc;
+}
+
+.attributeCell {
+  font-weight: 600;
+  color: #1a1a1a;
+  background-color: #f9f9f9;
+}
+
+.valueCell {
+  padding: 1rem;
+}
+
+.value {
+  display: block;
+  word-wrap: break-word;
+  white-space: normal;
+  color: #333;
+  line-height: 1.4;
+}
+
+.evenRow {
+  background-color: #fafafa;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  background-color: #fafafa;
+}
+
+.emptyState p {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.closeButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #0066ff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: #0052cc;
+}
+
+@media (max-width: 768px) {
+  .attributeColumn {
+    width: 100px;
+    min-width: 100px;
+    padding: 0.75rem;
+  }
+
+  .productColumn {
+    min-width: 150px;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .productImage {
+    height: 80px;
+  }
+
+  .productName {
+    font-size: 0.8rem;
+  }
+}

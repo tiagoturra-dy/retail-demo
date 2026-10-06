@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, RotateCcw, X, SendHorizontal, Search, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useMuse } from '../../context/MuseContext';
+import { ShoppingMuseV2 } from './ShoppingMuseV2';
 import { MicButton } from '../../components/MicButton/MicButton';
 import { LiveMicButton } from '../../components/LiveMicButton/LiveMicButton';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -667,9 +669,11 @@ export const ShoppingMuse = () => {
                     className={styles.messageBubble}
                     ref={messages[messages.length - 1]?.id === msg.id ? lastBubbleRef : null}
                   >
-                    <p className={styles.messageText}>
-                      {ttsState?.msgId === msg.id ? ttsState.visibleText : msg.text}
-                    </p>
+                    <div className={styles.messageText}>
+                      <ReactMarkdown>
+                        {ttsState?.msgId === msg.id ? ttsState.visibleText : msg.text}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                   
                   {msg.widgets && msg.widgets.length > 0 && ttsState?.msgId !== msg.id && (
@@ -761,4 +765,20 @@ export const ShoppingMuse = () => {
       )}
     </AnimatePresence>
   );
+};
+
+// Version wrapper - renders either V1 or V2 based on MUSE_VERSION env var
+export const ShoppingMuseWrapper = () => {
+  const { isMuseOpen } = useMuse();
+
+  if (!isMuseOpen) return null;
+
+  // Check URL param to force V1 welcome screen
+  const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
+  if (urlVersion === 'v1') {
+    return <ShoppingMuse />;
+  }
+
+  // Default to V2 chat (skip welcome screen)
+  return <ShoppingMuseV2 />;
 };
