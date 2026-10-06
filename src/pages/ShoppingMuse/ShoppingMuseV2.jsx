@@ -556,17 +556,7 @@ export const ShoppingMuseV2 = () => {
                               <div className={styles.widgetsContainer}>
                                 {msg.blocks.map((block, bIdx) => {
                                   if (block.type === 'recommendation') {
-                                    console.log(`[ShoppingMuseV2] Rendering recommendation block ${bIdx}:`, {
-                                      dataIsArray: Array.isArray(block.data),
-                                      dataLength: block.data?.length,
-                                      items: block.data
-                                    });
                                     return block.data.map((item, itemIdx) => {
-                                      console.log(`[ShoppingMuseV2] Rendering item ${itemIdx}:`, {
-                                        title: item.title,
-                                        slotsCount: item.slots?.length || 0,
-                                        slots: item.slots
-                                      });
                                       return (
                                         <MuseWidgetBlock
                                           key={`${bIdx}-${itemIdx}`}

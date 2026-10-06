@@ -145,6 +145,10 @@ export const CartProvider = ({ children }) => {
         // Mark as server sync to prevent auto-syncing back to API
         isServerSyncRef.current = true;
         setCart(mergedCart);
+        // Reset flag after state update
+        setTimeout(() => {
+          isServerSyncRef.current = false;
+        }, 0);
       }
 
       return serverCart;
@@ -185,6 +189,29 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     // Sync cart from server on mount (in case external systems updated it)
     syncCartFromServer(cartId);
+
+    // Poll server every 30 seconds as fallback if WebSocket fails
+    // Only poll when page is visible to save resources
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('[CartContext] Page visible, syncing cart');
+        syncCartFromServer(cartId);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const pollInterval = setInterval(() => {
+      if (!document.hidden) {
+        console.log('[CartContext] 🔄 Polling cart from server (fallback)');
+        syncCartFromServer(cartId);
+      }
+    }, 30000);
+
+    return () => {
+      clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [cartId]);
 
   useEffect(() => {
@@ -386,6 +413,7 @@ export const CartProvider = ({ children }) => {
         clearCartId,
         clearCartFromServer,
         syncCartFromServer,
+        syncCart: syncCartFromServer,
         cartId,
         totalItems,
         subtotal,
