@@ -2,7 +2,7 @@ import React from 'react';
 import { Package, Eye, MessageSquare, ShoppingBag } from 'lucide-react';
 import styles from './QuickActionsBar.module.css';
 
-export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, onAskAbout, onAddToCart }) => {
+export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, onAskAbout, onAddToCart, isAddingToCart = false }) => {
   const count = selectedProducts?.length || 0;
   const hasMultiple = count >= 2;
 
@@ -71,13 +71,21 @@ export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, on
 
         {onAddToCart && (
           <button
-            className={`${styles.actionButton} ${count >= 1 ? styles.actionButtonActive : styles.actionButtonDisabled}`}
+            className={`${styles.actionButton} ${count >= 1 && !isAddingToCart ? styles.actionButtonActive : styles.actionButtonDisabled}`}
             onClick={handleAddToCart}
-            disabled={count < 1}
-            title={count >= 1 ? 'Add selected items to cart' : 'Select at least 1 item to add to cart'}
+            disabled={count < 1 || isAddingToCart}
+            title={isAddingToCart ? 'Adding to cart...' : count >= 1 ? 'Add selected items to cart' : 'Select at least 1 item to add to cart'}
             aria-label="Add to cart"
           >
-            <ShoppingBag size={16} />
+            {isAddingToCart ? (
+              <div className={styles.loadingDots}>
+                <span className={styles.dot} />
+                <span className={styles.dot} />
+                <span className={styles.dot} />
+              </div>
+            ) : (
+              <ShoppingBag size={16} />
+            )}
           </button>
         )}
       </div>

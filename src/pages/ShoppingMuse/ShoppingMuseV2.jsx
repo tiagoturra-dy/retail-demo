@@ -129,6 +129,7 @@ export const ShoppingMuseV2 = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isLiveMic, setIsLiveMic] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [ttsState, setTtsState] = useState(null);
@@ -303,6 +304,8 @@ export const ShoppingMuseV2 = () => {
   const handleAddToCart = useCallback(async () => {
     if (selectedProducts.length === 0) return;
 
+    setIsAddingToCart(true);
+
     // Track the add to cart action
     personalizationService.trackMuseEvent({
       name: 'Muse Add to Cart',
@@ -349,6 +352,8 @@ export const ShoppingMuseV2 = () => {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsAddingToCart(false);
     }
   }, [selectedProducts, cart, cartId]);
 
@@ -602,7 +607,7 @@ export const ShoppingMuseV2 = () => {
                         </motion.div>
                       ))}
                     </AnimatePresence>
-                    {isLoading && (
+                    {(isLoading || isAddingToCart) && (
                       <motion.div
                         layout
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -646,6 +651,7 @@ export const ShoppingMuseV2 = () => {
                       onFindSimilar={handleFindSimilar}
                       onAskAbout={handleAskAbout}
                       onAddToCart={handleAddToCart}
+                      isAddingToCart={isAddingToCart}
                     />
                   )}
 
