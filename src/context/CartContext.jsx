@@ -54,6 +54,12 @@ export const CartProvider = ({ children }) => {
         quantity: item.quantity
       }));
 
+      console.log('[syncCartToApi] Sending PUT request', {
+        cartId: currentCartId,
+        itemCount: lineItems.length,
+        items: lineItems
+      });
+
       const response = await fetch(`${getApiBaseUrl()}/api/carts/${currentCartId}`, {
         method: 'PUT',
         headers: {
@@ -103,6 +109,8 @@ export const CartProvider = ({ children }) => {
 
   const syncCartFromServer = async (currentCartId = cartId) => {
     try {
+      console.log('[syncCartFromServer] Fetching cart from server', { cartId: currentCartId });
+
       const response = await fetch(`${getApiBaseUrl()}/api/carts/${currentCartId}`, {
         method: 'GET',
         headers: {
@@ -152,7 +160,16 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     // Auto-sync cart to API when cart changes (but NOT from WebSocket or server sync updates)
+    console.log('[CartContext] Cart or cartId changed, checking sync eligibility', {
+      cartLength: cart.length,
+      cartId,
+      isWebSocketUpdate: isWebSocketUpdateRef.current,
+      isServerSync: isServerSyncRef.current,
+      willSync: !isWebSocketUpdateRef.current && !isServerSyncRef.current
+    });
+
     if (!isWebSocketUpdateRef.current && !isServerSyncRef.current) {
+      console.log('[CartContext] Syncing cart to API');
       syncCartToApi(cart, cartId);
     }
     // Reset flags after check
@@ -172,7 +189,10 @@ export const CartProvider = ({ children }) => {
       if (e.key === 'retail_cart' && e.newValue) {
         try {
           const updatedCart = JSON.parse(e.newValue);
-          console.log('[CartContext] Cart synced from another tab:', updatedCart);
+          console.log('[CartContext] 🔄 Cart synced from another tab:', {
+            itemCount: updatedCart.length,
+            items: updatedCart
+          });
           setCart(updatedCart);
         } catch (error) {
           console.error('[CartContext] Error parsing cart from storage:', error);
@@ -180,7 +200,7 @@ export const CartProvider = ({ children }) => {
       }
       
       if (e.key === 'retail_cart_id' && e.newValue) {
-        console.log('[CartContext] CartId synced from another tab:', e.newValue);
+        console.log('[CartContext] 🔄 CartId synced from another tab:', e.newValue);
         setCartId(e.newValue);
       }
     };
@@ -192,6 +212,7 @@ export const CartProvider = ({ children }) => {
 
   // Handle WebSocket cart updates
   const handleWebSocketCartUpdate = (serverCart) => {
+    console.log('[CartContext] 📡 WebSocket cart update received:', serverCart);
     if (serverCart.line_items && Array.isArray(serverCart.line_items)) {
       const mergedCart = serverCart.line_items.map(lineItem => ({
         id: lineItem.item.id,
@@ -203,8 +224,11 @@ export const CartProvider = ({ children }) => {
       }));
       // Mark this as a WebSocket update to prevent sync loop
       isWebSocketUpdateRef.current = true;
+      console.log('[CartContext] 📡 Setting cart from WebSocket (flag set):', {
+        itemCount: mergedCart.length,
+        items: mergedCart
+      });
       setCart(mergedCart);
-      console.log('[CartContext] Cart updated via WebSocket:', mergedCart);
     }
   };
 
@@ -212,6 +236,7 @@ export const CartProvider = ({ children }) => {
   useCartWebSocket(cartId, handleWebSocketCartUpdate);
 
   const addToCart = (product, quantity = 1) => {
+    console.log('[CartContext] 🛒 addToCart called:', { productId: product.id, productName: product.name, quantity });
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       let newCart;
@@ -219,8 +244,10 @@ export const CartProvider = ({ children }) => {
         newCart = prev.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
         );
+        console.log('[CartContext] Updated existing item quantity');
       } else {
         newCart = [...prev, { ...product, quantity }];
+        console.log('[CartContext] Added new item to cart');
       }
 
       setLastAdded(product);
@@ -250,6 +277,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
+    console.log('[CartContext] 🗑️ removeFromCart called:', { productId });
     // Send quantity: -1 (server will decrement, remove if result <= 0)
     setCart((prev) => {
       const updated = prev.map((item) => 
@@ -264,6 +292,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const updateQuantity = (productId, quantity) => {
+    console.log('[CartContext] 📊 updateQuantity called:', { productId, quantity });
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
@@ -273,8 +302,14 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  const clearCart = () => setCart([]);
-  const clearLastAdded = () => setLastAdded(null);
+  const clearCart = () => {
+    console.log('[CartContext] 🧹 clearCart called');
+    setCart([]);
+  };
+  const clearLastAdded = () => {
+    console.log('[CartContext] Clear last added');
+    setLastAdded(null);
+  };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   let subtotal = Number(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2));
