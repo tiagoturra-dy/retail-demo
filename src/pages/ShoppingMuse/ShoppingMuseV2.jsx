@@ -226,12 +226,13 @@ export const ShoppingMuseV2 = () => {
     isSpeakingRef.current = false;
   }, []);
 
-  const appendBotMessage = useCallback((text, widgets = []) => {
+  const appendBotMessage = useCallback((text, widgets = [], blocks = []) => {
     const botMessage = {
       id: Date.now() + 1,
       type: 'bot',
       text,
       widgets,
+      blocks,
       timestamp: new Date()
     };
     setMessages(prev => [...prev, botMessage]);
@@ -243,16 +244,16 @@ export const ShoppingMuseV2 = () => {
     lang,
     onMessage: (text, isBot) => {
       if (isBot) {
-        appendBotMessage(text, []);
+        appendBotMessage(text, [], []);
         setIsLoading(false);
       }
     },
     onMuseResult: (response) => {
-      appendBotMessage(response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE, response.widgets || []);
+      appendBotMessage(response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE, response.widgets || [], response.blocks || []);
       setIsLoading(false);
     },
     onError: () => {
-      appendBotMessage(CONSTANTS.ERROR_BOT_MESSAGE, []);
+      appendBotMessage(CONSTANTS.ERROR_BOT_MESSAGE, [], []);
       setIsLoading(false);
     },
   });
@@ -329,18 +330,21 @@ export const ShoppingMuseV2 = () => {
         type: 'bot',
         text: response.answer || `Added ${selectedProducts.length} item(s) to your cart. Ready to continue shopping?`,
         widgets: [],
+        blocks: response.blocks || [],
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, confirmationMessage]);
 
-      // Keep selected products for further actions (user can deselect manually or continue)
+      // Deselect all products after adding to cart
+      setSelectedProducts([]);
     } catch (error) {
       console.error('Error adding to cart via Muse:', error);
       const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
         text: 'Sorry, I had trouble adding those items to your cart. Please try again.',
+        blocks: [],
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -380,6 +384,7 @@ export const ShoppingMuseV2 = () => {
         type: 'bot',
         text: CONSTANTS.INITIAL_BOT_MESSAGE,
         widgets: [],
+        blocks: [],
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botMessage]);
@@ -421,6 +426,7 @@ export const ShoppingMuseV2 = () => {
         type: 'bot',
         text: response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE,
         widgets: response.widgets || [],
+        blocks: response.blocks || [],
         timestamp: new Date()
       };
 
@@ -444,6 +450,7 @@ export const ShoppingMuseV2 = () => {
         id: Date.now() + 1,
         type: 'bot',
         text: CONSTANTS.ERROR_BOT_MESSAGE,
+        blocks: [],
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -554,10 +561,23 @@ export const ShoppingMuseV2 = () => {
                                         selectedProducts={selectedProducts}
                                         onNavigate={closeMuse}
                                       />
-                                    )
+                                    );
                                   }
-                                  // Future: handle other block types here
-                                  return null
+                                  if (block.type === 'redirect' && block.data?.url) {
+                                    const buttonLabel = block.data.type
+                                      ? block.data.type.charAt(0).toUpperCase() + block.data.type.slice(1).toLowerCase()
+                                      : 'Click here';
+                                    return (
+                                      <button
+                                        key={bIdx}
+                                        onClick={() => window.location.href = block.data.url}
+                                        className={styles.redirectButton}
+                                      >
+                                        {buttonLabel}
+                                      </button>
+                                    );
+                                  }
+                                  return null;
                                 })}
                               </div>
                             )}

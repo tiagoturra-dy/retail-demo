@@ -402,6 +402,30 @@
                 }
               }
             }
+
+            .redirectButton {
+              padding: 0.6rem 1rem;
+              background-color: var(--color-zinc-900);
+              color: var(--color-white);
+              border: none;
+              border-radius: 0.75rem;
+              font-size: 0.95rem;
+              font-weight: 500;
+              cursor: pointer;
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+              text-transform: none;
+              margin-top: 0.5rem;
+              width: fit-content;
+
+              &:hover {
+                background-color: var(--color-zinc-800);
+                transform: translateY(-1px);
+              }
+
+              &:active {
+                transform: translateY(0);
+              }
+            }
           }
 
           .timestamp {
