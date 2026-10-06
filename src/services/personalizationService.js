@@ -314,17 +314,37 @@ export const personalizationService = {
         const variationId = data?.choices?.[0]?.variations?.[0]?.id
         
         if (block.type === 'recommendation' && block.data) {
+          console.log('[Muse V2] Raw recommendation block.data structure:', {
+            dataIsArray: Array.isArray(block.data),
+            dataLength: block.data.length,
+            firstItem: block.data[0],
+            allItems: block.data
+          });
+          
           // Keep each recommendation item separate with its own slots
-          const processedItems = block.data.map(item => ({
-            ...item,
-            slots: (item.slots || []).map(slot => ({
-              ...slot.productData,
-              sku: slot.sku,
-              slotId: slot.slotId,
-              decisionId,
-              variationId,
-            }))
-          }))
+          const processedItems = block.data.map((item, idx) => {
+            console.log(`[Muse V2] Processing item ${idx}:`, {
+              title: item.title,
+              slotsCount: item.slots?.length || 0,
+              slots: item.slots
+            });
+            
+            return {
+              ...item,
+              slots: (item.slots || []).map(slot => ({
+                ...slot.productData,
+                sku: slot.sku,
+                slotId: slot.slotId,
+                decisionId,
+                variationId,
+              }))
+            };
+          });
+          
+          console.log('[Muse V2] Processed items:', {
+            itemsCount: processedItems.length,
+            items: processedItems
+          });
           
           return {
             type: block.type,

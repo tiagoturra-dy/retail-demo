@@ -37,12 +37,19 @@ const CONSTANTS = {
   FALLBACK_BOT_MESSAGE: 'I\'m sorry, I couldn\'t find a specific answer for that. How else can I help you?',
 };
 
-const MuseCarousel = ({ slots, onProductSelect, selectedProducts, onNavigate }) => {
+const MuseCarousel = ({ slots, onProductSelect, selectedProducts, onNavigate, emblaApiRef }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     align: 'start',
     containScroll: 'trimSnaps',
     dragFree: true
   });
+
+  // Expose embla API to parent component
+  useEffect(() => {
+    if (emblaApiRef) {
+      emblaApiRef.current = emblaApi;
+    }
+  }, [emblaApi, emblaApiRef]);
 
   const handleSelectToggle = useCallback((e, product) => {
     e.stopPropagation();
@@ -108,6 +115,7 @@ const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate
         onProductSelect={onProductSelect}
         selectedProducts={selectedProducts}
         onNavigate={onNavigate}
+        emblaApiRef={emblaApiRef}
       />
     </div>
   );
@@ -543,18 +551,30 @@ export const ShoppingMuseV2 = () => {
                               <div className={styles.widgetsContainer}>
                                 {msg.blocks.map((block, bIdx) => {
                                   if (block.type === 'recommendation') {
-                                    return block.data.map((item, itemIdx) => (
-                                      <MuseWidgetBlock
-                                        key={`${bIdx}-${itemIdx}`}
-                                        widget={{
-                                          title: item.title || 'Recommendations',
-                                          slots: item.slots || []
-                                        }}
-                                        onProductSelect={handleProductSelect}
-                                        selectedProducts={selectedProducts}
-                                        onNavigate={closeMuse}
-                                      />
-                                    ));
+                                    console.log(`[ShoppingMuseV2] Rendering recommendation block ${bIdx}:`, {
+                                      dataIsArray: Array.isArray(block.data),
+                                      dataLength: block.data?.length,
+                                      items: block.data
+                                    });
+                                    return block.data.map((item, itemIdx) => {
+                                      console.log(`[ShoppingMuseV2] Rendering item ${itemIdx}:`, {
+                                        title: item.title,
+                                        slotsCount: item.slots?.length || 0,
+                                        slots: item.slots
+                                      });
+                                      return (
+                                        <MuseWidgetBlock
+                                          key={`${bIdx}-${itemIdx}`}
+                                          widget={{
+                                            title: item.title || 'Recommendations',
+                                            slots: item.slots || []
+                                          }}
+                                          onProductSelect={handleProductSelect}
+                                          selectedProducts={selectedProducts}
+                                          onNavigate={closeMuse}
+                                        />
+                                      );
+                                    });
                                   }
                                   if (block.type === 'redirect' && block.data?.url) {
                                     const buttonLabel = block.data.type
