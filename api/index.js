@@ -511,6 +511,19 @@ app.get('/api/health', (req, res) => {
 });
 
 // Cart API health endpoint
+// Cart sync log endpoint (for debugging)
+app.get('/api/carts/sync-log', (req, res) => {
+  res.json({
+    log: cartSyncLog,
+    total_carts: Object.keys(cartStore).length,
+    carts: Object.entries(cartStore).map(([id, cart]) => ({
+      id,
+      items: cart.line_items.length,
+      total: cart.total_estimate.amount
+    }))
+  });
+});
+
 app.get('/api/carts', (req, res) => {
   res.status(200).json({ health: { status: 'ok' } });
 });
@@ -522,6 +535,19 @@ app.get('/api/carts/health', (req, res) => {
 
 // In-memory cart store (in production, this would connect to your e-commerce platform)
 const cartStore = {};
+const cartSyncLog = [];  // Log all cart sync operations
+
+// Log cart sync operation
+const logCartSync = (operation, cartId, details) => {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    operation,  // 'CREATE', 'UPDATE', 'FETCH', 'DELETE'
+    cartId,
+    ...details
+  };
+  cartSyncLog.push(entry);
+  console.log(`[CART SYNC] ${operation}:`, entry);
+};
 
 // Helper function to fetch product details by SKU from DY API
 const fetchProductBySku = async (sku) => {
@@ -635,6 +661,7 @@ app.get('/api/carts/:id', (req, res) => {
 
     // Retrieve cart from store, or return empty cart if doesn't exist
     const cart = cartStore[id];
+    logCartSync('FETCH', id, { found: !!cart, items: cart?.line_items?.length || 0 });
     
     res.json({
       cart_id: id,
@@ -778,6 +805,7 @@ app.put('/api/carts/:id', async (req, res) => {
 
     // Store the updated cart
     cartStore[id] = updatedCart;
+    logCartSync('UPDATE', id, { items: mergedLineItems.length, total: updatedCart.total_estimate.amount });
 
     // Broadcast update to all subscribed clients
     broadcastCartUpdate(id, updatedCart);
@@ -805,7 +833,7 @@ app.delete('/api/carts/:id', (req, res) => {
     // Delete cart from store
     if (cartStore[id]) {
       delete cartStore[id];
-
+      logCartSync('DELETE', id, { deleted: true });
     }
 
     res.json({ success: true, message: 'Cart cleared' });
