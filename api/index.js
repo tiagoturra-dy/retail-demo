@@ -634,17 +634,23 @@ const fetchProductBySku = async (sku) => {
 // Helper function to broadcast cart updates to all subscribed clients
 const broadcastCartUpdate = (cartId, cart) => {
   const subscribers = cartSubscriptions.get(cartId);
+  console.log('[broadcastCartUpdate] Broadcasting to cartId:', cartId, 'subscribers:', subscribers?.size || 0);
   if (subscribers && subscribers.size > 0) {
     const message = JSON.stringify({
       type: 'CART_UPDATE',
       cartId,
       data: cart
     });
+    let sentCount = 0;
     subscribers.forEach(ws => {
       if (ws.readyState === 1) { // WebSocket.OPEN
         ws.send(message);
+        sentCount++;
       }
     });
+    console.log('[broadcastCartUpdate] Sent CART_UPDATE to', sentCount, 'clients');
+  } else {
+    console.log('[broadcastCartUpdate] No subscribers found for cartId:', cartId);
   }
 };
 
@@ -1126,10 +1132,12 @@ if (process.env.NODE_ENV !== 'production') {
         
         if (data.type === 'SUBSCRIBE') {
           const { cartId } = data;
+          console.log('[WebSocket] SUBSCRIBE request for cartId:', cartId);
           if (!cartSubscriptions.has(cartId)) {
             cartSubscriptions.set(cartId, new Set());
           }
           cartSubscriptions.get(cartId).add(ws);
+          console.log('[WebSocket] Successfully subscribed. Total subscribers for cartId:', cartSubscriptions.get(cartId).size);
 
           
           // Send confirmation

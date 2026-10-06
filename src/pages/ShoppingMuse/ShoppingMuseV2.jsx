@@ -309,18 +309,11 @@ export const ShoppingMuseV2 = () => {
 
     try {
       // Send add to cart request to Muse without redirecting
-      const productsInfo = selectedProducts.map(p => ({
-        id: p.id || p.sku,
-        name: p.name,
-        sku: p.sku,
-        quantity: 1
-      }));
-
+      // Cart will be updated by external service via WebSocket
       const response = await personalizationService.getMuseResponseV2({
         query: `Add items to cart: ${selectedProducts.map(p => `${p.sku} (${p.name})`).join(', ')}`,
         cart,
         cartId,
-        // selectedProducts: productsInfo,
         action: 'addToCart'
       });
 
@@ -550,18 +543,18 @@ export const ShoppingMuseV2 = () => {
                               <div className={styles.widgetsContainer}>
                                 {msg.blocks.map((block, bIdx) => {
                                   if (block.type === 'recommendation') {
-                                    return (
+                                    return block.data.map((item, itemIdx) => (
                                       <MuseWidgetBlock
-                                        key={bIdx}
+                                        key={`${bIdx}-${itemIdx}`}
                                         widget={{
-                                          title: block.data?.[0]?.title || 'Recommendations',
-                                          slots: block.data || []
+                                          title: item.title || 'Recommendations',
+                                          slots: item.slots || []
                                         }}
                                         onProductSelect={handleProductSelect}
                                         selectedProducts={selectedProducts}
                                         onNavigate={closeMuse}
                                       />
-                                    );
+                                    ));
                                   }
                                   if (block.type === 'redirect' && block.data?.url) {
                                     const buttonLabel = block.data.type

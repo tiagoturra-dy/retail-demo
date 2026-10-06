@@ -67,15 +67,19 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
       wsRef.current.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          console.log('[useCartWebSocket] Received message:', message.type);
+          console.log('[useCartWebSocket] Received message:', message.type, 'for cartId:', message.cartId);
 
           if (message.type === 'CART_UPDATE' && message.cartId === cartId) {
-            console.log('[useCartWebSocket] Cart updated:', message.data);
+            console.log('[useCartWebSocket] 🔄 CART_UPDATE for our cartId! Calling onCartUpdate callback...');
+            console.log('[useCartWebSocket] Cart data:', message.data);
             if (onCartUpdateRef.current) {
               onCartUpdateRef.current(message.data);
+              console.log('[useCartWebSocket] ✅ onCartUpdate callback executed');
+            } else {
+              console.warn('[useCartWebSocket] ⚠️ onCartUpdateRef.current is null!');
             }
           } else if (message.type === 'SUBSCRIBED') {
-            console.log('[useCartWebSocket] Subscription confirmed:', message.cartId);
+            console.log('[useCartWebSocket] ✅ Subscription confirmed for cartId:', message.cartId);
           }
         } catch (error) {
           console.error('[useCartWebSocket] Error parsing message:', error);
@@ -125,11 +129,15 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
 
     // Only connect if we have a cartId
     if (cartId) {
+      console.log('[useCartWebSocket] Setting up WebSocket for cartId:', cartId);
       connect();
+    } else {
+      console.log('[useCartWebSocket] No cartId provided, skipping WebSocket connection');
     }
 
     return () => {
       isMounted = false;
+      console.log('[useCartWebSocket] Cleaning up WebSocket for cartId:', cartId);
       unsubscribe();
       disconnect();
     };

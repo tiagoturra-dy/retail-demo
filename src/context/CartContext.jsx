@@ -229,6 +229,11 @@ export const CartProvider = ({ children }) => {
         items: mergedCart
       });
       setCart(mergedCart);
+      // Update localStorage to trigger storage events in other tabs
+      localStorage.setItem('retail_cart', JSON.stringify(mergedCart));
+      console.log('[CartContext] 📡 Cart updated in localStorage');
+    } else {
+      console.warn('[CartContext] 📡 WebSocket message missing line_items:', serverCart);
     }
   };
 
