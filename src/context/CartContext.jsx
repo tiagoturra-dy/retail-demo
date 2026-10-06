@@ -165,6 +165,31 @@ export const CartProvider = ({ children }) => {
     syncCartFromServer(cartId);
   }, [cartId]);
 
+  useEffect(() => {
+    // Listen for cart updates from other tabs via localStorage
+    const handleStorageChange = (e) => {
+      // Only handle cart-related storage changes
+      if (e.key === 'retail_cart' && e.newValue) {
+        try {
+          const updatedCart = JSON.parse(e.newValue);
+          console.log('[CartContext] Cart synced from another tab:', updatedCart);
+          setCart(updatedCart);
+        } catch (error) {
+          console.error('[CartContext] Error parsing cart from storage:', error);
+        }
+      }
+      
+      if (e.key === 'retail_cart_id' && e.newValue) {
+        console.log('[CartContext] CartId synced from another tab:', e.newValue);
+        setCartId(e.newValue);
+      }
+    };
+
+    // Listen for storage changes from OTHER tabs
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Handle WebSocket cart updates
   const handleWebSocketCartUpdate = (serverCart) => {
     if (serverCart.line_items && Array.isArray(serverCart.line_items)) {
