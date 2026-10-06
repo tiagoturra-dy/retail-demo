@@ -32,8 +32,9 @@ export const CartProvider = ({ children }) => {
     return savedCartId || nanoid();
   });
 
-  // Track if cart update came from WebSocket to prevent sync loops
+  // Track if cart update came from WebSocket or server sync to prevent sync loops
   const isWebSocketUpdateRef = useRef(false);
+  const isServerSyncRef = useRef(false);
 
   const clearCartId = () => {
     clearCartFromServer(cartId);
@@ -128,6 +129,8 @@ export const CartProvider = ({ children }) => {
           image_url: lineItem.item.image_url || '',
           brand: lineItem.item.brand || ''
         }));
+        // Mark as server sync to prevent auto-syncing back to API
+        isServerSyncRef.current = true;
         setCart(mergedCart);
       }
 
@@ -148,12 +151,13 @@ export const CartProvider = ({ children }) => {
   }, [cartId]);
 
   useEffect(() => {
-    // Auto-sync cart to API when cart changes (but NOT from WebSocket updates)
-    if (!isWebSocketUpdateRef.current) {
+    // Auto-sync cart to API when cart changes (but NOT from WebSocket or server sync updates)
+    if (!isWebSocketUpdateRef.current && !isServerSyncRef.current) {
       syncCartToApi(cart, cartId);
     }
-    // Reset flag after check
+    // Reset flags after check
     isWebSocketUpdateRef.current = false;
+    isServerSyncRef.current = false;
   }, [cart, cartId]);
 
   useEffect(() => {
