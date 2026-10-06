@@ -64,7 +64,7 @@ const MuseCarousel = ({ slots, onProductSelect, selectedProducts, onNavigate, em
           const isSelected = selectedProducts?.some(p => (p.id || p.sku) === productKey);
           return (
             <div
-              key={productKey}
+              key={`${productKey}-${pIdx}`}
               className={styles.emblaSlide}
             >
               <div className={styles.productCardWrapper}>
