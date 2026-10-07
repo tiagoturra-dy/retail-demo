@@ -43,6 +43,11 @@ export const CartProvider = ({ children }) => {
   // localStorage cart can't clobber a server cart updated by Muse in another session/tab
   const isHydratingRef = useRef(true);
   const isServerSyncRef = useRef(false);
+  // Mirrors `cart` for reading the latest value outside of React's render/state-update cycle
+  const cartRef = useRef(cart);
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   const clearCartId = () => {
     clearCartFromServer(cartId);
@@ -145,6 +150,15 @@ export const CartProvider = ({ children }) => {
           image_url: lineItem.item.image_url || '',
           brand: lineItem.item.brand || ''
         }));
+
+        // Cart store is in-memory and can lose state (server restart/cold start).
+        // Never let an empty server response wipe out a non-empty local cart -
+        // instead push the local cart back up to heal the server's state.
+        if (mergedCart.length === 0 && cartRef.current.length > 0) {
+          console.warn('[syncCartFromServer] Server cart is empty but local cart is not - re-syncing local cart to server instead of wiping it');
+          syncCartToApi(cartRef.current, currentCartId);
+          return serverCart;
+        }
 
         // Only update if cart actually changed to avoid unnecessary re-renders
         setCart((prevCart) => {

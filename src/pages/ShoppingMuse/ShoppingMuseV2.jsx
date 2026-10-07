@@ -150,6 +150,13 @@ export const ShoppingMuseV2 = () => {
   const MESSAGE_MAX_LEN = 150;
   const museName = museConfig.museName;
 
+  // Muse's cart mutations happen out-of-band (DY calls our cart API async on its own
+  // timeline), so poll a couple of times after any turn instead of guessing one delay
+  const reconcileCartFromServer = useCallback(() => {
+    setTimeout(() => syncCartFromServer(cartId), 1500);
+    setTimeout(() => syncCartFromServer(cartId), 4000);
+  }, [syncCartFromServer, cartId]);
+
   useEffect(() => {
     isLiveMicRef.current = isLiveMic;
   }, [isLiveMic]);
@@ -352,11 +359,9 @@ export const ShoppingMuseV2 = () => {
       // Muse's cart mutation happens out-of-band (DY calls our cart API async), so the
       // WebSocket push can be missed or delayed. Reconcile directly so pages like
       // Checkout never see a stale/empty cart without requiring a manual refresh.
-      setTimeout(() => {
-        syncCartFromServer(cartId);
-      }, 1500);
+      reconcileCartFromServer();
     }
-  }, [selectedProducts, cart, cartId, syncCartFromServer]);
+  }, [selectedProducts, cart, cartId, syncCartFromServer, reconcileCartFromServer]);
 
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
@@ -463,6 +468,9 @@ export const ShoppingMuseV2 = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      // Any Muse turn can involve an out-of-band cart mutation on DY's side (e.g. it
+      // decided to add/remove items), so reconcile here too, not just after explicit ATC
+      reconcileCartFromServer();
     }
   };
 
