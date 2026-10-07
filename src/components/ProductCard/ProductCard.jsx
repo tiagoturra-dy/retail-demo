@@ -10,7 +10,7 @@ import { AddToCartButton } from '../AddToCartButton/AddToCartButton';
 import { AddToWishlistButton } from '../AddToWishlistButton/AddToWishlistButton';
 import styles from './ProductCard.module.css';
 
-export const ProductCard = ({ product, compact = false, className = '', style, addToCartPosition, onNavigate }) => {
+export const ProductCard = ({ product, compact = false, className = '', style, addToCartPosition, onNavigate, hideAddToCart = false }) => {
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
 
@@ -60,7 +60,7 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
           )}
           <p className={`${styles.productPrice} ${compact ? styles.compactPrice : ''}`}>{formatPrice(product.price)}</p>
         </div>
-        {(!compact || addToCartPosition === 'right') && (
+        {!hideAddToCart && (!compact || addToCartPosition === 'right') && (
           <AddToCartButton 
             product={product} 
             className={styles.addToCartBtn} 
@@ -71,7 +71,7 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
           />
         )}
       </div>
-      {addToCartPosition === 'bottom' && (
+      {!hideAddToCart && addToCartPosition === 'bottom' && (
         <AddToCartButton
           product={product}
           showText={true}

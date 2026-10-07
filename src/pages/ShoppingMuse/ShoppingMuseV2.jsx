@@ -73,6 +73,7 @@ const MuseCarousel = ({ slots, onProductSelect, selectedProducts, onNavigate, em
                   compact={true}
                   addToCartPosition='bottom'
                   onNavigate={onNavigate}
+                  hideAddToCart={true}
                 />
                 <button
                   className={`${styles.selectButton} ${isSelected ? styles.selectButtonActive : ''}`}
