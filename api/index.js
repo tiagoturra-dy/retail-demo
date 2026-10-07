@@ -672,7 +672,7 @@ app.get('/api/carts/:id', (req, res) => {
     res.json({
       cart_id: id,
       line_items: cart ? cart.line_items : [],
-      total_estimate: cart ? cart.total_estimate : { subtotal: '0.00', tax: '0.00', total: '0.00' }
+      total_estimate: cart ? cart.total_estimate : { amount: '0.00', currency: 'USD' }
     });
   } catch (error) {
     console.error('[GET /api/carts/:id] Error:', error);
