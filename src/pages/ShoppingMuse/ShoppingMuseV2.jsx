@@ -155,17 +155,12 @@ export const ShoppingMuseV2 = () => {
   }, [isLiveMic]);
 
   useEffect(() => {
-    if (!lastBubbleRef.current || !messagesListRef.current) return;
+    if (!messagesListRef.current) return;
     const list = messagesListRef.current;
-    const isOverflowing = list.scrollHeight > list.clientHeight;
-    if (!isOverflowing) return;
+    // Scroll to bottom after a small delay to allow animations to complete
     const t = setTimeout(() => {
-      const bubble = lastBubbleRef.current;
-      if (!bubble) return;
-      const listTop = list.getBoundingClientRect().top;
-      const bubbleTop = bubble.getBoundingClientRect().top;
-      list.scrollBy({ top: bubbleTop - listTop, behavior: 'smooth' });
-    }, 150);
+      list.scrollTop = list.scrollHeight;
+    }, 100);
     return () => clearTimeout(t);
   }, [messages, isLoading]);
 
