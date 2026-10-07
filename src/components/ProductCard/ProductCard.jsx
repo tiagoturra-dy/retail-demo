@@ -15,11 +15,11 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
   const { formatPrice } = useCurrency();
 
   const handleTrackClick = () => {
-    console.log('ProductCard clicked:', product.name, 'DecisionId:', product.decisionId);
-    if (product.decisionId) {
-      personalizationService.trackClick({ decisionId: product.decisionId, variationId: product.variationId });
+    console.log('ProductCard clicked:', product.name, 'DecisionId:', product.decisionId, 'SlotId:', product.slotId);
+    if (product.slotId || product.decisionId) {
+      personalizationService.trackClick({ decisionId: product.decisionId, variationId: product.variationId, slotId: product.slotId });
     } else {
-      console.warn('No decisionId found for product:', product.name);
+      console.warn('No decisionId/slotId found for product:', product.name);
     }
     if (onNavigate) onNavigate(product);
   };

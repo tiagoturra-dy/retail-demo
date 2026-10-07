@@ -93,7 +93,8 @@ export const CategoryPage = () => {
         ...slot,
         ...slot.productData,
         decisionId,
-        variationId: variation.id
+        variationId: variation.id,
+        slotId: slot.slotId
       }));
 
       setProducts(processedProducts);

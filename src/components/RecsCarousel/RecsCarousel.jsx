@@ -32,7 +32,8 @@ export const RecsCarousel = ({ recommendations, additionalClass = '' }) => {
             ...slot, 
             ...slot.productData, 
             decisionId: choice.decisionId, 
-            variationId: variation.id
+            variationId: variation.id,
+            slotId: slot.slotId
           };
           return product;
         })

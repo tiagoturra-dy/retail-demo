@@ -84,7 +84,8 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
                 ...slot,
                 ...slot.productData,
                 decisionId: choice.decisionId,
-                variationId: variation.id
+                variationId: variation.id,
+                slotId: slot.slotId
               }));
             })
           ).filter(product => product.sku);
@@ -156,7 +157,8 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
               ...slot,
               ...slot.productData,
               decisionId,
-              variationId: variation.id
+              variationId: variation.id,
+              slotId: slot.slotId
             }));
             setResults(processedResults);
             gaDYVariationImpression(choice, variation);
@@ -226,11 +228,11 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
   };
 
   const handleTrackClick = (product) => {
-    console.log('ProductCard clicked:', product.name, 'DecisionId:', product.decisionId);
-    if (product.decisionId) {
-      personalizationService.trackClick({ decisionId: product.decisionId, variationId: product.variationId });
+    console.log('ProductCard clicked:', product.name, 'DecisionId:', product.decisionId, 'SlotId:', product.slotId);
+    if (product.slotId || product.decisionId) {
+      personalizationService.trackClick({ decisionId: product.decisionId, variationId: product.variationId, slotId: product.slotId });
     } else {
-      console.warn('No decisionId found for product:', product.name);
+      console.warn('No decisionId/slotId found for product:', product.name);
     }
     navigate(`/product/${product.sku}`);
     onClose();

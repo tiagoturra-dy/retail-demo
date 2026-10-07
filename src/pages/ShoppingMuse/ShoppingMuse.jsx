@@ -332,7 +332,7 @@ export const ShoppingMuse = () => {
         const decisionId = choice?.decisionId;
         const variationId = variation?.id;
         const rawSlots = variation?.payload?.data?.slots || [];
-        const slots = rawSlots.map(slot => ({ ...slot, ...slot.productData, decisionId, variationId }));
+        const slots = rawSlots.map(slot => ({ ...slot, ...slot.productData, decisionId, variationId, slotId: slot.slotId }));
         setWelcomeProducts(slots);
       })
       .catch(() => {});

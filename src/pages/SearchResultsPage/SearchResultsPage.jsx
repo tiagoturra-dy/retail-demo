@@ -70,7 +70,8 @@ export const SearchResultsPage = () => {
         ...slot,
         ...slot.productData,
         decisionId,
-        variationId: variation.id
+        variationId: variation.id,
+        slotId: slot.slotId
       }));
 
       setResults(processedResults);

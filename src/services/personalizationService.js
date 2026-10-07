@@ -112,19 +112,16 @@ export const personalizationService = {
 
     return recs
   },
-  trackClick: async ({ decisionId, variationId, cart = [] }) => {
-    if (!decisionId || !variationId) return
+  trackClick: async ({ decisionId, variationId, slotId, cart = [] }) => {
+    if (!slotId && !decisionId) return
 
-    console.log('Tracking click for decisionId:', decisionId, variationId)
+    console.log('Tracking click - slotId:', slotId, 'decisionId:', decisionId, 'variationId:', variationId)
 
     let body = await buildBaseBody({ cart })
-    body.engagements = [
-      {
-        type: 'CLICK',
-        decisionId,
-        variationIds: [variationId],
-      },
-    ]
+    // SLOT_CLICK is required to report product clicks for recommendation/search campaigns
+    body.engagements = slotId
+      ? [{ type: 'SLOT_CLICK', slotId: String(slotId), ...(variationId != null ? { variations: [Number(variationId)] } : {}) }]
+      : [{ type: 'CLICK', decisionId, ...(variationId != null ? { variations: [Number(variationId)] } : {}) }]
 
     console.log('[Engage] Sending to /api/engage:', JSON.stringify(body));
 
