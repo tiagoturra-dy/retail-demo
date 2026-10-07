@@ -39,6 +39,9 @@ export const CartProvider = ({ children }) => {
 
   // Track if cart update came from WebSocket or server sync to prevent sync loops
   const isWebSocketUpdateRef = useRef(false);
+  // Blocks the auto-sync PUT until the first server fetch resolves, so a stale
+  // localStorage cart can't clobber a server cart updated by Muse in another session/tab
+  const isHydratingRef = useRef(true);
   const isServerSyncRef = useRef(false);
 
   const clearCartId = () => {
@@ -186,14 +189,20 @@ export const CartProvider = ({ children }) => {
   }, [cartId]);
 
   useEffect(() => {
-    // Auto-sync cart to API when cart changes (but NOT from WebSocket or server sync updates)
+    // Auto-sync cart to API when cart changes (but NOT from WebSocket, server sync, or before hydration)
     console.log('[CartContext] Cart or cartId changed, checking sync eligibility', {
       cartLength: cart.length,
       cartId,
+      isHydrating: isHydratingRef.current,
       isWebSocketUpdate: isWebSocketUpdateRef.current,
       isServerSync: isServerSyncRef.current,
-      willSync: !isWebSocketUpdateRef.current && !isServerSyncRef.current
+      willSync: !isHydratingRef.current && !isWebSocketUpdateRef.current && !isServerSyncRef.current
     });
+
+    if (isHydratingRef.current) {
+      // Still waiting on the initial syncCartFromServer - don't push a possibly-stale local cart yet
+      return;
+    }
 
     if (!isWebSocketUpdateRef.current && !isServerSyncRef.current) {
       console.log('[CartContext] Syncing cart to API');
@@ -205,8 +214,10 @@ export const CartProvider = ({ children }) => {
   }, [cart, cartId]);
 
   useEffect(() => {
-    // Sync cart from server on mount (in case external systems updated it)
-    syncCartFromServer(cartId);
+    // Sync cart from server on mount (in case external systems updated it) before allowing any auto-sync PUT
+    syncCartFromServer(cartId).finally(() => {
+      isHydratingRef.current = false;
+    });
 
     // Poll server every 30 seconds as fallback if WebSocket fails
     // Only poll when page is visible to save resources

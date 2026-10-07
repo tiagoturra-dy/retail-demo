@@ -92,16 +92,17 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
 
       wsRef.current.onclose = () => {
         console.log('[useCartWebSocket] Disconnected');
-        
-        // Attempt to reconnect
+
+        // Keep retrying forever (capped backoff) - a cart update can otherwise be missed
+        // permanently since the cartId never changes and nothing else would reconnect us
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current += 1;
           console.log(`[useCartWebSocket] Reconnecting... (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
-          setTimeout(connect, reconnectDelayRef.current);
-          reconnectDelayRef.current = Math.min(reconnectDelayRef.current * 2, 10000); // Exponential backoff, max 10s
         } else {
-          console.warn('[useCartWebSocket] Max reconnection attempts reached');
+          console.warn('[useCartWebSocket] Max reconnection attempts reached, continuing to retry at max interval');
         }
+        setTimeout(connect, reconnectDelayRef.current);
+        reconnectDelayRef.current = Math.min(reconnectDelayRef.current * 2, 10000); // Exponential backoff, max 10s
       };
     } catch (error) {
       console.error('[useCartWebSocket] Error creating WebSocket:', error);

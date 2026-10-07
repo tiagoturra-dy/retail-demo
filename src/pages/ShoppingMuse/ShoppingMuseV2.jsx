@@ -122,7 +122,7 @@ const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate
 };
 
 export const ShoppingMuseV2 = () => {
-  const { cart, cartId } = useCart();
+  const { cart, cartId, syncCartFromServer } = useCart();
   const { lang } = useCurrency();
   const { isMuseOpen, closeMuse, pendingQuery, clearPendingQuery, museConfig } = useMuse();
   
@@ -349,8 +349,14 @@ export const ShoppingMuseV2 = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsAddingToCart(false);
+      // Muse's cart mutation happens out-of-band (DY calls our cart API async), so the
+      // WebSocket push can be missed or delayed. Reconcile directly so pages like
+      // Checkout never see a stale/empty cart without requiring a manual refresh.
+      setTimeout(() => {
+        syncCartFromServer(cartId);
+      }, 1500);
     }
-  }, [selectedProducts, cart, cartId]);
+  }, [selectedProducts, cart, cartId, syncCartFromServer]);
 
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
