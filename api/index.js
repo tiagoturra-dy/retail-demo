@@ -541,6 +541,24 @@ app.get('/api/carts/health', (req, res) => {
 const cartStore = {};
 const cartSyncLog = [];  // Log all cart sync operations
 
+// Merchant business error codes (UCP messages) per Shopping Muse error handling spec
+const CART_ERROR_CODES = {
+  NOT_FOUND: 'not_found',
+  ITEM_UNAVAILABLE: 'item_unavailable',
+  OUT_OF_STOCK: 'out_of_stock',
+  QUANTITY_LIMIT_EXCEEDED: 'quantity_invalid_limit_exceeded',
+  QUANTITY_MINIMUM_NOT_MET: 'quantity_invalid_minimum_not_met',
+  ITEM_INELIGIBLE: 'item_ineligible'
+};
+
+const MAX_QUANTITY_PER_ITEM = 10;
+
+const buildUcpMessage = (code, content, { type = 'error', severity } = {}) => {
+  const message = { type, code, content };
+  if (severity) message.severity = severity;
+  return message;
+};
+
 // Log cart sync operation
 const logCartSync = (operation, cartId, details) => {
   const entry = {
@@ -614,13 +632,16 @@ const fetchProductBySku = async (sku) => {
       
       if (slots && slots.length > 0) {
         const product = slots[0];
+        const inventory = product.productData?.['type:number:inventory'];
         return {
           id: product.sku,
           name: product.productData?.name || product.productData?.title || 'Product',
           sku: product.sku,
           price: parseFloat(product.productData?.price) || 0,
           image_url: product.productData?.image_url || product.productData?.imageUrl || '',
-          brand: product.productData?.brand || ''
+          brand: product.productData?.brand || '',
+          in_stock: product.productData?.in_stock !== 'FALSE',
+          inventory: typeof inventory === 'number' ? inventory : null
         };
       }
     } else {
@@ -668,11 +689,21 @@ app.get('/api/carts/:id', (req, res) => {
     // Retrieve cart from store, or return empty cart if doesn't exist
     const cart = cartStore[id];
     logCartSync('FETCH', id, { found: !!cart, items: cart?.line_items?.length || 0 });
-    
+
+    const messages = [];
+    if (!cart) {
+      messages.push(buildUcpMessage(
+        CART_ERROR_CODES.NOT_FOUND,
+        `Cart ${id} does not exist or has expired.`,
+        { severity: 'recoverable' }
+      ));
+    }
+
     res.json({
       cart_id: id,
       line_items: cart ? cart.line_items : [],
-      total_estimate: cart ? cart.total_estimate : { amount: '0.00', currency: 'USD' }
+      total_estimate: cart ? cart.total_estimate : { amount: '0.00', currency: 'USD' },
+      ...(messages.length ? { messages } : {})
     });
   } catch (error) {
     console.error('[GET /api/carts/:id] Error:', error);
@@ -711,6 +742,7 @@ app.put('/api/carts/:id', async (req, res) => {
     
     // Process incoming items: add, update, remove, or decrement
     let totalAmount = 0;
+    const ucpMessages = [];
 
     for (let i = 0; i < line_items.length; i++) {
       const item = line_items[i];
@@ -753,22 +785,37 @@ app.put('/api/carts/:id', async (req, res) => {
       
       if (!productDetails) {
         console.warn(`[PUT /api/carts/:id] Could not fetch details for SKU: ${sku}`);
-        // Still add/update in cart but with basic info
-        const newItem = {
-          id: existingIndex >= 0 ? mergedLineItems[existingIndex].id : `line_${Date.now()}_${i}`,
-          item: {
-            id: sku
-          },
-          quantity: finalQuantity,
-          price: { amount: '0.00', currency: 'USD' }
-        };
-        
-        if (existingIndex >= 0) {
-          mergedLineItems[existingIndex] = newItem;
-        } else {
-          mergedLineItems.push(newItem);
-        }
-      } else {
+        ucpMessages.push(buildUcpMessage(
+          CART_ERROR_CODES.ITEM_UNAVAILABLE,
+          `The item ${sku} does not exist or can't currently be purchased.`,
+          { severity: 'recoverable' }
+        ));
+        continue;
+      }
+
+      if (productDetails.in_stock === false || productDetails.inventory === 0) {
+        ucpMessages.push(buildUcpMessage(
+          CART_ERROR_CODES.OUT_OF_STOCK,
+          `No inventory is currently available for item ${sku}.`,
+          { severity: 'recoverable' }
+        ));
+        continue;
+      }
+
+      // Clamp quantity to the allowed maximum (inventory on hand or the per-item cap)
+      const allowedMax = productDetails.inventory !== null
+        ? Math.min(productDetails.inventory, MAX_QUANTITY_PER_ITEM)
+        : MAX_QUANTITY_PER_ITEM;
+      if (finalQuantity > allowedMax) {
+        ucpMessages.push(buildUcpMessage(
+          CART_ERROR_CODES.QUANTITY_LIMIT_EXCEEDED,
+          `The requested quantity for item ${sku} exceeds the allowed maximum of ${allowedMax}.`,
+          { severity: 'recoverable' }
+        ));
+        finalQuantity = allowedMax;
+      }
+
+      {
         const itemPrice = productDetails.price;
         const newItem = {
           id: existingIndex >= 0 ? mergedLineItems[existingIndex].id : `line_${Date.now()}_${i}`,
@@ -834,7 +881,8 @@ app.put('/api/carts/:id', async (req, res) => {
     });
 
     res.json({
-      ...updatedCart
+      ...updatedCart,
+      ...(ucpMessages.length ? { messages: ucpMessages } : {})
     });
   } catch (error) {
     console.error('[PUT /api/carts/:id] Error:', error);
