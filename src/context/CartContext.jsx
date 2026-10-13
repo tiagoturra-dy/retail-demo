@@ -358,17 +358,23 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId) => {
     console.log('[CartContext] 🗑️ removeFromCart called:', { productId });
-    // Send quantity: -1 (server will decrement, remove if result <= 0)
-    setCart((prev) => {
-      const updated = prev.map((item) => 
-        item.id === productId ? { ...item, quantity: -1 } : item
-      );
-      // Schedule cleanup of qty 0 items after sync response
-      const cleanup = setTimeout(() => {
-        setCart((current) => current.filter((item) => item.quantity > 0));
-      }, 200);
-      return updated;
-    });
+    const previousCart = cartRef.current;
+    const removedItem = previousCart.find((item) => item.id === productId);
+
+    if (!removedItem) {
+      return;
+    }
+
+    const updatedCart = previousCart.filter((item) => item.id !== productId);
+    cartRef.current = updatedCart;
+    setCart(updatedCart);
+
+    // The cart API merges updates, so omitting an item does not remove it.
+    // Include an explicit zero-quantity line item to remove it server-side.
+    syncCartToApi([
+      ...updatedCart,
+      { ...removedItem, quantity: 0 }
+    ], cartId);
   };
 
   const updateQuantity = (productId, quantity) => {
