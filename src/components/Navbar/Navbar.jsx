@@ -12,6 +12,7 @@ import styles from './Navbar.module.css';
 import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
 import { BagIcon } from '../../icons/BagIcon/BagIcon';
 import { Helper } from '../../helpers/helper';
+import { MiniCart } from '../MiniCart/MiniCart';
 
 export const Navbar = ({ logoText }) => {
   const navigate = useNavigate();
@@ -21,8 +22,10 @@ export const Navbar = ({ logoText }) => {
   const [overlayInitialQuery, setOverlayInitialQuery] = useState('');
   const [previewPosition, setPreviewPosition] = useState(null);
   const [isDraggingPreview, setIsDraggingPreview] = useState(false);
+  const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const previewNotificationRef = useRef(null);
+  const miniCartRegionRef = useRef(null);
   const { totalItems, lastAdded, clearLastAdded, subtotal } = useCart();
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -32,25 +35,46 @@ export const Navbar = ({ logoText }) => {
     ? new URLSearchParams(location.search).get('q') || ''
     : '';
 
-  const popupHovered = useRef(false);
-  const popupTimerRef = useRef(null);
-
-  // Auto-dismiss popup after 5 seconds, paused while hovering
   useEffect(() => {
-    if (!lastAdded) return;
-    popupHovered.current = false;
-    popupTimerRef.current = setTimeout(clearLastAdded, 5000);
-    return () => clearTimeout(popupTimerRef.current);
+    if (lastAdded) {
+      setIsMiniCartOpen(true);
+    }
   }, [lastAdded]);
 
-  const handlePopupMouseEnter = () => {
-    popupHovered.current = true;
-    clearTimeout(popupTimerRef.current);
+  useEffect(() => {
+    if (!isMiniCartOpen) return;
+
+    const handlePointerDown = (event) => {
+      if (!miniCartRegionRef.current?.contains(event.target)) {
+        setIsMiniCartOpen(false);
+        clearLastAdded();
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsMiniCartOpen(false);
+        clearLastAdded();
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMiniCartOpen, clearLastAdded]);
+
+  const closeMiniCart = () => {
+    setIsMiniCartOpen(false);
+    clearLastAdded();
   };
 
-  const handlePopupMouseLeave = () => {
-    popupHovered.current = false;
-    popupTimerRef.current = setTimeout(clearLastAdded, 5000);
+  const handleMiniCartBlur = (event) => {
+    if (!miniCartRegionRef.current?.contains(event.relatedTarget)) {
+      closeMiniCart();
+    }
   };
 
   // Safety check for styles
@@ -213,51 +237,27 @@ export const Navbar = ({ logoText }) => {
               </Link>
             )}
             
-            <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`} data-dy-nav-icon="cart">
-              <BagIcon className={`dy-nav-icon ${s.actionIcon}`} />
-              {totalItems > 0 && (
-                <span className={`${s.cartBadge} cart-badge`} cart-total-items={totalItems || 0} cart-subtotal={subtotal}>{totalItems}</span>
-              )}
-            </Link>
-
-            {/* Added to Bag popup */}
-            <AnimatePresence>
-              {lastAdded && (
-                <motion.div
-                  className={`${s.addedToBagPopup} dy-added-to-bag-popup`}
-                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                  transition={{ duration: 0.18 }}
-                  onMouseEnter={handlePopupMouseEnter}
-                  onMouseLeave={handlePopupMouseLeave}
-                >
-                  <div className={s.popupHeader}>
-                    <span className={s.popupTitle}>Added To Bag</span>
-                  </div>
-                  <div className={`dy-added-to-bag-popup-item ${s.popupItem}`}>
-                    <img
-                      src={lastAdded.image_url || lastAdded.image}
-                      alt={lastAdded.name}
-                      className={s.popupItemImage}
-                    />
-                    <div className={s.popupItemInfo}>
-                      <div className={s.popupItemTopRow}>
-                        <span className={s.popupItemName}>{lastAdded.name}</span>
-                        <button className={s.popupClose} onClick={clearLastAdded} aria-label="Close">✕</button>
-                      </div>
-                      {lastAdded.color && <p className={s.popupItemAttr}>Color: {lastAdded.color}</p>}
-                      {lastAdded.size && <p className={s.popupItemAttr}>Size: {lastAdded.size}</p>}
-                      <p className={s.popupItemPrice}>${lastAdded.price?.toFixed(2)}</p>
-                    </div>
-                  </div>
-                  <div className={`dy-added-to-bag-popup-actions ${s.popupActions}`}>
-                    <Link to="/cart" className={s.popupGoToBag} onClick={clearLastAdded}>GO TO BAG</Link>
-                    <Link to="/checkout" className={s.popupCheckout} onClick={clearLastAdded}>CHECKOUT</Link>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div
+              ref={miniCartRegionRef}
+              className={s.miniCartRegion}
+              onMouseEnter={() => setIsMiniCartOpen(true)}
+              onMouseLeave={closeMiniCart}
+              onFocus={() => setIsMiniCartOpen(true)}
+              onBlur={handleMiniCartBlur}
+            >
+              <Link to="/cart" className={`${s.actionBtn} ${s.cartBtn}`} data-dy-nav-icon="cart">
+                <BagIcon className={`dy-nav-icon ${s.actionIcon}`} />
+                {totalItems > 0 && (
+                  <span className={`${s.cartBadge} cart-badge`} cart-total-items={totalItems || 0} cart-subtotal={subtotal}>{totalItems}</span>
+                )}
+              </Link>
+              <MiniCart
+                isOpen={isMiniCartOpen}
+                onClose={closeMiniCart}
+                onMouseEnter={() => setIsMiniCartOpen(true)}
+                onMouseLeave={closeMiniCart}
+              />
+            </div>
           </div>
         </div>
       </div>
