@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Minus, Plus, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -8,9 +8,20 @@ import { gaRemoveFromCart } from '../../lib/gaEvents';
 import { Helper } from '../../helpers/helper';
 import styles from './MiniCart.module.css';
 
-export const MiniCart = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
+export const MiniCart = ({ isOpen, onClose, onMouseEnter, onMouseLeave, lastAddedItem }) => {
   const { cart, subtotal, updateQuantity, removeFromCart } = useCart();
   const { formatPrice } = useCurrency();
+  const [addedItemId, setAddedItemId] = useState(null);
+
+  useEffect(() => {
+    if (!lastAddedItem?.id) {
+      return undefined;
+    }
+
+    setAddedItemId(lastAddedItem.id);
+    const timeoutId = setTimeout(() => setAddedItemId(null), 2000);
+    return () => clearTimeout(timeoutId);
+  }, [lastAddedItem]);
 
   const handleDecrease = (item) => {
     if (item.quantity === 1) {
@@ -56,7 +67,10 @@ export const MiniCart = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
             <>
               <ul className={styles.itemList}>
                 {cart.map((item) => (
-                  <li className={styles.item} key={item.id}>
+                  <li
+                    className={`${styles.item} ${item.id === addedItemId ? styles.addedItem : ''}`}
+                    key={item.id}
+                  >
                     <Link className={styles.itemImageLink} to={`/product/${item.id}`} onClick={onClose}>
                       <img src={Helper.getProductImage(item.image_url || item.image)} alt={item.name} className={styles.itemImage} />
                     </Link>
@@ -84,7 +98,9 @@ export const MiniCart = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
                   </li>
                 ))}
               </ul>
-              <div className={`${styles.messagePlaceholder} dy-minicart-message`} />
+              <div className={`${styles.messagePlaceholder} ${addedItemId ? styles.messageVisible : ''} dy-minicart-message`} aria-live="polite">
+                {addedItemId ? `${lastAddedItem?.name || 'Item'} added to shopping bag.` : ''}
+              </div>
               <footer className={styles.footer}>
                 <div className={styles.subtotal}>
                   <span>Subtotal</span>

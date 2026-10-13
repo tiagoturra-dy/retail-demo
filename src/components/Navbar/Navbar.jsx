@@ -253,6 +253,7 @@ export const Navbar = ({ logoText }) => {
               </Link>
               <MiniCart
                 isOpen={isMiniCartOpen}
+                lastAddedItem={lastAdded}
                 onClose={closeMiniCart}
                 onMouseEnter={() => setIsMiniCartOpen(true)}
                 onMouseLeave={closeMiniCart}
