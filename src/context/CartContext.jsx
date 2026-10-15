@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import nanoid from 'nano-id';
 import { Helper } from '../helpers/helper';
 import { useCartWebSocket } from '../hooks/useCartWebSocket';
 
@@ -27,15 +26,7 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [lastAdded, setLastAdded] = useState(null);
-  const [cartId, setCartId] = useState(() => {
-    const savedCartId = localStorage.getItem('retail_cart_id');
-    const id = savedCartId || nanoid();
-    // Persist immediately
-    localStorage.setItem('retail_cart_id', id);
-    sessionStorage.setItem('cart_id', id);
-    console.log('[CartContext] Initialized cartId:', id);
-    return id;
-  });
+  const [cartId, setCartId] = useState(() => localStorage.getItem('retail_cart_id'));
 
   // Track if cart update came from WebSocket or server sync to prevent sync loops
   const isWebSocketUpdateRef = useRef(false);
@@ -51,10 +42,9 @@ export const CartProvider = ({ children }) => {
 
   const clearCartId = () => {
     clearCartFromServer(cartId);
-    const newCartId = nanoid();
-    setCartId(newCartId);
-    localStorage.setItem('retail_cart_id', newCartId);
-    sessionStorage.setItem('cart_id', newCartId);
+    localStorage.removeItem('retail_cart_id');
+    sessionStorage.removeItem('cart_id');
+    setCartId(null);
   };
 
   const syncCartToApi = async (cartItems = cart, currentCartId = cartId) => {
@@ -198,6 +188,9 @@ export const CartProvider = ({ children }) => {
   }, [cart]);
 
   useEffect(() => {
+    if (!cartId) {
+      return;
+    }
     localStorage.setItem('retail_cart_id', cartId);
     sessionStorage.setItem('cart_id', cartId);
   }, [cartId]);
@@ -213,7 +206,7 @@ export const CartProvider = ({ children }) => {
       willSync: !isHydratingRef.current && !isWebSocketUpdateRef.current && !isServerSyncRef.current
     });
 
-    if (isHydratingRef.current) {
+    if (!cartId || isHydratingRef.current) {
       // Still waiting on the initial syncCartFromServer - don't push a possibly-stale local cart yet
       return;
     }
@@ -228,6 +221,11 @@ export const CartProvider = ({ children }) => {
   }, [cart, cartId]);
 
   useEffect(() => {
+    if (!cartId) {
+      isHydratingRef.current = false;
+      return undefined;
+    }
+
     // Sync cart from server on mount (in case external systems updated it) before allowing any auto-sync PUT
     syncCartFromServer(cartId).finally(() => {
       isHydratingRef.current = false;

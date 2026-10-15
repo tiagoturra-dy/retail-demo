@@ -4,10 +4,45 @@ import App from './App';
 import './index.css';
 import { Helper } from './helpers/helper';
 import { personalizationService } from './services/personalizationService';
+import nanoid from 'nano-id';
 
 const getRuntimeConfig = (response) => {
   const config = response?.choices?.[0]?.variations?.[0]?.payload?.data;
   return config?.schemaVersion === 1 ? config : null;
+};
+
+const getCartApiBaseUrl = () => (
+  process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'
+);
+
+// Create the server cart before React renders, so external Muse calls can use it immediately.
+const initializeCart = async () => {
+  const existingCartId = localStorage.getItem('retail_cart_id');
+  const cartId = existingCartId || nanoid();
+
+  localStorage.setItem('retail_cart_id', cartId);
+  sessionStorage.setItem('cart_id', cartId);
+
+  console.log('[Cart Init] Initializing cart', {
+    cartId,
+    reused: !!existingCartId
+  });
+
+  const response = await fetch(`${getCartApiBaseUrl()}/api/carts/${cartId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
+    },
+    body: JSON.stringify({ line_items: [] })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Cart API returned status ${response.status}`);
+  }
+
+  console.log('[Cart Init] Cart ready', { cartId });
+  return cartId;
 };
 
 // Initialize DY dyid before any components render to avoid race conditions
@@ -123,9 +158,9 @@ const loadDYScripts = () => {
 };
 
 if (!Helper.isBot(navigator.userAgent)) {
-  // Initialize DY before rendering app
-  initializeDYid().then(() => {
-    console.log('[Main] DY initialization complete, rendering app...');
+  // Initialize DY identity and server cart before rendering the app.
+  Promise.all([initializeDYid(), initializeCart()]).then(() => {
+    console.log('[Main] Initialization complete, rendering app...');
     
     // Load DY scripts after dyid is primed
     loadDYScripts();
@@ -138,5 +173,7 @@ if (!Helper.isBot(navigator.userAgent)) {
         <App />
       // </StrictMode>,
     );
+    }).catch((error) => {
+      console.error('[Main] Initialization failed:', error);
   });
 }
