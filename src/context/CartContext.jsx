@@ -366,6 +366,26 @@ export const CartProvider = ({ children }) => {
     }
 
     const updatedCart = previousCart.filter((item) => item.id !== productId);
+
+    if (window.DY && typeof window.DY.API === 'function') {
+      window.DY.API('event', {
+        name: 'Remove from Cart',
+        properties: {
+          dyType: 'remove-from-cart-v1',
+          value: removedItem.price * removedItem.quantity,
+          currency: 'USD',
+          productId: String(removedItem.id),
+          quantity: removedItem.quantity,
+          cart: updatedCart.map((item) => ({
+            productId: String(item.id),
+            quantity: item.quantity,
+            itemPrice: item.price
+          }))
+        }
+      });
+      console.log('[Dynamic Yield] Remove from Cart event triggered for product:', removedItem.id);
+    }
+
     cartRef.current = updatedCart;
     setCart(updatedCart);
 
