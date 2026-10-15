@@ -543,7 +543,6 @@ const cartSyncLog = [];  // Log all cart sync operations
 
 // Merchant business error codes (UCP messages) per Shopping Muse error handling spec
 const CART_ERROR_CODES = {
-  NOT_FOUND: 'not_found',
   ITEM_UNAVAILABLE: 'item_unavailable',
   OUT_OF_STOCK: 'out_of_stock',
   QUANTITY_LIMIT_EXCEEDED: 'quantity_invalid_limit_exceeded',
@@ -686,24 +685,14 @@ app.get('/api/carts/:id', (req, res) => {
     
     console.log('[GET /api/carts/:id] Fetching cart:', id);
 
-    // Retrieve cart from store, or return empty cart if doesn't exist
+    // The store is per-process. A missing cart is an empty cart after a cold start.
     const cart = cartStore[id];
     logCartSync('FETCH', id, { found: !!cart, items: cart?.line_items?.length || 0 });
-
-    const messages = [];
-    if (!cart) {
-      messages.push(buildUcpMessage(
-        CART_ERROR_CODES.NOT_FOUND,
-        `Cart ${id} does not exist or has expired.`,
-        { severity: 'recoverable' }
-      ));
-    }
 
     res.json({
       cart_id: id,
       line_items: cart ? cart.line_items : [],
-      total_estimate: cart ? cart.total_estimate : { amount: '0.00', currency: 'USD' },
-      ...(messages.length ? { messages } : {})
+      total_estimate: cart ? cart.total_estimate : { amount: '0.00', currency: 'USD' }
     });
   } catch (error) {
     console.error('[GET /api/carts/:id] Error:', error);

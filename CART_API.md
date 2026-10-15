@@ -62,9 +62,8 @@ The cart management API provides endpoints to externally manage shopping carts i
 ```
 
 **HTTP Status:**
-- `200 OK` - Cart found
+- `200 OK` - Cart found, or an empty cart when the cart is not present in the current server instance
 - `401 Unauthorized` - Invalid API key
-- `404 Not Found` - Cart does not exist
 - `500 Internal Server Error` - Server error
 
 ---
