@@ -5,28 +5,37 @@ import './index.css';
 import { Helper } from './helpers/helper';
 import { personalizationService } from './services/personalizationService';
 
+const getRuntimeConfig = (response) => {
+  const config = response?.choices?.[0]?.variations?.[0]?.payload?.data;
+  return config?.schemaVersion === 1 ? config : null;
+};
+
 // Initialize DY dyid before any components render to avoid race conditions
 const initializeDYid = async () => {
   console.log('[DY Init] Starting DY initialization...');
   
-  // Only initialize if dyid doesn't already exist
+  // Keep existing DY identity, but fetch the runtime config on every refresh.
   const existingDyid = Helper.getStoredValue('_dyid');
   const existingDyidServer = Helper.getStoredValue('_dyid_server');
-  
-  if (existingDyid || existingDyidServer) {
-    console.log('[DY Init] ✓ dyid already exists, skipping initialization', {
+
+  try {
+    console.log('[DY Init] Existing DY identity', {
       _dyid: existingDyid ? '(set)' : '(empty)',
       _dyid_server: existingDyidServer ? '(set)' : '(empty)'
     });
-    return;
-  }
-
-  try {
     console.log('[DY Init] Building request body for DY API...');
     const body = await personalizationService.buildBaseBody({ cart: [], isImplicitImpressionMode: false, isImplicitPageview: false });
-    // Remove selector - just prime the dyid
-    delete body.selector;
-    console.log('[DY Init] Request body prepared (selector removed)');
+    
+    // get initial site config
+    body.selector = { names: ['BlueberryConfig'] };
+    body.options = {
+      isImplicitPageview: false,
+      isImplicitImpressionMode: false,
+      isImplicitClientData: false,
+      returnAnalyticsMetadata: false,
+    };
+    
+    console.log('[DY Init] Request body prepared with runtime config selector');
     
     console.log('[DY Init] Sending prime request to /api/choose...');
     const response = await fetch(`/api/choose`, {
@@ -44,6 +53,13 @@ const initializeDYid = async () => {
     }
 
     const data = await response.json();
+    const runtimeConfig = getRuntimeConfig(data);
+    if (runtimeConfig) {
+      window.__dyRuntimeConfig = runtimeConfig;
+      console.log('[DY Init] Runtime config loaded', { schemaVersion: runtimeConfig.schemaVersion });
+    } else {
+      console.warn('[DY Init] No valid runtime config received; using app defaults');
+    }
     console.log('[DY Init] Received response from DY API', {
       cookieCount: data?.cookies?.length || 0,
       hasChoices: !!data?.choices

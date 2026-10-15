@@ -5,10 +5,15 @@ const CurrencyContext = createContext(undefined);
 const LOCAL_STORAGE_KEY = 'dyRetailDemoCurrency'
 const DEFAULT_LANG = 'en-US';
 
+const getRuntimeDefaultLang = () => {
+  const currency = window.__dyRuntimeConfig?.ui?.defaultCurrency;
+  return CURRENCY_OPTIONS.find(option => option.value === currency)?.lang || DEFAULT_LANG;
+};
+
 export const CurrencyProvider = ({ children }) => {
   const [lang, setLang] = useState(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return CURRENCY_OPTIONS.some(o => o.lang === saved) ? saved : DEFAULT_LANG;
+    return CURRENCY_OPTIONS.some(o => o.lang === saved) ? saved : getRuntimeDefaultLang();
   });
 
   const currencyOption = CURRENCY_OPTIONS.find(o => o.lang === lang) || CURRENCY_OPTIONS[0];

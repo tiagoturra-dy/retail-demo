@@ -770,9 +770,9 @@ export const ShoppingMuse = () => {
 
 // Version wrapper - renders either V1 or V2 based on URL param or env var
 export const ShoppingMuseWrapper = () => {
-  const { isMuseOpen } = useMuse();
+  const { isMuseOpen, museConfig } = useMuse();
 
-  if (!isMuseOpen) return null;
+  if (!isMuseOpen || !museConfig.enabled) return null;
 
   // Check URL param first
   const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
@@ -783,9 +783,7 @@ export const ShoppingMuseWrapper = () => {
     return <ShoppingMuse />;
   }
 
-  // Fall back to env var
-  const envVersion = process.env.REACT_APP_MUSE_VERSION;
-  if (envVersion === 'v2') {
+  if (museConfig.version === 'v2') {
     return <ShoppingMuseV2 />;
   }
 

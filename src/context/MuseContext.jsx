@@ -2,26 +2,38 @@ import { createContext, useContext, useState, useCallback } from 'react';
 
 const MuseContext = createContext(null);
 
-// Get muse version from URL param > env var > default to 'v1'
+const toBoolean = (value, fallback = false) => {
+  if (typeof value === 'boolean') return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return fallback;
+};
+
+const getRuntimeMuseConfig = () => {
+  const runtimeMuse = window.__dyRuntimeConfig?.muse;
+  if (!runtimeMuse) return {};
+
+  return {
+    enabled: toBoolean(runtimeMuse.enabled, true),
+    version: runtimeMuse.version === 'v2' ? 'v2' : 'v1',
+    museName: typeof runtimeMuse.name === 'string' ? runtimeMuse.name : undefined,
+    trendingQueries: Array.isArray(runtimeMuse.trendingQueries) ? runtimeMuse.trendingQueries : undefined,
+    disclaimer: runtimeMuse.disclaimer && typeof runtimeMuse.disclaimer === 'object' ? runtimeMuse.disclaimer : undefined,
+  };
+};
+
+// URL param overrides DY config for preview and testing.
 const getMuseVersion = () => {
-  // Check URL parameter first
   const params = new URLSearchParams(window.location.search);
   const urlVersion = params.get('museVersion');
   if (urlVersion === 'v1' || urlVersion === 'v2') {
     return urlVersion;
   }
-  
-  // Fall back to env var
-  const envVersion = process.env.REACT_APP_MUSE_VERSION;
-  if (envVersion === 'v2') {
-    return 'v2';
-  }
-  
-  // Default to v1
-  return 'v1';
+  return getRuntimeMuseConfig().version || 'v1';
 };
 
 const DEFAULT_CONFIG = {
+  enabled: true,
   version: 'v1',
   museName: 'Personal Shopper',
   trendingQueries: [],
@@ -39,10 +51,13 @@ export const MuseProvider = ({ children }) => {
   const [pendingQuery, setPendingQuery] = useState(null);
   const [museConfig, setMuseConfig] = useState(() => ({
     ...DEFAULT_CONFIG,
+    ...getRuntimeMuseConfig(),
     version: getMuseVersion(),
   }));
 
   const openMuse = useCallback((options = {}) => {
+    if (!museConfig.enabled) return;
+
     const { query, live, version, museName, trendingQueries, disclaimer } = options;
     
     // Re-check URL param every time Muse is opened
@@ -58,7 +73,7 @@ export const MuseProvider = ({ children }) => {
     }));
     setPendingQuery({ query: query || null, live: live || false });
     setIsMuseOpen(true);
-  }, []);
+  }, [museConfig.enabled]);
 
   const closeMuse = useCallback(() => {
     setIsMuseOpen(false);
@@ -69,7 +84,7 @@ export const MuseProvider = ({ children }) => {
   }, []);
 
   return (
-    <MuseContext.Provider value={{ isMuseOpen, openMuse, closeMuse, pendingQuery, clearPendingQuery, museConfig }}>
+    <MuseContext.Provider value={{ isMuseOpen, openMuse, closeMuse, pendingQuery, clearPendingQuery, museConfig, siteConfig: window.__dyRuntimeConfig || {} }}>
       {children}
     </MuseContext.Provider>
   );
