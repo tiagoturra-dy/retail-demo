@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, RotateCcw, SendHorizontal, ShoppingCart, Check } from 'lucide-react';
+import { X, RotateCcw, SendHorizontal, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMuse } from '../../context/MuseContext';
@@ -15,6 +15,7 @@ import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { MicButton } from '../../components/MicButton/MicButton';
 import { LiveMicButton } from '../../components/LiveMicButton/LiveMicButton';
 import { MuseIcon } from '../../icons/MuseIcon/MuseIcon';
+import { AddToBagIcon } from '../../icons/AddToBagIcon/AddToBagIcon';
 import { QuickActionsBar } from '../../components/QuickActionsBar/QuickActionsBar';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -706,7 +707,7 @@ export const ShoppingMuseV2 = () => {
                         onClick={handleAddToCart}
                         title="Add selected items to cart"
                       >
-                        <ShoppingCart size={20} />
+                        <AddToBagIcon size={20} />
                       </button>
                     )}
                     <button

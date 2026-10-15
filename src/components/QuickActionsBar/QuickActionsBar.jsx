@@ -1,5 +1,8 @@
 import React from 'react';
-import { Package, Eye, MessageSquare, ShoppingBag } from 'lucide-react';
+import { CompareIcon } from '../../icons/CompareIcon/CompareIcon';
+import { SearchSimilarIcon } from '../../icons/SearchSimilarIcon/SearchSimilarIcon';
+import { AskIcon } from '../../icons/AskIcon/AskIcon';
+import { AddToBagIcon } from '../../icons/AddToBagIcon/AddToBagIcon';
 import styles from './QuickActionsBar.module.css';
 
 export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, onAskAbout, onAddToCart, isAddingToCart = false }) => {
@@ -39,15 +42,16 @@ export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, on
       </div>
 
       <div className={styles.actions}>
-        <button
-          className={`${styles.actionButton} ${hasMultiple ? styles.actionButtonActive : styles.actionButtonDisabled}`}
-          onClick={handleCompare}
-          disabled={!hasMultiple}
-          title={hasMultiple ? 'Compare selected items' : 'Select at least 2 items to compare'}
-          aria-label="Compare items"
-        >
-          <Eye size={16} />
-        </button>
+        {hasMultiple && (
+          <button
+            className={`${styles.actionButton} ${styles.actionButtonActive}`}
+            onClick={handleCompare}
+            title="Compare selected items"
+            aria-label="Compare items"
+          >
+            <CompareIcon size={24} />
+          </button>
+        )}
 
         <button
           className={`${styles.actionButton} ${count >= 1 ? styles.actionButtonActive : styles.actionButtonDisabled}`}
@@ -56,7 +60,7 @@ export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, on
           title={count >= 1 ? 'Find similar items' : 'Select at least 1 item to find similar items'}
           aria-label="Find similar items"
         >
-          <Package size={16} />
+          <SearchSimilarIcon size={24} />
         </button>
 
         <button
@@ -66,7 +70,7 @@ export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, on
           title={count >= 1 ? 'Ask about selected items' : 'Select at least 1 item to ask about'}
           aria-label="Ask about items"
         >
-          <MessageSquare size={16} />
+          <AskIcon size={24} />
         </button>
 
         {onAddToCart && (
@@ -84,7 +88,7 @@ export const QuickActionsBar = ({ selectedProducts, onCompare, onFindSimilar, on
                 <span className={styles.dot} />
               </div>
             ) : (
-              <ShoppingBag size={16} />
+              <AddToBagIcon size={24} />
             )}
           </button>
         )}
