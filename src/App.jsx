@@ -34,6 +34,7 @@ import { useCart } from './context/CartContext';
 import Clarity from '@microsoft/clarity';
 import { useEffect, useRef } from 'react';
 import { GoogleAnalytics } from './components/GoogleAnalytics/GoogleAnalytics';
+import { SessionProvider } from './context/SessionContext';
 
 // window.__resetPushPermission()
 // Clears FCM localStorage keys, unregisters the service worker, and deletes the Firebase messaging IndexedDB.
@@ -137,16 +138,17 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <ContentProvider>
-        <CurrencyProvider>
-          <CartProvider>
-            <WishlistProvider>
-            <MuseProvider>
-              <CartGlobalBridge />
-              <MuseGlobalBridge />
-              <SearchGlobalBridge />
-              <Router>
+    <SessionProvider>
+      <AuthProvider>
+        <ContentProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <WishlistProvider>
+              <MuseProvider>
+                <CartGlobalBridge />
+                <MuseGlobalBridge />
+                <SearchGlobalBridge />
+                <Router>
               <ScrollToTop />
               <GoogleAnalytics />
               <DYManager />
@@ -178,12 +180,13 @@ export default function App() {
                 </main>
                 <Footer logoText={LOGO_TEXT} />
               </div>
-            </Router>
-            </MuseProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </CurrencyProvider>
-      </ContentProvider>
-    </AuthProvider>
+                </Router>
+              </MuseProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </CurrencyProvider>
+        </ContentProvider>
+      </AuthProvider>
+    </SessionProvider>
   );
 }

@@ -12,8 +12,8 @@ import { personalizationService } from '../../services/personalizationService';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useSession } from '../../context/SessionContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
-import { Helper } from '../../helpers/helper';
 import { resolveVoice } from '../../helpers/voiceConstants';
 import { useGroqConversation } from '../../hooks/useGroqConversation';
 import styles from './ShoppingMuse.module.css';
@@ -266,6 +266,7 @@ const MuseWelcomeV2 = ({ museName, trendingQueries, disclaimer, welcomeProducts,
 export const ShoppingMuse = () => {
   const { cart } = useCart();
   const { lang } = useCurrency();
+  const { clearMuseChat } = useSession();
   const { isMuseOpen, closeMuse, pendingQuery, clearPendingQuery, museConfig } = useMuse();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -568,7 +569,7 @@ export const ShoppingMuse = () => {
     hasAutoStarted.current = false;
     lastProcessedQueryRef.current = '';
     resetGroq();
-    Helper.setStoredValue('_dyMuseChatId', '', -1); // Clear the cookie
+    clearMuseChat();
     if (museVersion === 'chat') handleSendMessage('');
     else lastProcessedQueryRef.current = null; // allow welcome screen to re-init on next open
   };

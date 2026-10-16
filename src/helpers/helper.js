@@ -83,7 +83,8 @@ export const Helper = {
       date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
       expires = `; expires=${date.toUTCString()}`;
     }
-    document.cookie = `${name}=${encodeURIComponent(value ?? "")}${expires}; path=${path}; SameSite=Lax`;  
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${name}=${encodeURIComponent(value ?? "")}${expires}; path=${path}; SameSite=Lax${secure}`;
   },
   removeStoredValue: (name) => {
     // Remove from localStorage
@@ -97,11 +98,21 @@ export const Helper = {
     document.cookie = `${base}; domain=${host}`;
     document.cookie = `${base}; domain=.${host.split('.').slice(-2).join('.')}`;
   },
+  parseDelimitedConfigList: (value) => {
+    if (typeof value !== 'string') return [];
+
+    return value
+      .split(/[|,]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  },
   getFreeShippingThreshold: () => {
-    return 175
+    const threshold = Number(window.__dyRuntimeConfig?.config?.shipping?.freeThreshold);
+    return Number.isFinite(threshold) ? threshold : 175;
   },
   getShippingValue: () => {
-    return 15
+    const fee = Number(window.__dyRuntimeConfig?.config?.shipping?.fee);
+    return Number.isFinite(fee) ? fee : 15;
   },
   getPublicIpAddress: async () => {
     try {

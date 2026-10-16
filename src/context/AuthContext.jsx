@@ -1,19 +1,15 @@
 import React, { createContext, useContext, useState } from 'react';
 import { USERS } from '../helpers/users.js';
-import { Helper } from '../helpers/helper.js';
+import { useSession } from './SessionContext';
 
 const AuthContext = createContext();
 
-// Get API base URL (backend server, not React dev server)
-const getApiBaseUrl = () => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  if (isProduction) {
-    // In production, API is on same host/port (proxied or deployed together)
-    return '';
-  } else {
-    // In development, API is on backend server port 5000
-    return 'http://localhost:5000';
-  }
+const storeLoginIdentity = ({ email = '', userId = '' }) => {
+  if (email) localStorage.setItem('retail_login_email', email);
+  else localStorage.removeItem('retail_login_email');
+
+  if (userId) localStorage.setItem('retail_login_user_id', userId);
+  else localStorage.removeItem('retail_login_user_id');
 };
 
 export const useAuth = () => {
@@ -25,6 +21,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const { clearSessionData } = useSession();
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('authUser');
     return savedUser ? JSON.parse(savedUser) : null;
@@ -36,6 +33,7 @@ export const AuthProvider = ({ children }) => {
       const userData = { id, role: 'admin', name: 'Admin User' };
       setUser(userData);
       localStorage.setItem('authUser', JSON.stringify(userData));
+      storeLoginIdentity({ userId: id });
       return userData;
     }
 
@@ -45,6 +43,21 @@ export const AuthProvider = ({ children }) => {
       const userData = { ...ecommUser, role: 'ecomm' };
       setUser(userData);
       localStorage.setItem('authUser', JSON.stringify(userData));
+      storeLoginIdentity({ userId: userData.user_id });
+      return userData;
+    }
+
+    if (id.includes('@')) {
+      const userData = {
+        user_id: '',
+        email: id,
+        Name: id,
+        DisplayName: id.split('@')[0],
+        role: 'ecomm',
+      };
+      setUser(userData);
+      localStorage.setItem('authUser', JSON.stringify(userData));
+      storeLoginIdentity({ email: id });
       return userData;
     }
 
@@ -54,19 +67,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('authUser');
-    Helper.removeStoredValue('_dyjsession');
-    
-    // Clear cart from server
-    const cartId = localStorage.getItem('retail_cart_id');
-    if (cartId) {
-      fetch(`${getApiBaseUrl()}/api/carts/${cartId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
-        }
-      }).catch(error => console.error('[logout] Error clearing cart:', error));
-    }
+    clearSessionData();
   };
 
   const isAdmin = user?.role === 'admin';

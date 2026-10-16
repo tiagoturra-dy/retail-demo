@@ -1124,7 +1124,7 @@ app.post('/api/email/opt-in', async (req, res) => {
     res.status(response.status).json(data);
   } catch (error) {
     console.error('[EMAIL OPT-IN] Error:', error);
-    res.status(500).json({ error: JSON.stringify(error) });
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 

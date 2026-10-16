@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Eye, EyeOff, Gift, Heart, Truck, User, Icon } from 'lucide-react';
+import { Eye, EyeOff, Gift, Heart, Truck, Icon } from 'lucide-react';
 import { coatHanger } from '@lucide/lab';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import styles from './LoginPage.module.css';
 import { LoginErrorModal } from '../../components/LoginErrorModal/LoginErrorModal';
+import { getAllowedLoginDomains, isAllowedLoginEmail, sendLoginEvent } from '../../services/loginIdentityService';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -23,28 +24,35 @@ export const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const normalizedIdentifier = identifier.trim();
+    const isEmailLogin = normalizedIdentifier.includes('@');
+
+    if (isEmailLogin && !isAllowedLoginEmail(normalizedIdentifier)) {
+      const domains = getAllowedLoginDomains();
+      const domainMessage = domains.length ? ` Use: ${domains.join(', ')}.` : '';
+      setErrorMessage(`Enter an email address from an allowed domain.${domainMessage}`);
+      setIsErrorModalOpen(true);
+      return;
+    }
+
     setLoading(true);
-    const userData = login(identifier);
-    setLoading(false);
+    const userData = login(normalizedIdentifier);
 
     if (userData) {
       if (userData.role === 'admin') {
+        setLoading(false);
         navigate('/admin');
       } else {
-        if (window.DY && window.DY.API) {
-          window.DY.API('event', {
-            name: 'Login',
-            properties: {
-              dyType: 'login-v1',
-              cuid: userData.user_id,
-              cuidType: 'id',
-            },
-          });
-        }
+        await sendLoginEvent({
+          email: isEmailLogin ? normalizedIdentifier : '',
+          userId: isEmailLogin ? '' : userData.user_id,
+        });
+        setLoading(false);
         const from = location.state?.from || '/welcome';
         navigate(from);
       }
     } else {
+      setLoading(false);
       setErrorMessage('User not found. Please use a User ID.');
       setIsErrorModalOpen(true);
     }
@@ -67,7 +75,7 @@ export const LoginPage = () => {
               type="text"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Enter your email or user ID"
               required
               className={s.formInput}
             />
@@ -78,7 +86,6 @@ export const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                required
                 className={s.formInput}
               />
               <button

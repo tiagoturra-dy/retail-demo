@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Helper } from '../helpers/helper';
 import { useCartWebSocket } from '../hooks/useCartWebSocket';
+import { useSession } from './SessionContext';
 
 const CartContext = createContext(undefined);
 
@@ -17,6 +18,7 @@ const getApiBaseUrl = () => {
 };
 
 export const CartProvider = ({ children }) => {
+  const { registerResetHandler } = useSession();
   // Configurable shipping constants
   const SHIPPING_THRESHOLD = Helper.getFreeShippingThreshold();
   const FLAT_SHIPPING_FEE = Helper.getShippingValue();
@@ -46,6 +48,8 @@ export const CartProvider = ({ children }) => {
     sessionStorage.removeItem('cart_id');
     setCartId(null);
   };
+
+  useEffect(() => registerResetHandler(clearCartId), [clearCartId, registerResetHandler]);
 
   const syncCartToApi = async (cartItems = cart, currentCartId = cartId) => {
     try {
@@ -452,20 +456,6 @@ export const CartProvider = ({ children }) => {
       currency: 'USD'
     }
   });
-
-  window.__clearSessionData = () => {
-    // Clear DY cookies and session storage
-    Helper.removeStoredValue('_dyid');
-    Helper.removeStoredValue('_dyjsession');
-    Helper.removeStoredValue('_dyMuseChatId');
-
-    sessionStorage.removeItem('_dyid');
-    sessionStorage.removeItem('_dyjsession');
-    sessionStorage.removeItem('_dyMuseChatId');
-
-    // Clear cart ID
-    clearCartId();
-  };
 
   return (
     <CartContext.Provider

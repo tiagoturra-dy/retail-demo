@@ -3,23 +3,41 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import styles from './ConfigurationOverlay.module.css';
 import { Helper } from '../../helpers/helper';
+import { getAllowedLoginDomains, isAllowedLoginEmail, sendLoginEvent } from '../../services/loginIdentityService';
 
-const DEFAULT_SEARCH_TERMS = ['summer dresses', 'running shoes', 'wireless earbuds', 'winter coat', 'coffee maker'];
+const FALLBACK_SEARCH_TERMS = ['summer dresses', 'running shoes', 'wireless earbuds', 'winter coat', 'coffee maker'];
+
+const getInitialSearchTerms = () => {
+  const configuredTerms = Helper.parseDelimitedConfigList(
+    window.__dyRuntimeConfig?.config?.search?.initialRecentList
+  );
+  return configuredTerms.length ? configuredTerms : FALLBACK_SEARCH_TERMS;
+};
 
 export const ConfigurationOverlay = ({ isOpen, onClose }) => {
   const [searchTerms, setSearchTerms] = useState('');
   const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-  const [useLegacyIntegration, setUseLegacyIntegration] = useState(true);
+  const allowedDomains = getAllowedLoginDomains();
+  const hasEmail = Boolean(email.trim());
+  const isAllowedEmail = isAllowedLoginEmail(email);
+  const emailValidationMessage = hasEmail && !isAllowedEmail
+    ? allowedDomains.length
+      ? `Use an email address from: ${allowedDomains.join(', ')}.`
+      : 'No allowed email domains are configured.'
+    : '';
 
   useEffect(() => {
     if (isOpen) {
       // Load existing search terms from localStorage
       const saved = localStorage.getItem('recentSearches');
-      const terms = saved ? JSON.parse(saved) : DEFAULT_SEARCH_TERMS;
+      const terms = saved ? JSON.parse(saved) : getInitialSearchTerms();
       setSearchTerms(terms.join('\n'));
+      setEmail(localStorage.getItem('retail_login_email') || '');
+      setUserId(localStorage.getItem('retail_login_user_id') || '');
       setMessage('');
     }
   }, [isOpen]);
@@ -29,19 +47,6 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
     setMessageType(type);
     if (duration) {
       setTimeout(() => setMessage(''), duration);
-    }
-  };
-
-  const callDYEventAPI = (email) => {
-    if (window.DY && typeof window.DY.API === 'function') {
-      window.DY.API('event', {
-        name: 'Message Opt In',
-        properties: {
-          dyType: 'message-optin-v1',
-          cuidType: 'email',
-          plainTextEmail: email
-        }
-      });
     }
   };
 
@@ -115,12 +120,7 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
         window.__clearSessionData();
       }
 
-      showMessage('Cookies and session cleared. Reloading page...');
-      
-      // Reload after a short delay to show message
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      window.location.reload();
     } catch (error) {
       console.error('Error clearing cookies:', error);
       showMessage('Error clearing cookies', 'error');
@@ -174,37 +174,31 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
   };
 
   const handleResetSearchTermsToDefault = () => {
-    setSearchTerms(DEFAULT_SEARCH_TERMS.join('\n'));
+    setSearchTerms(getInitialSearchTerms().join('\n'));
   };
 
   const handleEmailOptIn = async () => {
-    if (!email || !email.includes('@')) {
-      showMessage('Please enter a valid email address', 'error');
+    if (!isAllowedLoginEmail(email)) {
+      const domains = getAllowedLoginDomains();
+      const domainMessage = domains.length ? ` Use: ${domains.join(', ')}.` : '';
+      showMessage(`Enter an email address from an allowed domain.${domainMessage}`, 'error');
       return;
     }
 
     setIsLoading(true);
     try {
-      if (useLegacyIntegration) {
-        // Call DY.API instead of backend endpoint
-        callDYEventAPI(email);
-        showMessage('Successfully opted in to email communications');
-        setEmail('');
-      } else {
-        // Current flow
-        const dyid = Helper.getStoredValue('_dyid');
-        const response = await fetch('/api/email/opt-in', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ email, dyid: dyid || '' }),
-        });
+      await sendLoginEvent({ email, userId });
+      const dyid = Helper.getStoredValue('_dyid');
+      const response = await fetch('/api/email/opt-in', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), dyid: dyid || '' }),
+      });
 
-        if (response.ok) {
-          showMessage('Successfully opted in to email communications');
-          setEmail('');
-        } else {
-          showMessage('Failed to opt in to email', 'error');
-        }
+      if (response.ok) {
+        showMessage('Successfully opted in to email communications');
+      } else {
+        showMessage('Failed to opt in to email', 'error');
       }
     } catch (error) {
       console.error('Email opt-in error:', error);
@@ -232,6 +226,7 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
       if (response.ok) {
         showMessage('Successfully opted out of email communications');
         setEmail('');
+        setUserId('');
       } else {
         showMessage('Failed to opt out of email', 'error');
       }
@@ -325,33 +320,37 @@ export const ConfigurationOverlay = ({ isOpen, onClose }) => {
                 <p className={styles.sectionDescription}>
                   Manage your email preferences for promotions and updates
                 </p>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={useLegacyIntegration}
-                    onChange={(e) => setUseLegacyIntegration(e.target.checked)}
-                    disabled={isLoading}
-                  />
-                  Use Legacy Event Integration
-                </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={styles.emailInput}
-                  placeholder="Enter your email address"
+                  placeholder="Enter your email"
+                  required
+                />
+                {emailValidationMessage && (
+                  <p className={styles.validationMessage} role="alert">
+                    {emailValidationMessage}
+                  </p>
+                )}
+                <input
+                  type="text"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  className={styles.emailInput}
+                  placeholder="Enter your user ID (optional)"
                 />
                 <div className={styles.sectionActions}>
                   <button
                     onClick={handleEmailOptIn}
-                    disabled={isLoading}
+                    disabled={isLoading || !isAllowedEmail}
                     className={`${styles.btn} ${styles.btnWarning}`}
                   >
                     {isLoading ? 'Processing...' : 'Opt-in'}
                   </button>
                   <button
                     onClick={handleEmailOptOut}
-                    disabled={isLoading}
+                    disabled={isLoading || !isAllowedEmail}
                     className={`${styles.btn} ${styles.btnSecondary}`}
                   >
                     {isLoading ? 'Processing...' : 'Opt-out'}

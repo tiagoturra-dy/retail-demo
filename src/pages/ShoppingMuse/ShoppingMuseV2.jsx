@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { useMuse } from '../../context/MuseContext';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useSession } from '../../context/SessionContext';
 import { CURRENCY_OPTIONS } from '../../helpers/currencyConstants';
 import { Helper } from '../../helpers/helper';
 import { resolveVoice } from '../../helpers/voiceConstants';
@@ -126,6 +127,7 @@ const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate
 export const ShoppingMuseV2 = () => {
   const { cart, cartId, syncCartFromServer } = useCart();
   const { lang } = useCurrency();
+  const { clearMuseChat } = useSession();
   const { isMuseOpen, closeMuse, pendingQuery, clearPendingQuery, museConfig } = useMuse();
   
   const [messages, setMessages] = useState([]);
@@ -484,7 +486,7 @@ export const ShoppingMuseV2 = () => {
     setSelectedProducts([]);
     lastProcessedQueryRef.current = '';
     resetGroq();
-    Helper.setStoredValue('_dyMuseChatId', '', -1);
+    clearMuseChat();
   };
 
   const handleSubmit = (e) => {

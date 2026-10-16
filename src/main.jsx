@@ -11,6 +11,8 @@ const getRuntimeConfig = (response) => {
   return config?.schemaVersion === 1 ? config : null;
 };
 
+window.__getConfiguration = () => window.__dyRuntimeConfig || null;
+
 const getCartApiBaseUrl = () => (
   process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'
 );

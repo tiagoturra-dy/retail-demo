@@ -20,8 +20,9 @@ export const WelcomeBackPage = () => {
   }
 
   const TIER_ORDER = ['Bronze', 'Silver', 'Gold', 'Platinum'];
-  const currentPoints = parseInt(user.LoyaltyPoints, 10);
-  const currentTierIndex = TIER_ORDER.indexOf(user.LoyaltyLevel);
+  const loyaltyLevel = LOYALTY_TIERS[user.LoyaltyLevel] ? user.LoyaltyLevel : 'Bronze';
+  const currentPoints = Number.parseInt(user.LoyaltyPoints, 10) || 0;
+  const currentTierIndex = TIER_ORDER.indexOf(loyaltyLevel);
   const isTopTier = currentTierIndex === TIER_ORDER.length - 1;
   const nextTier = isTopTier ? null : TIER_ORDER[currentTierIndex + 1];
   const progressPercent = isTopTier
@@ -29,8 +30,8 @@ export const WelcomeBackPage = () => {
     : Math.min(
         100,
         Math.round(
-          ((currentPoints - LOYALTY_TIERS[user.LoyaltyLevel].min) /
-            (LOYALTY_TIERS[nextTier].min - LOYALTY_TIERS[user.LoyaltyLevel].min)) *
+          ((currentPoints - LOYALTY_TIERS[loyaltyLevel].min) /
+            (LOYALTY_TIERS[nextTier].min - LOYALTY_TIERS[loyaltyLevel].min)) *
             100
         )
       );
@@ -39,7 +40,7 @@ export const WelcomeBackPage = () => {
   // window.__getLoyaltyInfo()
   useEffect(() => {
     window.__getLoyaltyInfo = () => ({
-      loyaltyLevel: user.LoyaltyLevel,
+      loyaltyLevel,
       loyaltyPoints: currentPoints,
       membershipNumber: user.MembershipNumber,
       nextTier,
@@ -49,7 +50,7 @@ export const WelcomeBackPage = () => {
     return () => {
       delete window.__getLoyaltyInfo;
     };
-  }, [user, currentPoints, nextTier, pointsToNext, progressPercent]);
+  }, [user, loyaltyLevel, currentPoints, nextTier, pointsToNext, progressPercent]);
 
   return (
     <div className={styles.welcomePageContainer}>
@@ -63,11 +64,11 @@ export const WelcomeBackPage = () => {
           <p className={styles.welcomeSubtitle}>Here is a summary of your account and loyalty status.</p>
         </div>
 
-        <div className={styles.loyaltyCard}>
+        <div className={`${styles.loyaltyCard} dy-loyaltyCard`}>
           <div className={styles.loyaltyHeader}>
             <div className={styles.loyaltyBadge}>
               <Award className={styles.loyaltyIcon} />
-              <span className={styles.loyaltyStatus}>{user.LoyaltyLevel}</span>
+              <span className={styles.loyaltyStatus}>{loyaltyLevel}</span>
             </div>
             <div className={styles.pointsDisplay}>
               <Star className={styles.pointsIcon} />

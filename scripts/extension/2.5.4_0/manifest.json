@@ -1,0 +1,61 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "/images/logo-off-128.png",
+         "16": "/images/logo-off-16.png",
+         "48": "/images/logo-off-48.png"
+      },
+      "default_popup": "popup.html",
+      "default_title": "Popup"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "js": [ "content-scripts/corporateBridge.js" ],
+      "matches": [ "http://127.0.0.1/*", "http://localhost/*", "https://ask-anything-steel.vercel.app/*" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "content-scripts/recording-status.js", "content-scripts/reportInjector.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_start"
+   }, {
+      "js": [ "content-scripts/scraper.js", "content-scripts/snipcss.js" ],
+      "matches": [ "\u003Call_urls>" ]
+   }, {
+      "js": [ "content-scripts/xhr-patch-injector.js" ],
+      "matches": [ "http://localhost:3001/*", "https://adm.dynamicyield.com/*", "https://adm.dynamicyield.eu/*" ],
+      "run_at": "document_start",
+      "world": "MAIN"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'",
+      "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-eval'"
+   },
+   "declarative_net_request": {
+      "rule_resources": [ {
+         "enabled": true,
+         "id": "strip-frame-headers",
+         "path": "rules/strip-frame-headers.json"
+      } ]
+   },
+   "description": "Run Dynamic Yield on sites locally",
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "/images/logo-128.png",
+      "16": "/images/logo-16.png",
+      "48": "/images/logo-48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0MgUfsQhLaOuXT+OgVhvbEoVZ5Z0OHuZxI2hPE6fbZXj9NAT+ZBMOFwTTWudAT/c70t7j3QYGcPVWgFuAMdkzuWL01xOWIkLZGwrnSTB1+YGOlwLCM7V/V72RUCqsksO0Wh4CFCbcrpLILeY6pL2aLfKfEXP+NDY5q/788VHgF4xZxF5On2VzcELZw4LK1tHtFEGLOSCLoxXi7Ckl4LfYTJggyIBMbgy7qICtoLSLLOrP9ICdHFk0OtcCNu4BrJMGdnS8TI/VrRPL82YV5pYDVTl7Tegivuj7x0PB1fd0QweosgtAro9z7945casAwV0PT+lAlNxaKRytAbcrWGpIwIDAQAB",
+   "manifest_version": 3,
+   "name": "dy-demo",
+   "options_ui": {
+      "open_in_tab": false,
+      "page": "options.html"
+   },
+   "permissions": [ "webRequest", "activeTab", "declarativeNetRequestWithHostAccess", "declarativeNetRequest", "tabs", "storage", "cookies", "webNavigation", "scripting", "offscreen", "debugger" ],
+   "sandbox": {
+      "pages": [ "sandbox.html" ]
+   },
+   "version": "2.5.4"
+}
