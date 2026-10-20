@@ -88,6 +88,7 @@ const SearchGlobalBridge = () => {
 
 // window.__openMuse({ query: 'summer dresses' })
 // window.__openMuse({ live: true })
+// window.__openMuse({ version: 'v2', homeVersion: 'v2' })
 const MuseGlobalBridge = () => {
   const { openMuse } = useMuse();
 

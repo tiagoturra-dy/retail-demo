@@ -20,6 +20,8 @@ Opens the Shopping Muse panel with optional configuration.
 | `museName` | String | Custom title for the Muse panel | `"Personal Shopper"` |
 | `trendingQueries` | Array<String> | List of suggested search queries to show | `["wedding dresses", "summer outfits"]` |
 | `disclaimer` | Object | Custom disclaimer text and links | See example below |
+| `homeVersion` | String | Select Muse V2 home: `'v1'` opens chat directly; `'v2'` shows configured home | `'v2'` |
+| `homeV2` | Object | Override the configured V2 home content for this open action | See runtime configuration |
 
 ### Examples
 
@@ -41,6 +43,14 @@ window.__openMuse({
 window.__openMuse({ 
   query: 'blue wedding dress',
   version: 'v2'
+});
+```
+
+**Open V2 with the configured home screen:**
+```javascript
+window.__openMuse({
+  version: 'v2',
+  homeVersion: 'v2'
 });
 ```
 

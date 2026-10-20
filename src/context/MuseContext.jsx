@@ -9,6 +9,8 @@ const toBoolean = (value, fallback = false) => {
   return fallback;
 };
 
+const getHomeVersion = (value) => value === 'v1' || value === 'v2' ? value : undefined;
+
 const getRuntimeMuseConfig = () => {
   const runtimeMuse = window.__dyRuntimeConfig?.muse;
   if (!runtimeMuse) return {};
@@ -19,6 +21,8 @@ const getRuntimeMuseConfig = () => {
     museName: typeof runtimeMuse.name === 'string' ? runtimeMuse.name : undefined,
     trendingQueries: Array.isArray(runtimeMuse.trendingQueries) ? runtimeMuse.trendingQueries : undefined,
     disclaimer: runtimeMuse.disclaimer && typeof runtimeMuse.disclaimer === 'object' ? runtimeMuse.disclaimer : undefined,
+    homeVersion: getHomeVersion(runtimeMuse.homeVersion),
+    homeV2: runtimeMuse.homeV2 && typeof runtimeMuse.homeV2 === 'object' ? runtimeMuse.homeV2 : undefined,
   };
 };
 
@@ -44,6 +48,8 @@ const DEFAULT_CONFIG = {
       { label: 'Privacy Policy', url: 'https://www.dynamicyield.com/privacy-policy/' },
     ],
   },
+  homeVersion: 'v2',
+  homeV2: {},
 };
 
 export const MuseProvider = ({ children }) => {
@@ -58,7 +64,7 @@ export const MuseProvider = ({ children }) => {
   const openMuse = useCallback((options = {}) => {
     if (!museConfig.enabled) return;
 
-    const { query, live, version, museName, trendingQueries, disclaimer } = options;
+    const { query, live, version, museName, trendingQueries, disclaimer, homeVersion, homeV2 } = options;
     
     // Re-check URL param every time Muse is opened
     const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
@@ -70,6 +76,8 @@ export const MuseProvider = ({ children }) => {
       museName: museName || prev.museName,
       trendingQueries: trendingQueries || prev.trendingQueries,
       disclaimer: disclaimer || prev.disclaimer,
+      homeVersion: getHomeVersion(homeVersion) || prev.homeVersion,
+      homeV2: homeV2 && typeof homeV2 === 'object' ? homeV2 : prev.homeV2,
     }));
     setPendingQuery({ query: query || null, live: live || false });
     setIsMuseOpen(true);

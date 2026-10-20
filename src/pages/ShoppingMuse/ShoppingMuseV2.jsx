@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, RotateCcw, SendHorizontal, Check } from 'lucide-react';
+import { X, RotateCcw, SendHorizontal, Check, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMuse } from '../../context/MuseContext';
@@ -124,6 +124,94 @@ const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate
   );
 };
 
+const MuseHomeV2 = ({ config, products, isLoadingProducts, onSubmit, onClose }) => {
+  const [query, setQuery] = useState('');
+  const hero = config.hero || {};
+  const categories = Array.isArray(config.categories) ? config.categories : [];
+  const popularProducts = config.popularProducts || {};
+  const heroStyle = hero.imageUrl ? { backgroundImage: `url("${hero.imageUrl}")` } : undefined;
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (query.trim()) onSubmit(query.trim());
+  };
+
+  return (
+    <div className={styles.home}>
+      <section className={styles.homeHero} style={heroStyle}>
+        <div className={styles.homeHeroOverlay} />
+        <div className={styles.homeHeader}>
+          <div className={styles.homeBrand}>
+            <span className={styles.homeBrandIcon}><MuseIcon color="currentColor" size={20} /></span>
+            <h1>{config.name || 'Shopping Muse'}</h1>
+          </div>
+          <button className={styles.homeCloseButton} onClick={onClose} aria-label="Close">
+            <X size={22} />
+          </button>
+        </div>
+        <div className={styles.homeHeroContent}>
+          <h2>{hero.title || 'Find your next signature look'}</h2>
+          {hero.subtitle && <p>{hero.subtitle}</p>}
+          {hero.cta?.label && hero.cta?.query && (
+            <button className={styles.homeCta} onClick={() => onSubmit(hero.cta.query)}>
+              {hero.cta.label}
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+        <form className={styles.homeSearchForm} onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={config.inputPlaceholder || CONSTANTS.PLACEHOLDER}
+            aria-label="Ask Shopping Muse"
+            maxLength={150}
+          />
+          <button type="submit" disabled={!query.trim()} aria-label="Send message">
+            <SendHorizontal size={22} />
+          </button>
+        </form>
+      </section>
+
+      <div className={styles.homeContent}>
+        <section className={styles.homeSection}>
+          {categories.length > 0 && (
+            <>
+              <h2>{config.categoryTitle || 'What are you looking for?'}</h2>
+            </>
+          )}
+          <div className={`${styles.homeCategories} dy-muse-home-categories`}>
+            {categories.map((category, index) => (
+              <button key={`${category.label}-${index}`} onClick={() => category.query && onSubmit(category.query)} disabled={!category.query}>
+                {category.label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.homeSection}>
+          <h2>{popularProducts.title || 'Popular picks'}</h2>
+          {products.length > 0 ? (
+            <div className={styles.homeProducts}>
+              {products.map((product, index) => (
+                <ProductCard
+                  key={product.slotId || product.sku || product.id || index}
+                  product={product}
+                  className={styles.homeProductCard}
+                  onNavigate={onClose}
+                />
+              ))}
+            </div>
+          ) : isLoadingProducts ? (
+            <div className={styles.homeProductsLoading} aria-label="Loading recommendations" />
+          ) : null}
+        </section>
+      </div>
+    </div>
+  );
+};
+
 const ComparisonTableHeader = ({ children, products, ...props }) => {
   const heading = React.Children.toArray(children).join('').toLowerCase();
   const product = products?.find(({ name }) => name && heading.includes(name.toLowerCase()));
@@ -154,6 +242,8 @@ export const ShoppingMuseV2 = () => {
   const [isLiveMic, setIsLiveMic] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [ttsState, setTtsState] = useState(null);
+  const [homeProducts, setHomeProducts] = useState([]);
+  const [isLoadingHomeProducts, setIsLoadingHomeProducts] = useState(false);
   
   const isLiveMicRef = useRef(false);
   const isSpeakingRef = useRef(false);
@@ -170,6 +260,10 @@ export const ShoppingMuseV2 = () => {
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
   const MESSAGE_MAX_LEN = 150;
   const museName = museConfig.museName;
+  const homeConfig = museConfig.homeV2 || {};
+  const homeProductsConfig = homeConfig.popularProducts || {};
+  const homeVersion = museConfig.homeVersion;
+  const showHome = homeVersion === 'v2' && messages.length === 0 && !isLoading;
 
   // Muse's cart mutations happen out-of-band (DY calls our cart API async on its own
   // timeline), so poll a couple of times after any turn instead of guessing one delay
@@ -181,6 +275,37 @@ export const ShoppingMuseV2 = () => {
   useEffect(() => {
     isLiveMicRef.current = isLiveMic;
   }, [isLiveMic]);
+
+  useEffect(() => {
+    const selector = homeProductsConfig.selector;
+    if (!isMuseOpen || !showHome || typeof selector !== 'string' || !selector) return;
+
+    let cancelled = false;
+    setIsLoadingHomeProducts(true);
+    personalizationService.getRecommendations({ selectors: [selector], cart })
+      .then((data) => {
+        if (cancelled) return;
+        const choice = data?.choices?.[0];
+        const variation = choice?.variations?.[0];
+        const rawSlots = variation?.payload?.data?.slots || [];
+        const limit = Number.isFinite(Number(homeProductsConfig.limit)) ? Number(homeProductsConfig.limit) : 4;
+        setHomeProducts(rawSlots.slice(0, limit).map((slot) => ({
+          ...slot,
+          ...slot.productData,
+          decisionId: choice?.decisionId,
+          variationId: variation?.id,
+          slotId: slot.slotId,
+        })));
+      })
+      .catch(() => {
+        if (!cancelled) setHomeProducts([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingHomeProducts(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [isMuseOpen, showHome, homeProductsConfig.selector, homeProductsConfig.limit, cart]);
 
   useEffect(() => {
     if (!messagesListRef.current) return;
@@ -401,14 +526,11 @@ export const ShoppingMuseV2 = () => {
       lastProcessedQueryRef.current = q;
       if (q) {
         handleSendMessage(q);
+      } else if (homeVersion === 'v1' && messages.length === 0) {
+        handleSendMessage('');
       }
-      return;
     }
-    if (messages.length === 0 && lastProcessedQueryRef.current === null) {
-      lastProcessedQueryRef.current = '';
-      handleSendMessage('');
-    }
-  }, [isMuseOpen, pendingQuery]);
+  }, [isMuseOpen, pendingQuery, homeVersion, messages.length]);
 
   const handleSendMessage = async (text, displayText, comparisonProducts = null) => {
     if (!text.trim()) {
@@ -502,9 +624,10 @@ export const ShoppingMuseV2 = () => {
     setTtsState(null);
     setMessages([]);
     setSelectedProducts([]);
-    lastProcessedQueryRef.current = '';
+    lastProcessedQueryRef.current = null;
     resetGroq();
     clearMuseChat();
+    if (homeVersion === 'v1') handleSendMessage('');
   };
 
   const handleSubmit = (e) => {
@@ -532,6 +655,16 @@ export const ShoppingMuseV2 = () => {
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
+            {showHome ? (
+              <MuseHomeV2
+                config={{ ...homeConfig, name: museName }}
+                products={homeProducts}
+                isLoadingProducts={isLoadingHomeProducts}
+                onSubmit={handleSendMessage}
+                onClose={closeMuse}
+              />
+            ) : (
+              <>
             <div className={styles.header}>
               <div className={styles.headerTop}>
                 <div className={styles.logoContainer}>
@@ -559,7 +692,6 @@ export const ShoppingMuseV2 = () => {
               </div>
             </div>
 
-            <>
               <div className={styles.chatContainer}>
                   <div className={styles.messagesList} ref={messagesListRef}>
                     <AnimatePresence initial={false}>
@@ -749,6 +881,7 @@ export const ShoppingMuseV2 = () => {
                   </form>
                 </div>
               </>
+            )}
             </motion.div>
         </>
       )}
