@@ -124,6 +124,23 @@ const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate
   );
 };
 
+const ComparisonTableHeader = ({ children, products, ...props }) => {
+  const heading = React.Children.toArray(children).join('').toLowerCase();
+  const product = products?.find(({ name }) => name && heading.includes(name.toLowerCase()));
+  const image = product?.image || product?.image_url || product?.imageUrl;
+
+  return (
+    <th {...props}>
+      {image && (
+        <span className={styles.comparisonProductImageFrame}>
+          <img src={Helper.getProductImage(image)} alt={product.name} className={styles.comparisonProductImage} />
+        </span>
+      )}
+      {children}
+    </th>
+  );
+};
+
 export const ShoppingMuseV2 = () => {
   const { cart, cartId, syncCartFromServer } = useCart();
   const { lang } = useCurrency();
@@ -292,7 +309,7 @@ export const ShoppingMuseV2 = () => {
   const handleCompare = useCallback(() => {
     const names = selectedProducts.map(p => p.name).join(', ');
     const query = `Compare: ${names}`;
-    handleSendMessage(query);
+    handleSendMessage(query, undefined, selectedProducts);
   }, [selectedProducts]);
 
   const handleFindSimilar = useCallback(() => {
@@ -393,7 +410,7 @@ export const ShoppingMuseV2 = () => {
     }
   }, [isMuseOpen, pendingQuery]);
 
-  const handleSendMessage = async (text, displayText) => {
+  const handleSendMessage = async (text, displayText, comparisonProducts = null) => {
     if (!text.trim()) {
       const botMessage = {
         id: Date.now() + 1,
@@ -443,6 +460,7 @@ export const ShoppingMuseV2 = () => {
         text: response.answer || CONSTANTS.FALLBACK_BOT_MESSAGE,
         widgets: response.widgets || [],
         blocks: response.blocks || [],
+        comparisonProducts,
         timestamp: new Date()
       };
 
@@ -559,7 +577,16 @@ export const ShoppingMuseV2 = () => {
                               ref={messages[messages.length - 1]?.id === msg.id ? lastBubbleRef : null}
                             >
                               <div className={styles.messageText}>
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    th: ({ children, ...props }) => (
+                                      <ComparisonTableHeader {...props} products={msg.comparisonProducts}>
+                                        {children}
+                                      </ComparisonTableHeader>
+                                    )
+                                  }}
+                                >
                                   {ttsState?.msgId === msg.id ? ttsState.visibleText : msg.text}
                                 </ReactMarkdown>
                               </div>
