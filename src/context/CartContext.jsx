@@ -36,6 +36,8 @@ export const CartProvider = ({ children }) => {
   // localStorage cart can't clobber a server cart updated by Muse in another session/tab
   const isHydratingRef = useRef(true);
   const isServerSyncRef = useRef(false);
+  // Prevent the cart effect from duplicating the explicit sync in addToCart.
+  const isAddToCartSyncRef = useRef(false);
   // Mirrors `cart` for reading the latest value outside of React's render/state-update cycle
   const cartRef = useRef(cart);
   useEffect(() => {
@@ -215,13 +217,14 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    if (!isWebSocketUpdateRef.current && !isServerSyncRef.current) {
+    if (!isWebSocketUpdateRef.current && !isServerSyncRef.current && !isAddToCartSyncRef.current) {
       console.log('[CartContext] Syncing cart to API');
       syncCartToApi(cart, cartId);
     }
     // Reset flags after check
     isWebSocketUpdateRef.current = false;
     isServerSyncRef.current = false;
+    isAddToCartSyncRef.current = false;
   }, [cart, cartId]);
 
   useEffect(() => {
@@ -319,43 +322,42 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, quantity = 1) => {
     console.log('[CartContext] 🛒 addToCart called:', { productId: product.id, productName: product.name, quantity });
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      let newCart;
-      if (existing) {
-        newCart = prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
-        );
-        console.log('[CartContext] Updated existing item quantity');
-      } else {
-        newCart = [...prev, { ...product, quantity }];
-        console.log('[CartContext] Added new item to cart');
-      }
+    const previousCart = cartRef.current;
+    const existing = previousCart.find((item) => item.id === product.id);
+    const newCart = existing
+      ? previousCart.map((item) =>
+        item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+      )
+      : [...previousCart, { ...product, quantity }];
 
-      setLastAdded(product);
+    console.log(existing ? '[CartContext] Updated existing item quantity' : '[CartContext] Added new item to cart');
+    cartRef.current = newCart;
+    setCart(newCart);
+    setLastAdded(product);
 
-      // Trigger Dynamic Yield Event
-      if (window.DY && typeof window.DY.API === 'function') {
-        window.DY.API("event", {
-          name: "Add to Cart",
-          properties: {
-            dyType: "add-to-cart-v1",
-            value: product.price,
-            currency: "USD",
-            productId: String(product.id),
-            quantity: quantity,
-            cart: newCart.map(item => ({
-              productId: String(item.id),
-              quantity: item.quantity,
-              itemPrice: item.price
-            }))
-          }
-        });
-        console.log('[Dynamic Yield] Add to Cart event triggered for product:', product.id);
-      }
+    // Sync before a Muse request can read this cart through the /carts API.
+    isAddToCartSyncRef.current = true;
+    syncCartToApi(newCart, cartId);
 
-      return newCart;
-    });
+    // Trigger Dynamic Yield Event
+    if (window.DY && typeof window.DY.API === 'function') {
+      window.DY.API("event", {
+        name: "Add to Cart",
+        properties: {
+          dyType: "add-to-cart-v1",
+          value: product.price,
+          currency: "USD",
+          productId: String(product.id),
+          quantity: quantity,
+          cart: newCart.map(item => ({
+            productId: String(item.id),
+            quantity: item.quantity,
+            itemPrice: item.price
+          }))
+        }
+      });
+      console.log('[Dynamic Yield] Add to Cart event triggered for product:', product.id);
+    }
   };
 
   const removeFromCart = (productId) => {
