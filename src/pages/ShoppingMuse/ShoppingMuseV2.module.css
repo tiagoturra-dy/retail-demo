@@ -688,6 +688,8 @@
   --home-brand: var(--color-emerald);
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   background-color: var(--color-white);
 
@@ -697,10 +699,18 @@
     padding: 0 1.25rem 1.5rem;
     display: flex;
     flex-direction: column;
-    background-color: var(--color-crimson);
-    background-position: center;
-    background-size: cover;
+    background-color: var(--color-white);
     color: var(--color-white);
+
+    .homeHeroImage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      mix-blend-mode: multiply;
+    }
 
     .homeHeroOverlay {
       position: absolute;
@@ -809,7 +819,7 @@
       width: 100%;
       height: 3rem;
       padding: 0.25rem 0.25rem 0.25rem 1rem;
-      border-radius: 2rem;
+      border-radius: 8px;
       background-color: var(--color-white);
       box-shadow: 0 4px 10px color-mix(in srgb, var(--color-black) 15%, transparent);
 
@@ -842,6 +852,10 @@
           opacity: 0.45;
           cursor: not-allowed;
         }
+
+        &:hover:not(:disabled) {
+          opacity: .85;
+        }
       }
     }
   }
@@ -862,13 +876,13 @@
       }
 
       .homeCategories {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        display: flex;
+        flex-flow: row wrap;
         gap: 0.5rem;
 
         button {
-          min-height: 3.5rem;
-          padding: 0.5rem;
+          padding: 0.3rem .5rem;
+          width: fit-content;
           border: 1px solid var(--home-border);
           border-radius: var(--radius-lg);
           background-color: var(--home-surface);
@@ -903,6 +917,36 @@
         height: 12rem;
         border-radius: 0.75rem;
         background-color: var(--home-surface);
+      }
+    }
+  }
+
+  .homeFooter {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--home-border);
+    color: var(--color-grey-500);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    text-align: center;
+
+    .homeFooterLinks {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+
+      a {
+        color: var(--color-crimson);
+        text-decoration: underline;
+
+        &:hover {
+          color: var(--color-emerald);
+        }
       }
     }
   }

@@ -126,10 +126,18 @@ const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate
 
 const MuseHomeV2 = ({ config, products, isLoadingProducts, onSubmit, onClose }) => {
   const [query, setQuery] = useState('');
+  const [isFullHeroImage, setIsFullHeroImage] = useState(false);
+  const [isHeroImageLoaded, setIsHeroImageLoaded] = useState(false);
   const hero = config.hero || {};
   const categories = Array.isArray(config.categories) ? config.categories : [];
   const popularProducts = config.popularProducts || {};
-  const heroStyle = hero.imageUrl ? { backgroundImage: `url("${hero.imageUrl}")` } : undefined;
+  const disclaimer = config.disclaimer || {};
+  const disclaimerLinks = Array.isArray(disclaimer.links) ? disclaimer.links : [];
+
+  useEffect(() => {
+    setIsFullHeroImage(false);
+    setIsHeroImageLoaded(false);
+  }, [hero.bluredImage, hero.imageUrl]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -138,7 +146,23 @@ const MuseHomeV2 = ({ config, products, isLoadingProducts, onSubmit, onClose }) 
 
   return (
     <div className={styles.home}>
-      <section className={styles.homeHero} style={heroStyle}>
+      <section className={styles.homeHero}>
+        {(hero.bluredImage || hero.imageUrl) && (
+          <img
+            className={`${styles.homeHeroImage} ${isHeroImageLoaded ? styles.homeHeroImageLoaded : ''}`}
+            src={isFullHeroImage ? hero.imageUrl : hero.bluredImage || hero.imageUrl}
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            onLoad={() => {
+              if (!isFullHeroImage && hero.imageUrl && hero.bluredImage) {
+                setIsFullHeroImage(true);
+              } else {
+                setIsHeroImageLoaded(true);
+              }
+            }}
+          />
+        )}
         <div className={styles.homeHeroOverlay} />
         <div className={styles.homeHeader}>
           <div className={styles.homeBrand}>
@@ -175,19 +199,20 @@ const MuseHomeV2 = ({ config, products, isLoadingProducts, onSubmit, onClose }) 
       </section>
 
       <div className={styles.homeContent}>
-        <section className={styles.homeSection}>
+        <section className={`${styles.homeSection} dy-muse-home-categories-section`}>
           {categories.length > 0 && (
             <>
               <h2>{config.categoryTitle || 'What are you looking for?'}</h2>
+              
+              <div className={`${styles.homeCategories}`}>
+                {categories.map((category, index) => (
+                  <button key={`${category.label}-${index}`} onClick={() => category.query && onSubmit(category.query)} disabled={!category.query}>
+                    {category.label}
+                  </button>
+                ))}
+              </div>
             </>
           )}
-          <div className={`${styles.homeCategories} dy-muse-home-categories`}>
-            {categories.map((category, index) => (
-              <button key={`${category.label}-${index}`} onClick={() => category.query && onSubmit(category.query)} disabled={!category.query}>
-                {category.label}
-              </button>
-            ))}
-          </div>
         </section>
 
         <section className={styles.homeSection}>
@@ -208,6 +233,21 @@ const MuseHomeV2 = ({ config, products, isLoadingProducts, onSubmit, onClose }) 
           ) : null}
         </section>
       </div>
+
+      {(disclaimer.text || disclaimerLinks.length > 0) && (
+        <footer className={styles.homeFooter}>
+          {disclaimer.text && <span>{disclaimer.text}</span>}
+          {disclaimerLinks.length > 0 && (
+            <span className={styles.homeFooterLinks}>
+              {disclaimerLinks.map((link, index) => (
+                <a key={`${link.label}-${index}`} href={link.url} target="_blank" rel="noopener noreferrer">
+                  {link.label}
+                </a>
+              ))}
+            </span>
+          )}
+        </footer>
+      )}
     </div>
   );
 };
@@ -264,6 +304,14 @@ export const ShoppingMuseV2 = () => {
   const homeProductsConfig = homeConfig.popularProducts || {};
   const homeVersion = museConfig.homeVersion;
   const showHome = homeVersion === 'v2' && messages.length === 0 && !isLoading;
+
+  useEffect(() => {
+    const blurredImageUrl = homeConfig.hero?.bluredImage;
+    if (!blurredImageUrl) return;
+
+    const image = new Image();
+    image.src = blurredImageUrl;
+  }, [homeConfig.hero?.bluredImage]);
 
   // Muse's cart mutations happen out-of-band (DY calls our cart API async on its own
   // timeline), so poll a couple of times after any turn instead of guessing one delay
@@ -657,7 +705,7 @@ export const ShoppingMuseV2 = () => {
           >
             {showHome ? (
               <MuseHomeV2
-                config={{ ...homeConfig, name: museName }}
+                config={{ ...homeConfig, name: museName, disclaimer: museConfig.disclaimer }}
                 products={homeProducts}
                 isLoadingProducts={isLoadingHomeProducts}
                 onSubmit={handleSendMessage}
