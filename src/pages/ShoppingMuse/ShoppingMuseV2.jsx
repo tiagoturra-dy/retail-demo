@@ -560,7 +560,7 @@ export const ShoppingMuseV2 = () => {
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
     if (isMuseOpen) {
-      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { dyType: 'muse-chat-open-v2' }, cart });
+      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { museVersion: 'muse-v2' }, cart });
     }
     return () => { document.body.style.overflow = ''; };
   }, [isMuseOpen, cart]);
@@ -608,7 +608,7 @@ export const ShoppingMuseV2 = () => {
     personalizationService.trackMuseEvent({
       name: 'Muse Message Sent',
       properties: {
-        dyType: 'muse-message-sent-v2',
+        museVersion: 'muse-v2',
         message: displayText || text,
         selectedProducts: selectedProducts.length,
         cartId
@@ -638,7 +638,7 @@ export const ShoppingMuseV2 = () => {
         personalizationService.trackMuseEvent({
           name: 'Muse Engagement',
           properties: {
-            dyType: 'muse-engagement-v2',
+            museVersion: 'muse-v2',
             widgetCount: response.widgets.length,
             selectedProducts: selectedProducts.length
           },

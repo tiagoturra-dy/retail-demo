@@ -454,7 +454,7 @@ export const ShoppingMuse = () => {
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
     if (isMuseOpen) {
-      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { dyType: 'muse-chat-open-v1' }, cart });
+      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { museVersion: 'muse-v1' }, cart });
     }
     return () => { document.body.style.overflow = ''; };
   }, [isMuseOpen]);
@@ -524,7 +524,7 @@ export const ShoppingMuse = () => {
     setInput('');
     setIsLoading(true);
 
-    personalizationService.trackMuseEvent({ name: 'Muse Message Sent', properties: { dyType: 'muse-message-sent-v1', message: displayText || text }, cart });
+    personalizationService.trackMuseEvent({ name: 'Muse Message Sent', properties: { museVersion: 'muse-v1', message: displayText || text }, cart });
 
     try {
       const response = await personalizationService.getMuseResponse({
@@ -541,7 +541,7 @@ export const ShoppingMuse = () => {
       };
 
       if (response.widgets && response.widgets.length > 0) {
-        personalizationService.trackMuseEvent({ name: 'Muse Engagement', properties: { dyType: 'muse-engagement-v1', widgetCount: response.widgets.length }, cart });
+        personalizationService.trackMuseEvent({ name: 'Muse Engagement', properties: { museVersion: 'muse-v1', widgetCount: response.widgets.length }, cart });
       }
 
       setMessages(prev => [...prev, botMessage]);
