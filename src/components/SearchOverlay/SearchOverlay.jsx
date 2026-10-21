@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { searchService } from '../../services/searchService';
 import styles from './SearchOverlay.module.css';
@@ -36,6 +36,7 @@ const constants = {
 
 export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = false, onOpen }) => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { openMuse } = useMuse();
   const { lang } = useCurrency();
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
@@ -65,8 +66,9 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
       }
     };
     fetchInitialSuggestions();
+  }, []);
 
-    // Fetch recommendations for empty state
+  useEffect(() => {
     const fetchRecommendations = async () => {
       try {
         const recs = await personalizationService.getRecommendations({
@@ -100,7 +102,7 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
       }
     };
     fetchRecommendations();
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (isOpen) {
@@ -386,13 +388,28 @@ export const SearchOverlay = ({ isOpen, onClose, initialQuery = '', embedded = f
                         product = {...product, ...product.productData}
                         delete product.productData;
                         return (
-                          <ProductCard key={product.sku} product={product} compact className={styles.searchResultItem} onClick={() => handleTrackClick(product)} />
+                          <ProductCard key={product.sku} product={product} compact className={styles.searchResultItem} onNavigate={onClose} />
                         );
                       })
                     ) : (
                       <div className={styles.searchEmpty}>{constants.loadingRecsText}</div>
                     )}
                   </div>
+
+                  {isMuse && recommendations.length > 0 && (
+                    <section className={styles.searchRecommendationsSection}>
+                      <h3 className={styles.searchSectionTitle}>{recsTitle ?? constants.recommendedTitle}</h3>
+                      <div className={styles.searchResultsList}>
+                        {recommendations.map((product) => {
+                          product = { ...product, ...product.productData };
+                          delete product.productData;
+                          return (
+                            <ProductCard key={product.sku} product={product} compact className={styles.searchResultItem} onNavigate={onClose} />
+                          );
+                        })}
+                      </div>
+                    </section>
+                  )}
 
                   {(results.length > 0 || (query.length < 3 && recommendations.length > 0)) && (
                     <div className={styles.searchViewAllContainer}>

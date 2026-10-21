@@ -167,6 +167,10 @@
     }
   }
 
+  .searchRecommendationsSection {
+    margin-top: 2rem;
+  }
+
   .searchResultItem {
     cursor: pointer;
     border-radius: 0 !important;
