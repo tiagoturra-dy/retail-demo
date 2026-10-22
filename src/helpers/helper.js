@@ -57,6 +57,10 @@ export const Helper = {
         const itemIds = cart.map(item => String(item.id))
         context = { type: 'CART', data: itemIds }
         break
+      case location.pathname === '/search':
+        const query = new URLSearchParams(location.search).get('q')
+        context = query ? { type: 'OTHER', data: [query] } : { type: 'OTHER' }
+        break
     }
     return context;
   },
