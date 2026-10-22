@@ -94,6 +94,18 @@ export const SearchResultsPage = () => {
     fetchResults();
   }, [fetchResults]);
 
+  useEffect(() => {
+    if (!query || typeof window.DY?.API !== 'function') return;
+
+    window.DY.API('event', {
+      name: 'Keyword Search',
+      properties: {
+        dyType: 'keyword-search-v1',
+        keywords: query
+      }
+    });
+  }, [query]);
+
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     if (page === 1) {

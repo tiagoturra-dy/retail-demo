@@ -25,6 +25,7 @@ export const DYManager = () => {
     if (window.DY && typeof window.DY.API === 'function') {
       window.DY.API('spa', {
         context: context,
+        url: window.location.href,
         countAsPageview: isRouteChange
       });
     }
