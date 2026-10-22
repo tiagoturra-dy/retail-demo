@@ -99,6 +99,18 @@ The cart management API provides endpoints to externally manage shopping carts i
 }
 ```
 
+The endpoint also accepts the camelCase cart payload used by external cart clients. An empty `lineItems` array clears the cart:
+
+```json
+{
+  "cartId": "cart_12345",
+  "lineItemsCount": 0,
+  "lineItems": []
+}
+```
+
+When `cartId` is supplied, it must match the `{id}` path parameter. When `lineItemsCount` is supplied, it must match the `lineItems` array length.
+
 **Response:**
 Same structure as Get Cart endpoint - returns the updated cart state.
 

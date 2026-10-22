@@ -704,7 +704,8 @@ app.get('/api/carts/:id', (req, res) => {
 app.put('/api/carts/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { line_items } = req.body;
+    const { cartId, lineItems, lineItemsCount, line_items: snakeCaseLineItems } = req.body;
+    const line_items = lineItems ?? snakeCaseLineItems;
 
     console.log('[PUT /api/carts/:id] Request received from:', req.get('origin') || 'unknown', {
       cartId: id,
@@ -717,6 +718,14 @@ app.put('/api/carts/:id', async (req, res) => {
       return res.status(400).json({ error: 'Invalid request: line_items must be an array' });
     }
 
+    if (cartId !== undefined && cartId !== id) {
+      return res.status(400).json({ error: 'cartId must match the cart ID in the request path' });
+    }
+
+    if (lineItemsCount !== undefined && lineItemsCount !== line_items.length) {
+      return res.status(400).json({ error: 'lineItemsCount must match the number of line items' });
+    }
+
     // Validate line items have item.id and quantity
     for (const item of line_items) {
       if (!item.item?.id || item.quantity === undefined) {
@@ -727,7 +736,9 @@ app.put('/api/carts/:id', async (req, res) => {
 
     // Get existing cart to merge with new items
     const existingCart = cartStore[id];
-    const mergedLineItems = existingCart ? [...existingCart.line_items] : [];
+    const mergedLineItems = line_items.length === 0
+      ? []
+      : existingCart ? [...existingCart.line_items] : [];
     
     // Process incoming items: add, update, remove, or decrement
     let totalAmount = 0;
