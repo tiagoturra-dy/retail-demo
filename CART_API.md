@@ -74,6 +74,8 @@ The cart management API provides endpoints to externally manage shopping carts i
 
 **Purpose:** Update cart contents
 
+The request body is the complete desired cart state. Items not present in the request are removed.
+
 **Parameters:**
 - `id` (path parameter): The cart ID
 

@@ -734,11 +734,8 @@ app.put('/api/carts/:id', async (req, res) => {
       }
     }
 
-    // Get existing cart to merge with new items
-    const existingCart = cartStore[id];
-    const mergedLineItems = line_items.length === 0
-      ? []
-      : existingCart ? [...existingCart.line_items] : [];
+    // PUT receives the complete cart state, so replace items omitted from the request.
+    const mergedLineItems = [];
     
     // Process incoming items: add, update, remove, or decrement
     let totalAmount = 0;
@@ -838,16 +835,6 @@ app.put('/api/carts/:id', async (req, res) => {
         totalAmount += itemPrice * finalQuantity;
       }
     }
-
-    // Calculate total including all items in merged cart
-    mergedLineItems.forEach(lineItem => {
-      // Skip items that were just processed (already counted)
-      if (line_items.find(li => li.item.id === lineItem.item.id && li.quantity !== 0)) {
-        return;
-      }
-      const price = parseFloat(lineItem.price.amount);
-      totalAmount += price * lineItem.quantity;
-    });
 
     const updatedCart = {
       cart_id: id,
