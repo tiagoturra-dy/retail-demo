@@ -9,6 +9,8 @@ import { createServer } from 'http';
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const imageProxyDestination = process.env.IMG_PROXY_DESTINATION
+  || 'https://objectstorage.us-ashburn-1.oraclecloud.com/n/idwcdpr2ujvo/b/se-demo/o/';
 
 // WebSocket subscriptions by cartId
 const cartSubscriptions = new Map();
@@ -912,6 +914,29 @@ app.delete('/api/carts/:id', (req, res) => {
   } catch (error) {
     console.error('[DELETE /api/carts/:id] Error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/img/*', async (req, res) => {
+  try {
+    const imagePath = req.params[0];
+
+    if (!imagePath || imagePath.includes('..')) {
+      return res.status(400).json({ error: 'Invalid image path' });
+    }
+
+    const upstreamResponse = await fetch(new URL(`img/${imagePath}`, imageProxyDestination));
+
+    if (!upstreamResponse.ok) {
+      return res.sendStatus(upstreamResponse.status);
+    }
+
+    res.set('Content-Type', upstreamResponse.headers.get('content-type') || 'application/octet-stream');
+    res.set('Cache-Control', 'public, max-age=3600, s-maxage=86400');
+    res.send(Buffer.from(await upstreamResponse.arrayBuffer()));
+  } catch (error) {
+    console.error('[/img] Image proxy error:', error);
+    res.status(502).json({ error: 'Unable to fetch image' });
   }
 });
 

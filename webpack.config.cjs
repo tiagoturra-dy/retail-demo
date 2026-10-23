@@ -111,7 +111,7 @@ module.exports = {
     hot: false, // HMR is disabled in AI Studio
     proxy: [
       {
-        context: ['/api'],
+        context: ['/api', '/img'],
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
