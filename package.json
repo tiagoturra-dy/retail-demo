@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://tiagoturra-dy.github.io/retail-demo",
+  "engines": {
+    "node": ">=24.22.1"
+  },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.cjs --mode production",
     "preview": "cross-env NODE_ENV=production webpack serve --config webpack.config.cjs --mode production",
