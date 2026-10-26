@@ -453,8 +453,11 @@ export const ShoppingMuse = () => {
   // Lock body scroll when panel is open
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
-    if (isMuseOpen) {
-      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { museVersion: 'muse-v1' }, cart });
+    if (isMuseOpen && window.DY && typeof window.DY.API === 'function') {
+      window.DY.API('event', {
+        name: 'Muse Chat Open',
+        properties: { museVersion: 'muse-v1' },
+      });
     }
     return () => { document.body.style.overflow = ''; };
   }, [isMuseOpen]);

@@ -559,11 +559,14 @@ export const ShoppingMuseV2 = () => {
 
   useEffect(() => {
     document.body.style.overflow = isMuseOpen ? 'hidden' : '';
-    if (isMuseOpen) {
-      personalizationService.trackMuseEvent({ name: 'Muse Chat Open', properties: { museVersion: 'muse-v2' }, cart });
+    if (isMuseOpen && window.DY && typeof window.DY.API === 'function') {
+      window.DY.API('event', {
+        name: 'Muse Chat Open',
+        properties: { museVersion: 'muse-v2' },
+      });
     }
     return () => { document.body.style.overflow = ''; };
-  }, [isMuseOpen, cart]);
+  }, [isMuseOpen]);
 
   useEffect(() => {
     if (!isMuseOpen) return;
