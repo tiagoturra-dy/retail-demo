@@ -22,6 +22,7 @@ Opens the Shopping Muse panel with optional configuration.
 | `disclaimer` | Object | Custom disclaimer text and links | See example below |
 | `homeVersion` | String | Select Muse V2 home: `'v1'` opens chat directly; `'v2'` shows configured home | `'v2'` |
 | `homeV2` | Object | Override the configured V2 home content for this open action | See runtime configuration |
+| `museResults` | String | Result product display for Muse V2: omit for carousels, or use `'list'` for one titleless product grid | `'list'` |
 
 ### Examples
 
@@ -51,6 +52,14 @@ window.__openMuse({
 window.__openMuse({
   version: 'v2',
   homeVersion: 'v2'
+});
+```
+
+**Open V2 with product list results:**
+```javascript
+window.__openMuse({
+  version: 'v2',
+  museResults: 'list'
 });
 ```
 
