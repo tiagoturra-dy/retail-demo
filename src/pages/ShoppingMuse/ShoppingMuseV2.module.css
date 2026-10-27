@@ -419,6 +419,13 @@
                   }
                 }
               }
+
+              .productList {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 1rem;
+                padding: 0.5rem 0.25rem;
+              }
             }
 
             .redirectButton {
@@ -973,6 +980,7 @@
     font-weight: 500;
     transition: all 0.2s;
     width: 100%;
+    box-sizing: border-box;
 
     &:hover {
       background-color: var(--color-zinc-200);
@@ -1021,6 +1029,10 @@
           .messageContent {
             .widgetsContainer {
               .widgetBlock {
+                .productList {
+                  grid-template-columns: 1fr;
+                }
+
                 .embla {
                   .emblaContainer {
                     .emblaSlide {

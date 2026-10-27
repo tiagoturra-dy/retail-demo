@@ -25,6 +25,11 @@ import styles from './ShoppingMuseV2.module.css';
 const ENABLE_TYPEWRITER = false;
 const MAX_SELECTED_PRODUCTS = 4;
 
+const hasRenderableMuseBlocks = (blocks) => blocks.some((block) => (
+  (block.type === 'recommendation' && block.data.some((item) => item.slots?.length > 0))
+  || (block.type === 'redirect' && block.data?.url)
+));
+
 const CONSTANTS = {
   TITLE: 'Personal Shopper',
   SUBTITLE: '',
@@ -94,32 +99,81 @@ const MuseCarousel = ({ slots, onProductSelect, selectedProducts, onNavigate, em
   );
 };
 
-const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate }) => {
+const MuseProductList = ({ slots, onProductSelect, selectedProducts, onNavigate }) => {
+  const handleSelectToggle = useCallback((e, product) => {
+    e.stopPropagation();
+    onProductSelect && onProductSelect(product);
+  }, [onProductSelect]);
+
+  return (
+    <div className={styles.productList}>
+      {slots.map((product, pIdx) => {
+        const productKey = product.id || product.sku || `product-${pIdx}`;
+        const isSelected = selectedProducts?.some(p => (p.id || p.sku) === productKey);
+        return (
+          <div key={`${productKey}-${pIdx}`} className={styles.productCardWrapper}>
+            <ProductCard
+              product={product}
+              compact={true}
+              addToCartPosition='bottom'
+              onNavigate={onNavigate}
+              hideAddToCart={true}
+            />
+            <button
+              className={`${styles.selectButton} ${isSelected ? styles.selectButtonActive : ''}`}
+              onClick={(e) => handleSelectToggle(e, product)}
+              aria-label="Select product"
+            >
+              <Check size={16} />
+              <span>{isSelected ? 'Selected' : 'Select'}</span>
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const MuseWidgetBlock = ({ widget, onProductSelect, selectedProducts, onNavigate, museResults }) => {
   const emblaApiRef = useRef(null);
+  const showList = museResults === 'list';
 
   const scrollPrev = useCallback(() => emblaApiRef.current?.scrollPrev(), []);
   const scrollNext = useCallback(() => emblaApiRef.current?.scrollNext(), []);
 
   return (
     <div className={styles.widgetBlock}>
-      <div className={styles.widgetHeader}>
-        {widget.title && <h4 className={styles.widgetTitle}>{widget.title}</h4>}
-        <div className={styles.widgetNavButtons}>
-          <button className={styles.widgetNavButton} onClick={scrollPrev} aria-label="Previous">
-            <ChevronLeft size={16} />
-          </button>
-          <button className={styles.widgetNavButton} onClick={scrollNext} aria-label="Next">
-            <ChevronRight size={16} />
-          </button>
+      {(widget.title || !showList) && (
+        <div className={styles.widgetHeader}>
+          {widget.title && <h4 className={styles.widgetTitle}>{widget.title}</h4>}
+          {!showList && (
+            <div className={styles.widgetNavButtons}>
+              <button className={styles.widgetNavButton} onClick={scrollPrev} aria-label="Previous">
+                <ChevronLeft size={16} />
+              </button>
+              <button className={styles.widgetNavButton} onClick={scrollNext} aria-label="Next">
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
-      </div>
-      <MuseCarousel
-        slots={widget.slots}
-        onProductSelect={onProductSelect}
-        selectedProducts={selectedProducts}
-        onNavigate={onNavigate}
-        emblaApiRef={emblaApiRef}
-      />
+      )}
+      {showList ? (
+        <MuseProductList
+          slots={widget.slots}
+          onProductSelect={onProductSelect}
+          selectedProducts={selectedProducts}
+          onNavigate={onNavigate}
+        />
+      ) : (
+        <MuseCarousel
+          slots={widget.slots}
+          onProductSelect={onProductSelect}
+          selectedProducts={selectedProducts}
+          onNavigate={onNavigate}
+          emblaApiRef={emblaApiRef}
+        />
+      )}
     </div>
   );
 };
@@ -300,6 +354,7 @@ export const ShoppingMuseV2 = () => {
   const langLabel = CURRENCY_OPTIONS.find(o => o.lang === lang)?.langLabel ?? lang;
   const MESSAGE_MAX_LEN = 150;
   const museName = museConfig.museName;
+  const museResults = museConfig.museResults;
   const homeConfig = museConfig.homeV2 || {};
   const homeProductsConfig = homeConfig.popularProducts || {};
   const homeVersion = museConfig.homeVersion;
@@ -775,10 +830,27 @@ export const ShoppingMuseV2 = () => {
                               </div>
                             </div>
 
-                            {msg.blocks && msg.blocks.length > 0 && ttsState?.msgId !== msg.id && (
+                            {msg.blocks && hasRenderableMuseBlocks(msg.blocks) && ttsState?.msgId !== msg.id && (
                               <div className={styles.widgetsContainer}>
+                                {museResults === 'list' && msg.blocks.some((block) => (
+                                  block.type === 'recommendation'
+                                  && block.data.some((item) => item.slots?.length > 0)
+                                )) && (
+                                  <MuseWidgetBlock
+                                    widget={{
+                                      slots: msg.blocks.flatMap((block) => block.type === 'recommendation'
+                                        ? block.data.flatMap((item) => item.slots || [])
+                                        : [])
+                                    }}
+                                    onProductSelect={handleProductSelect}
+                                    selectedProducts={selectedProducts}
+                                    onNavigate={closeMuse}
+                                    museResults={museResults}
+                                  />
+                                )}
                                 {msg.blocks.map((block, bIdx) => {
                                   if (block.type === 'recommendation') {
+                                    if (museResults === 'list') return null;
                                     return block.data.map((item, itemIdx) => {
                                       return (
                                         <MuseWidgetBlock
@@ -790,6 +862,7 @@ export const ShoppingMuseV2 = () => {
                                           onProductSelect={handleProductSelect}
                                           selectedProducts={selectedProducts}
                                           onNavigate={closeMuse}
+                                          museResults={museResults}
                                         />
                                       );
                                     });

@@ -10,6 +10,12 @@ const toBoolean = (value, fallback = false) => {
 };
 
 const getHomeVersion = (value) => value === 'v1' || value === 'v2' ? value : undefined;
+const getMuseResultsDisplay = (value) => value === 'list' ? 'list' : undefined;
+
+const getMuseResultsDisplayFromUrl = () => {
+  const params = new URLSearchParams(window.location.search);
+  return getMuseResultsDisplay(params.get('museResults'));
+};
 
 const getRuntimeMuseConfig = () => {
   const runtimeMuse = window.__dyRuntimeConfig?.muse;
@@ -41,6 +47,7 @@ const DEFAULT_CONFIG = {
   version: 'v1',
   museName: 'Personal Shopper',
   trendingQueries: [],
+  museResults: getMuseResultsDisplayFromUrl() || 'carousel',
   disclaimer: {
     text: 'Shopping Muse can make mistakes. Consider double-checking important information.',
     links: [
@@ -64,17 +71,19 @@ export const MuseProvider = ({ children }) => {
   const openMuse = useCallback((options = {}) => {
     if (!museConfig.enabled) return;
 
-    const { query, live, version, museName, trendingQueries, disclaimer, homeVersion, homeV2 } = options;
+    const { query, live, version, museName, trendingQueries, disclaimer, homeVersion, homeV2, museResults } = options;
     
     // Re-check URL param every time Muse is opened
     const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
     const finalVersion = version || (urlVersion === 'v1' || urlVersion === 'v2' ? urlVersion : undefined);
+    const finalMuseResults = getMuseResultsDisplay(museResults) || getMuseResultsDisplayFromUrl() || 'carousel';
     
     setMuseConfig(prev => ({
       ...prev,
       version: finalVersion || prev.version,
       museName: museName || prev.museName,
       trendingQueries: trendingQueries || prev.trendingQueries,
+      museResults: finalMuseResults,
       disclaimer: disclaimer || prev.disclaimer,
       homeVersion: getHomeVersion(homeVersion) || prev.homeVersion,
       homeV2: homeV2 && typeof homeV2 === 'object' ? homeV2 : prev.homeV2,
