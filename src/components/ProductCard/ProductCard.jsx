@@ -33,7 +33,7 @@ export const ProductCard = ({ product, compact = false, className = '', style, a
       style={style}
     >
       <div className={styles.productImageContainer}>
-        <Link to={`/product/${product.sku}`} className={styles.productCardLink} onClick={handleTrackClick} data-skyu={product.sku}>
+        <Link to={`/product/${product.sku}`} className={styles.productCardLink} onClick={handleTrackClick} data-sku={product.sku}>
           <img
             src={Helper.getProductImage(product.image_url)}
             alt={product.name}
