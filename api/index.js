@@ -516,7 +516,47 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Cart API health endpoint
+// Record every cart API request with a consistent, privacy-conscious shape.
+app.use('/api/carts', (req, res, next) => {
+  const pathSegments = req.path.split('/').filter(Boolean);
+  const reservedPaths = new Set(['debug', 'health', 'sync-log']);
+  const cartId = pathSegments[0] && !reservedPaths.has(pathSegments[0])
+    ? pathSegments[0]
+    : null;
+  const lineItems = req.body?.lineItems ?? req.body?.line_items;
+  const itemIds = req.method === 'GET' || !Array.isArray(lineItems)
+    ? undefined
+    : lineItems
+      .map((lineItem) => String(lineItem?.item?.id ?? lineItem?.id ?? ''))
+      .filter(Boolean);
+
+  res.on('finish', () => {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      cartId,
+      requester: req.get('origin') || req.get('x-forwarded-for')?.split(',')[0].trim() || req.ip || 'unknown',
+      operation: req.method,
+      status: res.statusCode
+    };
+
+    if (req.method === 'GET' && cartId) {
+      entry.itemIds = (cartStore[cartId]?.line_items ?? [])
+        .map((lineItem) => String(lineItem?.item?.id ?? lineItem?.id ?? ''))
+        .filter(Boolean);
+    } else if (req.method !== 'GET') {
+      entry.itemIds = itemIds ?? [];
+    }
+
+    cartSyncLog.push(entry);
+    if (cartSyncLog.length > 500) {
+      cartSyncLog.shift();
+    }
+    console.log('[CART API]', entry);
+  });
+
+  next();
+});
+
 // Cart sync log endpoint (for debugging)
 app.get('/api/carts/sync-log', (req, res) => {
   res.json({
@@ -558,18 +598,6 @@ const buildUcpMessage = (code, content, { type = 'error', severity } = {}) => {
   const message = { type, code, content };
   if (severity) message.severity = severity;
   return message;
-};
-
-// Log cart sync operation
-const logCartSync = (operation, cartId, details) => {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    operation,  // 'CREATE', 'UPDATE', 'FETCH', 'DELETE'
-    cartId,
-    ...details
-  };
-  cartSyncLog.push(entry);
-  console.log(`[CART SYNC] ${operation}:`, entry);
 };
 
 // Helper function to fetch product details by SKU from DY API
@@ -685,11 +713,8 @@ app.get('/api/carts/:id', (req, res) => {
   try {
     const { id } = req.params;
     
-    console.log('[GET /api/carts/:id] Fetching cart:', id);
-
     // The store is per-process. A missing cart is an empty cart after a cold start.
     const cart = cartStore[id];
-    logCartSync('FETCH', id, { found: !!cart, items: cart?.line_items?.length || 0 });
 
     res.json({
       cart_id: id,
@@ -697,7 +722,6 @@ app.get('/api/carts/:id', (req, res) => {
       total_estimate: cart ? cart.total_estimate : { amount: '0.00', currency: 'USD' }
     });
   } catch (error) {
-    console.error('[GET /api/carts/:id] Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -709,14 +733,7 @@ app.put('/api/carts/:id', async (req, res) => {
     const { cartId, lineItems, lineItemsCount, line_items: snakeCaseLineItems } = req.body;
     const line_items = lineItems ?? snakeCaseLineItems;
 
-    console.log('[PUT /api/carts/:id] Request received from:', req.get('origin') || 'unknown', {
-      cartId: id,
-      lineItemsCount: line_items?.length || 0,
-      lineItems: line_items
-    });
-
     if (!line_items || !Array.isArray(line_items)) {
-      console.error('[PUT /api/carts/:id] Invalid line_items:', line_items);
       return res.status(400).json({ error: 'Invalid request: line_items must be an array' });
     }
 
@@ -731,7 +748,6 @@ app.put('/api/carts/:id', async (req, res) => {
     // Validate line items have item.id and quantity
     for (const item of line_items) {
       if (!item.item?.id || item.quantity === undefined) {
-        console.error('[PUT /api/carts/:id] Invalid line item:', item);
         return res.status(400).json({ error: 'Each line item must have item.id (SKU) and quantity' });
       }
     }
@@ -849,32 +865,15 @@ app.put('/api/carts/:id', async (req, res) => {
 
     // Store the updated cart
     cartStore[id] = updatedCart;
-    logCartSync('UPDATE', id, { items: mergedLineItems.length, total: updatedCart.total_estimate.amount });
-
-    console.log('[PUT /api/carts/:id] Cart stored, subscribers count:', cartSubscriptions.get(id)?.size || 0);
 
     // Broadcast update to all subscribed clients
     broadcastCartUpdate(id, updatedCart);
-
-    console.log('[PUT /api/carts/:id] ✅ Response being sent to Muse:', {
-      cartId: id,
-      itemsCount: mergedLineItems.length,
-      itemsDetail: mergedLineItems.map(li => ({
-        id: li.id,
-        sku: li.item.id,
-        quantity: li.quantity,
-        price: li.price
-      })),
-      total: updatedCart.total_estimate.amount,
-      currency: updatedCart.total_estimate.currency
-    });
 
     res.json({
       ...updatedCart,
       ...(ucpMessages.length ? { messages: ucpMessages } : {})
     });
   } catch (error) {
-    console.error('[PUT /api/carts/:id] Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -902,17 +901,13 @@ app.delete('/api/carts/:id', (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log('[DELETE /api/carts/:id] Clearing cart:', id);
-
     // Delete cart from store
     if (cartStore[id]) {
       delete cartStore[id];
-      logCartSync('DELETE', id, { deleted: true });
     }
 
     res.json({ success: true, message: 'Cart cleared' });
   } catch (error) {
-    console.error('[DELETE /api/carts/:id] Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -196,6 +196,21 @@ const cartId = sessionStorage.getItem('cart_id');
 
 ---
 
+## Cart Request Logging
+
+Every `/api/carts` request is logged after its response completes. Each entry contains:
+
+- `timestamp`: ISO 8601 completion time
+- `cartId`: ID from the route, or `null` for collection and diagnostic routes
+- `requester`: request origin, forwarded client IP, direct client IP, or `unknown`
+- `operation`: HTTP method, such as `GET`, `PUT`, or `DELETE`
+- `status`: final HTTP response status
+- `itemIds`: for `GET`, the current stored item IDs for the requested cart; for other methods, IDs supplied in `lineItems` or `line_items`, or an empty array when no body item IDs exist
+
+The in-memory `/api/carts/sync-log` endpoint returns the latest 500 entries.
+
+---
+
 ## Cart Synchronization Flow
 
 1. **Initialization:** Cart ID is generated (nanoid) and stored in both localStorage and sessionStorage
