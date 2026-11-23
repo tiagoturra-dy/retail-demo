@@ -837,7 +837,7 @@ app.put('/api/carts/:id', async (req, res) => {
           item: {
             id: productDetails.id,
             sku: productDetails.sku,
-            name: productDetails.name,
+            title: productDetails.name,
             image_url: productDetails.image_url,
             brand: productDetails.brand
           },

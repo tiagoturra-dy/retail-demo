@@ -151,7 +151,7 @@ export const CartProvider = ({ children }) => {
           id: lineItem.item.id,
           quantity: lineItem.quantity,
           price: parseFloat(lineItem.price.amount),
-          name: lineItem.item.name || 'Product',
+          name: lineItem.item.title || lineItem.item.name || 'Product',
           image_url: lineItem.item.image_url || '',
           brand: lineItem.item.brand || ''
         }));
@@ -307,7 +307,7 @@ export const CartProvider = ({ children }) => {
         id: lineItem.item.id,
         quantity: lineItem.quantity,
         price: parseFloat(lineItem.price.amount),
-        name: lineItem.item.name || 'Product',
+        name: lineItem.item.title || lineItem.item.name || 'Product',
         image_url: lineItem.item.image_url || '',
         brand: lineItem.item.brand || ''
       }));
@@ -449,7 +449,8 @@ export const CartProvider = ({ children }) => {
     cart_id: cartId,
     line_items: cart.map((item) => ({
       item: {
-        id: String(item.id)
+        id: String(item.id),
+        title: item.name
       },
       quantity: item.quantity,
       price: {

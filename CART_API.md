@@ -45,7 +45,8 @@ The cart management API provides endpoints to externally manage shopping carts i
     {
       "id": "line_123",
       "item": {
-        "id": "SKU_123"
+        "id": "SKU_123",
+        "title": "Product title"
       },
       "quantity": 1,
       "price": {
@@ -158,8 +159,12 @@ const cartData = window.__getCartApi();
 // Returns:
 // {
 //   cart_id: "unique-cart-id",
-//   line_items: [...],
-//   total_estimate: { amount: "...", currency: "USD" }
+//   line_items: [{
+//     item: { id: "SKU_123", title: "Product title" },
+//     quantity: 1,
+//     price: { amount: "129.00", currency: "USD" }
+//   }],
+//   total_estimate: { amount: "129.00", currency: "USD" }
 // }
 ```
 
