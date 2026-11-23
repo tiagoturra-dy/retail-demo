@@ -36,8 +36,9 @@ export const CartProvider = ({ children }) => {
   // localStorage cart can't clobber a server cart updated by Muse in another session/tab
   const isHydratingRef = useRef(true);
   const isServerSyncRef = useRef(false);
-  // Prevent the cart effect from duplicating the explicit sync in addToCart.
-  const isAddToCartSyncRef = useRef(false);
+  // Prevent the cart effect from duplicating explicit cart syncs.
+  const isExplicitSyncRef = useRef(false);
+  const syncQueueRef = useRef(Promise.resolve());
   // Mirrors `cart` for reading the latest value outside of React's render/state-update cycle
   const cartRef = useRef(cart);
   useEffect(() => {
@@ -53,7 +54,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => registerResetHandler(clearCartId), [clearCartId, registerResetHandler]);
 
-  const syncCartToApi = async (cartItems = cart, currentCartId = cartId) => {
+  const putCartToApi = async (cartItems = cart, currentCartId = cartId) => {
     try {
       // Always send current cart state - empty array means empty cart, non-empty has all items
       const lineItems = cartItems.map((item) => ({
@@ -90,6 +91,14 @@ export const CartProvider = ({ children }) => {
       console.error('[syncCartToApi] Error syncing cart:', error);
       return null;
     }
+  };
+
+  const syncCartToApi = (cartItems = cart, currentCartId = cartId) => {
+    const request = syncQueueRef.current
+      .catch(() => null)
+      .then(() => putCartToApi(cartItems, currentCartId));
+    syncQueueRef.current = request;
+    return request;
   };
 
   const clearCartFromServer = async (currentCartId = cartId) => {
@@ -217,14 +226,14 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    if (!isWebSocketUpdateRef.current && !isServerSyncRef.current && !isAddToCartSyncRef.current) {
+    if (!isWebSocketUpdateRef.current && !isServerSyncRef.current && !isExplicitSyncRef.current) {
       console.log('[CartContext] Syncing cart to API');
       syncCartToApi(cart, cartId);
     }
     // Reset flags after check
     isWebSocketUpdateRef.current = false;
     isServerSyncRef.current = false;
-    isAddToCartSyncRef.current = false;
+    isExplicitSyncRef.current = false;
   }, [cart, cartId]);
 
   useEffect(() => {
@@ -336,7 +345,7 @@ export const CartProvider = ({ children }) => {
     setLastAdded(product);
 
     // Sync before a Muse request can read this cart through the /carts API.
-    isAddToCartSyncRef.current = true;
+    isExplicitSyncRef.current = true;
     syncCartToApi(newCart, cartId);
 
     // Trigger Dynamic Yield Event
@@ -391,14 +400,9 @@ export const CartProvider = ({ children }) => {
     }
 
     cartRef.current = updatedCart;
+    isExplicitSyncRef.current = true;
     setCart(updatedCart);
-
-    // The cart API merges updates, so omitting an item does not remove it.
-    // Include an explicit zero-quantity line item to remove it server-side.
-    syncCartToApi([
-      ...updatedCart,
-      { ...removedItem, quantity: 0 }
-    ], cartId);
+    syncCartToApi(updatedCart, cartId);
   };
 
   const updateQuantity = (productId, quantity) => {

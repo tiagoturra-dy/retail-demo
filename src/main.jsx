@@ -17,7 +17,7 @@ const getCartApiBaseUrl = () => (
   process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'
 );
 
-// Create the server cart before React renders, so external Muse calls can use it immediately.
+// Verify the server cart is reachable before React renders without overwriting existing state.
 const initializeCart = async () => {
   const existingCartId = localStorage.getItem('retail_cart_id');
   const cartId = existingCartId || nanoid();
@@ -31,12 +31,11 @@ const initializeCart = async () => {
   });
 
   const response = await fetch(`${getCartApiBaseUrl()}/api/carts/${cartId}`, {
-    method: 'PUT',
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       'x-api-key': process.env.REACT_APP_CART_API_KEY || ''
-    },
-    body: JSON.stringify({ line_items: [] })
+    }
   });
 
   if (!response.ok) {

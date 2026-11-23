@@ -3,6 +3,8 @@ import { useEffect, useRef, useCallback } from 'react';
 export const useCartWebSocket = (cartId, onCartUpdate) => {
   const wsRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
+  const reconnectTimeoutRef = useRef(null);
+  const shouldReconnectRef = useRef(false);
   const maxReconnectAttempts = 5;
   const reconnectDelayRef = useRef(1000);
   const onCartUpdateRef = useRef(onCartUpdate); // Capture callback in ref
@@ -34,8 +36,8 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
   }, []);
 
   const connect = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      return; // Already connected
+    if (!shouldReconnectRef.current || wsRef.current?.readyState === WebSocket.OPEN) {
+      return;
     }
 
     try {
@@ -93,16 +95,18 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
       wsRef.current.onclose = () => {
         console.log('[useCartWebSocket] Disconnected');
 
-        // Keep retrying forever (capped backoff) - a cart update can otherwise be missed
-        // permanently since the cartId never changes and nothing else would reconnect us
+        if (!shouldReconnectRef.current) {
+          return;
+        }
+
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current += 1;
           console.log(`[useCartWebSocket] Reconnecting... (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
         } else {
           console.warn('[useCartWebSocket] Max reconnection attempts reached, continuing to retry at max interval');
         }
-        setTimeout(connect, reconnectDelayRef.current);
-        reconnectDelayRef.current = Math.min(reconnectDelayRef.current * 2, 10000); // Exponential backoff, max 10s
+        reconnectTimeoutRef.current = setTimeout(connect, reconnectDelayRef.current);
+        reconnectDelayRef.current = Math.min(reconnectDelayRef.current * 2, 10000);
       };
     } catch (error) {
       console.error('[useCartWebSocket] Error creating WebSocket:', error);
@@ -110,9 +114,19 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
   }, [cartId, getWebSocketUrl]);
 
   const disconnect = useCallback(() => {
+    shouldReconnectRef.current = false;
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
     if (wsRef.current) {
-      wsRef.current.close();
+      const socket = wsRef.current;
       wsRef.current = null;
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onerror = null;
+      socket.onclose = null;
+      socket.close();
     }
   }, []);
 
@@ -126,23 +140,20 @@ export const useCartWebSocket = (cartId, onCartUpdate) => {
   }, [cartId]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    // Only connect if we have a cartId
     if (cartId) {
       console.log('[useCartWebSocket] Setting up WebSocket for cartId:', cartId);
+      shouldReconnectRef.current = true;
       connect();
     } else {
       console.log('[useCartWebSocket] No cartId provided, skipping WebSocket connection');
     }
 
     return () => {
-      isMounted = false;
       console.log('[useCartWebSocket] Cleaning up WebSocket for cartId:', cartId);
       unsubscribe();
       disconnect();
     };
-  }, [cartId]); // Only reconnect when cartId changes
+  }, [cartId, connect, disconnect, unsubscribe]);
 
   return {
     isConnected: wsRef.current?.readyState === WebSocket.OPEN,
