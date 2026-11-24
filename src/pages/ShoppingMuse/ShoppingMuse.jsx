@@ -271,7 +271,7 @@ export const ShoppingMuse = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [enableGroq, setEnableGroq] = useState(false);
+  const enableGroq = false;
   const [isLiveMic, setIsLiveMic] = useState(false);
   const isLiveMicRef = useRef(false);
   const isSpeakingRef = useRef(false);
@@ -633,13 +633,6 @@ export const ShoppingMuse = () => {
           </div>
           <p className={styles.subtitle}>{CONSTANTS.SUBTITLE}</p>
           <div className={styles.headerActions}>
-            <button
-              onClick={() => setEnableGroq(v => !v)}
-              className={`${styles.groqToggle} ${enableGroq ? styles.groqToggleOn : ''}`}
-              title={enableGroq ? 'Groq mode — click to use legacy Muse' : 'Legacy mode — click to use Groq'}
-            >
-              {enableGroq ? 'G+M' : 'M'}
-            </button>
             <button
               onClick={handleReset}
               className={styles.resetButton}
