@@ -769,7 +769,7 @@ export const ShoppingMuse = () => {
 export const ShoppingMuseWrapper = () => {
   const { isMuseOpen, museConfig } = useMuse();
 
-  if (!isMuseOpen || !museConfig.enabled) return null;
+  if (!museConfig.enabled) return null;
 
   // Check URL param first
   const urlVersion = new URLSearchParams(window.location.search).get('museVersion');
@@ -777,7 +777,7 @@ export const ShoppingMuseWrapper = () => {
     return <ShoppingMuseV2 />;
   }
   if (urlVersion === 'v1') {
-    return <ShoppingMuse />;
+    return isMuseOpen ? <ShoppingMuse /> : null;
   }
 
   if (museConfig.version === 'v2') {
@@ -785,5 +785,5 @@ export const ShoppingMuseWrapper = () => {
   }
 
   // Default to V1
-  return <ShoppingMuse />;
+  return isMuseOpen ? <ShoppingMuse /> : null;
 };

@@ -411,18 +411,18 @@ export const ShoppingMuseV2 = () => {
   }, [isMuseOpen, showHome, homeProductsConfig.selector, homeProductsConfig.limit, cart]);
 
   useEffect(() => {
-    if (!messagesListRef.current) return;
+    if (!isMuseOpen || !messagesListRef.current) return;
     const list = messagesListRef.current;
     // Scroll to bottom after a small delay to allow animations to complete
     const t = setTimeout(() => {
       list.scrollTop = list.scrollHeight;
     }, 100);
     return () => clearTimeout(t);
-  }, [messages, isLoading]);
+  }, [isMuseOpen, messages, isLoading]);
 
   useEffect(() => {
-    if (!isLoading) inputRef.current?.focus();
-  }, [isLoading]);
+    if (isMuseOpen && !isLoading) inputRef.current?.focus();
+  }, [isMuseOpen, isLoading]);
 
   const speakBotMessage = useCallback((text, msgId) => {
     if (!window.speechSynthesis) return;
@@ -485,6 +485,13 @@ export const ShoppingMuseV2 = () => {
     ttsMsgRef.current = null;
     isSpeakingRef.current = false;
   }, []);
+
+  const handleClose = () => {
+    liveMicButtonRef.current?.stop();
+    isLiveMicRef.current = false;
+    interruptSpeech();
+    closeMuse();
+  };
 
   const appendBotMessage = useCallback((text, widgets = [], blocks = []) => {
     const botMessage = {
@@ -628,8 +635,8 @@ export const ShoppingMuseV2 = () => {
     if (pendingQuery !== null) {
       const { query: q } = pendingQuery;
       clearPendingQuery();
-      if (lastProcessedQueryRef.current === q) return;
-      lastProcessedQueryRef.current = q;
+      if (lastProcessedQueryRef.current === pendingQuery) return;
+      lastProcessedQueryRef.current = pendingQuery;
       if (q) {
         handleSendMessage(q);
       } else if (homeVersion === 'v1' && messages.length === 0) {
@@ -752,7 +759,7 @@ export const ShoppingMuseV2 = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={closeMuse}
+            onClick={handleClose}
           />
           <motion.div
             className={styles.panel}
@@ -767,7 +774,7 @@ export const ShoppingMuseV2 = () => {
                 products={homeProducts}
                 isLoadingProducts={isLoadingHomeProducts}
                 onSubmit={handleSendMessage}
-                onClose={closeMuse}
+                onClose={handleClose}
               />
             ) : (
               <>
@@ -788,7 +795,7 @@ export const ShoppingMuseV2 = () => {
                     <RotateCcw size={18} />
                   </button>
                   <button
-                    onClick={closeMuse}
+                    onClick={handleClose}
                     className={styles.closeButton}
                     title="Close"
                   >
@@ -844,7 +851,7 @@ export const ShoppingMuseV2 = () => {
                                     }}
                                     onProductSelect={handleProductSelect}
                                     selectedProducts={selectedProducts}
-                                    onNavigate={closeMuse}
+                                    onNavigate={handleClose}
                                     museResults={museResults}
                                   />
                                 )}
@@ -861,7 +868,7 @@ export const ShoppingMuseV2 = () => {
                                           }}
                                           onProductSelect={handleProductSelect}
                                           selectedProducts={selectedProducts}
-                                          onNavigate={closeMuse}
+                                          onNavigate={handleClose}
                                           museResults={museResults}
                                         />
                                       );

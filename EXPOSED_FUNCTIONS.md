@@ -8,6 +8,8 @@ This document describes the global functions exposed by the retail demo applicat
 
 Opens the Shopping Muse panel with optional configuration.
 
+Muse V2 reopens the existing conversation during the current page lifetime. A page reload or Muse version change clears the displayed history. Calling with `query` adds a new message to the conversation.
+
 ### Parameters
 
 `options` (Object) - Configuration object with the following properties:
